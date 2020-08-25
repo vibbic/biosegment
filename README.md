@@ -8,5 +8,5 @@ conda activate biosegment
 
 ## Run development
 ```
-python app/main2.py
+PYTHONPATH=app/plotly-common python app/main2.py
 ```
