@@ -1,0 +1,3 @@
+[submodule "app/plotly-common"]
+	path = app/plotly-common
+	url = https://github.com/nicholas-esterer/plotly-common.git
