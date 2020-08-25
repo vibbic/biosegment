@@ -1,0 +1,43 @@
+flowchart LR
+    subgraph disk[Dataset in disk storage]
+    ann[(annotations)]
+    raw[(raw data)]
+    end
+
+    subgraph model[AI server]
+    GPU[(GPU)]
+    saved_models
+    saved_models--> |Load model|Inference_run
+    saved_models--> |Load model|Training_run
+    Inference_run <--> GPU
+    Training_run <--> GPU
+    Training_run-->|Save retrained model|saved_models
+    
+    end
+
+    subgraph backend
+    b1[UI server]
+    raw-->b1
+    ann-->b1
+    b1-->|Upload new annotations|ann
+    b1-->|Train model with data and annotation|Training_run
+    b1-->|Infer new annotation|Inference_run
+    end
+
+    subgraph frontend
+    UI
+    UI-->|Commands/Edits|b1
+    b1-->|Vizualizations|UI
+    subgraph uis[UI's]
+    UI
+    Catmaid
+    ...
+    end
+    end
+
+    user_bio[Scientist]
+    user_bio-->|Upload new data|raw
+    user_bio<-->|Interact via website|UI
+
+    user_ai[AI engineer]
+    user_ai-->|Upload new models|saved_models
