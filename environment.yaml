@@ -4,14 +4,13 @@ channels:
   - defaults
 dependencies:
   - python>=3.7
+  # backend
   - fastapi>=0.58.1
-  # - uvicorn>=0.11.5
-  - gunicorn>=20.0.4
+  - uvicorn>=0.11.3
+  - sqlalchemy>=1.3.19
+  # frontend
   - dash>=1.10.2
   - dash-bootstrap-components>=0.10.5
   - pandas>=1.1.0
   - pillow>=7.2.0
   - scikit-image>=0.16.2
-  - pip
-  - pip:
-    - uvicorn
