@@ -2,7 +2,7 @@ from biosegment_frontend.utils import get_folder_list
 
 from PIL import Image
 from skimage import io as skio
-from image_utils import label_to_colors
+from biosegment_frontend.image_utils import label_to_colors
 
 class Dataset:
 

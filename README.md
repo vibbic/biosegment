@@ -8,5 +8,5 @@ conda activate biosegment
 
 ## Run development
 ```
-PYTHONPATH=app/plotly-common python app/main2.py
+uvicorn main:backend_app --reload
 ```
