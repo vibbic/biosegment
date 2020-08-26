@@ -1,43 +1,52 @@
 from Dataset import Dataset
 
-class DatasetStore:
+class DatasetStore(object):
+
+    __instance = None
+    available = [
+        {
+            "name": "EMBL Raw",
+            "slices": "data/EM/EMBL/raw/",
+            "labels": "data/EM/EMBL/labels/"
+        },
+        {
+            "name": "EMBL Test",
+            "slices": "data/EM/EMBL/test/",
+            "labels": "data/EM/EMBL/test_labels/"
+        },
+        {
+            "name": "EMBL Validation",
+            "slices": "data/EM/EMBL/val/",
+            "labels": "data/EM/EMBL/val_labels/"
+        },
+        {
+            "name": "EMBL Training",
+            "slices": "data/EM/EMBL/train/",
+            "labels": "data/EM/EMBL/train_labels/"
+        }
+    ]
 
     def __init__(self):
-        self.available = [
-            {
-                "name": "EMBL Raw",
-                "slices": "data/EM/EMBL/raw/",
-                "labels": "data/EM/EMBL/labels/"
-            },
-            {
-                "name": "EMBL Test",
-                "slices": "data/EM/EMBL/test/",
-                "labels": "data/EM/EMBL/test_labels/"
-            },
-            {
-                "name": "EMBL Validation",
-                "slices": "data/EM/EMBL/val/",
-                "labels": "data/EM/EMBL/val_labels/"
-            },
-            {
-                "name": "EMBL Training",
-                "slices": "data/EM/EMBL/train/",
-                "labels": "data/EM/EMBL/train_labels/"
-            }
-        ]
-        self.selected = "EMBL Raw"
+        """ Virtually private constructor. """
+        if DatasetStore.__instance != None:
+            raise Exception("This class is a singleton!")
+        else:
+            DatasetStore.__instance = self
 
-    def set_selection(self, name):
-        self.selected = name
+    @staticmethod 
+    def getInstance():
+        """ Static access method. """
+        if DatasetStore.__instance == None:
+            DatasetStore()
+        return DatasetStore.__instance
 
-    def get_names_available(self):
-        return [d["name"] for d in self.available]
+    @staticmethod
+    def get_names_available():
+        return [d["name"] for d in DatasetStore.available]
 
-    def get_selected_dataset(self):
-        return self.get_dataset(self.selected)
-
-    def get_dataset(self, name):
-        metadata = [d for d in self.available if d["name"] == name][0]
+    @staticmethod
+    def get_dataset(name):
+        metadata = [d for d in DatasetStore.available if d["name"] == name][0]
         return Dataset(
             slices_folder=metadata["slices"], 
             labels_folder=metadata["labels"])
