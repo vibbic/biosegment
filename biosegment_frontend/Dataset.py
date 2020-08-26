@@ -1,4 +1,4 @@
-from utils import get_folder_list
+from biosegment_frontend.utils import get_folder_list
 
 from PIL import Image
 from skimage import io as skio

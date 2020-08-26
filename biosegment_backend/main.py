@@ -2,10 +2,9 @@ from fastapi import FastAPI
 
 app = FastAPI(title="BioSegment")
 
-@app.get("/")
+@app.get("/hello")
 def read_root():
     return {"Hello": "World"}
-
 
 @app.get("/items/{item_id}")
 def read_item(item_id: int, q: str = None):

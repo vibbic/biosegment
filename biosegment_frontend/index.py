@@ -3,8 +3,8 @@ import dash_html_components as html
 from dash.dependencies import Input, Output
 import dash_bootstrap_components as dbc
 
-from app import app
-from pages import (
+from biosegment_frontend.app import app
+from biosegment_frontend.pages import (
     Viewer2DPage
 )
 

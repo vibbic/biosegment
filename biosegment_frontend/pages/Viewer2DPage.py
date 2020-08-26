@@ -2,9 +2,9 @@ import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output
 
-from app import app
-from DatasetStore import DatasetStore
-from components.Viewer2D import Viewer2D
+from biosegment_frontend.app import app
+from biosegment_frontend.DatasetStore import DatasetStore
+from biosegment_frontend.components.Viewer2D import Viewer2D
 
 title="Viewer 2D"
 path="/"

@@ -3,11 +3,11 @@ import dash_core_components as dcc
 from dash.dependencies import Input, Output, State
 import plotly.graph_objects as go
 
-from app import app
-from Dataset import Dataset
-from DatasetStore import DatasetStore
+from biosegment_frontend.app import app
+from biosegment_frontend.Dataset import Dataset
+from biosegment_frontend.DatasetStore import DatasetStore
 
-from components.BasicComponent import BasicComponent
+from biosegment_frontend.components.BasicComponent import BasicComponent
 
 def add_layout_images_to_fig(fig, dataset, slice_id, update_ranges=True):
     """ images is a sequence of PIL Image objects """

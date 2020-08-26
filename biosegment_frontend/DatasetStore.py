@@ -1,4 +1,4 @@
-from Dataset import Dataset
+from biosegment_frontend.Dataset import Dataset
 
 class DatasetStore(object):
 
