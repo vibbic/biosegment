@@ -1,14 +1,10 @@
-FROM tiangolo/uvicorn-gunicorn-fastapi:python3.7
+FROM continuumio/miniconda3
 
-# Install Poetry
-RUN curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | POETRY_HOME=/opt/poetry python && \
-    cd /usr/local/bin && \
-    ln -s /opt/poetry/bin/poetry && \
-    poetry config virtualenvs.create false
+WORKDIR /code
 
-# Copy using poetry.lock* in case it doesn't exist yet
-COPY ./app/pyproject.toml ./app/poetry.lock* /app/
+COPY environment.yaml .
 
-RUN poetry install --no-root --no-dev
+# Create the environment:
+RUN /opt/conda/bin/conda env create -n biosegment -f environment.yaml 
 
-COPY ./app /app
+ENV PATH /opt/conda/envs/biosegment/bin:$PATH
