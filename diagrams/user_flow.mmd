@@ -1,0 +1,17 @@
+flowchart LR
+    open[Open dataset]
+    ann[Open annotation]
+    edit_ann[Edit annotation]
+    new_ann[Create new annotation]
+    new_model[Create new model]
+    train[Train model on annotation]
+    infer[infer annotation with model]
+
+    open --> ann
+    ann --> edit_ann
+    edit_ann --> new_ann
+    ann --> train --> new_model
+    open --> infer 
+    ann --> infer --> new_ann
+    new_ann --> ann
+    new_model --> infer
