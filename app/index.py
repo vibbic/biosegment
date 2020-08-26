@@ -5,11 +5,11 @@ import dash_bootstrap_components as dbc
 
 from app import app
 from pages import (
-    Viewer2D
+    Viewer2DPage
 )
 
 pages = [
-    Viewer2D
+    Viewer2DPage
 ]
 
 SIDEBAR_STYLE = {
