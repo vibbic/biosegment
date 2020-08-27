@@ -11,7 +11,8 @@ services:
       - POSTGRES_DB=test_db
   web:
     build: .
-    command: bash -c "alembic upgrade head && uvicorn main:backend_app --host 0.0.0.0 --port 8000 --reload"
+    # command: bash -c "alembic upgrade head && uvicorn main:backend_app --host 0.0.0.0 --port 8000 --reload"
+    command: bash -c "uvicorn main:backend_app --host 0.0.0.0 --port 8000 --reload"
     volumes:
       - .:/code
     ports:

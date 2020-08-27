@@ -2,7 +2,7 @@ from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from ..database import Base
+from ..db.base import Base
 from ..main import app, get_db
 
 
@@ -34,7 +34,7 @@ def test_create_user():
     response = client.post(
         "/users/",
         json={
-            "name": "Deadpool",
+            "full_name": "Deadpool",
             "email": "deadpool@example.com", 
             "password": "chimichangas4life"
         },
@@ -53,7 +53,18 @@ def test_create_user():
 
 def test_create_project():
     response = client.post(
-        "/users/1/projects/",
+        "/users/",
+        json={
+            "full_name": "Deadpool",
+            "email": "deadpool2@example.com", 
+            "password": "chimichangas4life"
+        },
+    )
+    data = response.json()
+    user_id = data["id"]
+
+    response = client.post(
+        f"/users/{user_id}/projects/",
         json={
             "name": "Project Red"
         },
