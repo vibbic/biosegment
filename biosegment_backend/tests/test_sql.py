@@ -33,7 +33,11 @@ client = TestClient(app)
 def test_create_user():
     response = client.post(
         "/users/",
-        json={"email": "deadpool@example.com", "password": "chimichangas4life"},
+        json={
+            "name": "Deadpool",
+            "email": "deadpool@example.com", 
+            "password": "chimichangas4life"
+        },
     )
     assert response.status_code == 200, response.text
     data = response.json()
@@ -46,3 +50,22 @@ def test_create_user():
     data = response.json()
     assert data["email"] == "deadpool@example.com"
     assert data["id"] == user_id
+
+def test_create_project():
+    response = client.post(
+        "/users/1/projects/",
+        json={
+            "name": "Project Red"
+        },
+    )
+    assert response.status_code == 200, response.text
+    data = response.json()
+    assert data["name"] == "Project Red"
+    assert "id" in data
+    project_id = data["id"]
+
+    response = client.get(f"/projects/{project_id}")
+    assert response.status_code == 200, response.text
+    data = response.json()
+    assert data["name"] == "Project Red"
+    assert data["id"] == project_id

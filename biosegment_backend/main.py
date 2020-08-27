@@ -22,6 +22,27 @@ def get_db():
     finally:
         db.close()
 
+@app.post("/users/{user_id}/projects/", response_model=schemas.Project)
+def create_project(user_id: int, project: schemas.ProjectCreate, db: Session = Depends(get_db)):
+    db_project = crud.get_project_by_name(db, name=project.name)
+    if db_project:
+        raise HTTPException(status_code=400, detail="Name already registered")
+    return crud.create_project(db=db, project=project, user_id=user_id)
+
+
+@app.get("/projects/", response_model=List[schemas.Project])
+def read_projects(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+    projects = crud.get_projects(db, skip=skip, limit=limit)
+    return projects
+
+
+@app.get("/projects/{project_id}", response_model=schemas.Project)
+def read_project(project_id: int, db: Session = Depends(get_db)):
+    db_project = crud.get_project(db, project_id=project_id)
+    if db_project is None:
+        raise HTTPException(status_code=404, detail="Project not found")
+    return db_project
+
 @app.post("/users/", response_model=schemas.User)
 def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     db_user = crud.get_user_by_email(db, email=user.email)
