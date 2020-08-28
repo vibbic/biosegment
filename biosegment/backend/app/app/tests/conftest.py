@@ -13,7 +13,11 @@ from app.tests.utils.utils import get_superuser_token_headers
 
 @pytest.fixture(scope="session")
 def db() -> Generator:
-    yield SessionLocal()
+    db = SessionLocal()
+    # not sure if this is needed to reload database changes during development
+    # from app.db.init_db import init_db
+    # init_db(db)
+    yield db
 
 
 @pytest.fixture(scope="module")

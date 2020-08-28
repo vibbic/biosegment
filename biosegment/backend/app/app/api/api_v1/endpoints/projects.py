@@ -38,7 +38,9 @@ def create_project(
     """
     Create new project.
     """
-    project = crud.project.create_with_owner(db=db, obj_in=project_in, owner_id=current_user.id)
+    project = crud.project.create_with_owner(
+        db=db, obj_in=project_in, owner_id=current_user.id
+    )
     return project
 
 
@@ -56,7 +58,9 @@ def update_project(
     project = crud.project.get(db=db, id=id)
     if not project:
         raise HTTPException(status_code=404, detail="Project not found")
-    if not crud.user.is_superuser(current_user) and (project.owner_id != current_user.id):
+    if not crud.user.is_superuser(current_user) and (
+        project.owner_id != current_user.id
+    ):
         raise HTTPException(status_code=400, detail="Not enough permissions")
     project = crud.project.update(db=db, db_obj=project, obj_in=project_in)
     return project
@@ -75,7 +79,9 @@ def read_project(
     project = crud.project.get(db=db, id=id)
     if not project:
         raise HTTPException(status_code=404, detail="Project not found")
-    if not crud.user.is_superuser(current_user) and (project.owner_id != current_user.id):
+    if not crud.user.is_superuser(current_user) and (
+        project.owner_id != current_user.id
+    ):
         raise HTTPException(status_code=400, detail="Not enough permissions")
     return project
 
@@ -93,7 +99,9 @@ def delete_project(
     project = crud.project.get(db=db, id=id)
     if not project:
         raise HTTPException(status_code=404, detail="Project not found")
-    if not crud.user.is_superuser(current_user) and (project.owner_id != current_user.id):
+    if not crud.user.is_superuser(current_user) and (
+        project.owner_id != current_user.id
+    ):
         raise HTTPException(status_code=400, detail="Not enough permissions")
     project = crud.project.remove(db=db, id=id)
     return project
