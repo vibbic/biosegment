@@ -9,7 +9,7 @@ class DatasetBase(BaseModel):
     title: Optional[str] = None
     description: Optional[str] = None
     file_type: Optional[str] = None
-    file_location: Optional[str] = None
+    location: Optional[str] = None
     resolution_x: Optional[int] = None
     resolution_y: Optional[int] = None
     resolution_z: Optional[int] = None
