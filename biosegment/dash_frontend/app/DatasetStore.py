@@ -2,27 +2,29 @@ from app.Dataset import Dataset
 
 class DatasetStore(object):
 
+    DATA_PREFIX = "/data/"
+
     __instance = None
     available = [
         {
             "name": "EMBL Raw",
-            "slices": "data/EM/EMBL/raw/",
-            "labels": "data/EM/EMBL/labels/"
+            "slices": f"{DATA_PREFIX}EMBL/raw/",
+            "labels": f"{DATA_PREFIX}EMBL/labels/"
         },
         {
             "name": "EMBL Test",
-            "slices": "data/EM/EMBL/test/",
-            "labels": "data/EM/EMBL/test_labels/"
+            "slices": f"{DATA_PREFIX}EMBL/test/",
+            "labels": f"{DATA_PREFIX}EMBL/test_labels/"
         },
         {
             "name": "EMBL Validation",
-            "slices": "data/EM/EMBL/val/",
-            "labels": "data/EM/EMBL/val_labels/"
+            "slices": f"{DATA_PREFIX}EMBL/val/",
+            "labels": f"{DATA_PREFIX}EMBL/val_labels/"
         },
         {
             "name": "EMBL Training",
-            "slices": "data/EM/EMBL/train/",
-            "labels": "data/EM/EMBL/train_labels/"
+            "slices": f"{DATA_PREFIX}EMBL/train/",
+            "labels": f"{DATA_PREFIX}EMBL/train_labels/"
         }
     ]
 
