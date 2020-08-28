@@ -11,7 +11,9 @@ def test_create_annotation(db: Session) -> None:
     description = random_lower_string()
     annotation_in = AnnotationCreate(title=title, description=description)
     user = create_random_user(db)
-    annotation = crud.annotation.create_with_owner(db=db, obj_in=annotation_in, owner_id=user.id)
+    annotation = crud.annotation.create_with_owner(
+        db=db, obj_in=annotation_in, owner_id=user.id
+    )
     assert annotation.title == title
     assert annotation.description == description
     assert annotation.owner_id == user.id
@@ -22,7 +24,9 @@ def test_get_annotation(db: Session) -> None:
     description = random_lower_string()
     annotation_in = AnnotationCreate(title=title, description=description)
     user = create_random_user(db)
-    annotation = crud.annotation.create_with_owner(db=db, obj_in=annotation_in, owner_id=user.id)
+    annotation = crud.annotation.create_with_owner(
+        db=db, obj_in=annotation_in, owner_id=user.id
+    )
     stored_annotation = crud.annotation.get(db=db, id=annotation.id)
     assert stored_annotation
     assert annotation.id == stored_annotation.id
@@ -36,10 +40,14 @@ def test_update_annotation(db: Session) -> None:
     description = random_lower_string()
     annotation_in = AnnotationCreate(title=title, description=description)
     user = create_random_user(db)
-    annotation = crud.annotation.create_with_owner(db=db, obj_in=annotation_in, owner_id=user.id)
+    annotation = crud.annotation.create_with_owner(
+        db=db, obj_in=annotation_in, owner_id=user.id
+    )
     description2 = random_lower_string()
     annotation_update = AnnotationUpdate(description=description2)
-    annotation2 = crud.annotation.update(db=db, db_obj=annotation, obj_in=annotation_update)
+    annotation2 = crud.annotation.update(
+        db=db, db_obj=annotation, obj_in=annotation_update
+    )
     assert annotation.id == annotation2.id
     assert annotation.title == annotation2.title
     assert annotation2.description == description2
@@ -51,7 +59,9 @@ def test_delete_annotation(db: Session) -> None:
     description = random_lower_string()
     annotation_in = AnnotationCreate(title=title, description=description)
     user = create_random_user(db)
-    annotation = crud.annotation.create_with_owner(db=db, obj_in=annotation_in, owner_id=user.id)
+    annotation = crud.annotation.create_with_owner(
+        db=db, obj_in=annotation_in, owner_id=user.id
+    )
     annotation2 = crud.annotation.remove(db=db, id=annotation.id)
     annotation3 = crud.annotation.get(db=db, id=annotation.id)
     assert annotation3 is None

@@ -10,7 +10,9 @@ def test_create_annotation(
 ) -> None:
     data = {"title": "Foo", "description": "Fighters"}
     response = client.post(
-        f"{settings.API_V1_STR}/annotations/", headers=superuser_token_headers, json=data,
+        f"{settings.API_V1_STR}/annotations/",
+        headers=superuser_token_headers,
+        json=data,
     )
     assert response.status_code == 200
     content = response.json()
@@ -25,7 +27,8 @@ def test_read_annotation(
 ) -> None:
     annotation = create_random_annotation(db)
     response = client.get(
-        f"{settings.API_V1_STR}/annotations/{annotation.id}", headers=superuser_token_headers,
+        f"{settings.API_V1_STR}/annotations/{annotation.id}",
+        headers=superuser_token_headers,
     )
     assert response.status_code == 200
     content = response.json()

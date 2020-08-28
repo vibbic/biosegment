@@ -38,7 +38,9 @@ def create_annotation(
     """
     Create new annotation.
     """
-    annotation = crud.annotation.create_with_owner(db=db, obj_in=annotation_in, owner_id=current_user.id)
+    annotation = crud.annotation.create_with_owner(
+        db=db, obj_in=annotation_in, owner_id=current_user.id
+    )
     return annotation
 
 
@@ -56,7 +58,9 @@ def update_annotation(
     annotation = crud.annotation.get(db=db, id=id)
     if not annotation:
         raise HTTPException(status_code=404, detail="Annotation not found")
-    if not crud.user.is_superuser(current_user) and (annotation.owner_id != current_user.id):
+    if not crud.user.is_superuser(current_user) and (
+        annotation.owner_id != current_user.id
+    ):
         raise HTTPException(status_code=400, detail="Not enough permissions")
     annotation = crud.annotation.update(db=db, db_obj=annotation, obj_in=annotation_in)
     return annotation
@@ -75,7 +79,9 @@ def read_annotation(
     annotation = crud.annotation.get(db=db, id=id)
     if not annotation:
         raise HTTPException(status_code=404, detail="Annotation not found")
-    if not crud.user.is_superuser(current_user) and (annotation.owner_id != current_user.id):
+    if not crud.user.is_superuser(current_user) and (
+        annotation.owner_id != current_user.id
+    ):
         raise HTTPException(status_code=400, detail="Not enough permissions")
     return annotation
 
@@ -93,7 +99,9 @@ def delete_annotation(
     annotation = crud.annotation.get(db=db, id=id)
     if not annotation:
         raise HTTPException(status_code=404, detail="Annotation not found")
-    if not crud.user.is_superuser(current_user) and (annotation.owner_id != current_user.id):
+    if not crud.user.is_superuser(current_user) and (
+        annotation.owner_id != current_user.id
+    ):
         raise HTTPException(status_code=400, detail="Not enough permissions")
     annotation = crud.annotation.remove(db=db, id=id)
     return annotation
