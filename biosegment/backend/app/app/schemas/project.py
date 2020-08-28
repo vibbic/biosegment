@@ -15,7 +15,7 @@ class ProjectBase(BaseModel):
 
 # Properties to receive on project creation
 class ProjectCreate(ProjectBase):
-    # a new project should have at least a title
+    # a user should give at least a title to create a project
     title: str
 
 
@@ -26,6 +26,8 @@ class ProjectUpdate(ProjectBase):
 
 # Properties shared by models stored in DB
 class ProjectInDBBase(ProjectBase):
+    # a project database row should have id, title, and owner_id filled in, not None
+    # -> the crud api should add an id and owner_id to the user provided title 
     id: int
     title: str
     owner_id: int
