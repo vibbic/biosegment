@@ -155,7 +155,7 @@ The `./backend/app` directory is mounted as a "host volume" inside the docker co
 You can rerun the test on live code:
 
 ```Bash
-docker-compose exec backend /app/tests-start.sh
+docker-compose exec backend sh /app/tests-start.sh
 ```
 
 #### Test running stack
