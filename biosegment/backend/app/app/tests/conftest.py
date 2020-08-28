@@ -9,14 +9,13 @@ from app.db.session import SessionLocal
 from app.main import app
 from app.tests.utils.user import authentication_token_from_email
 from app.tests.utils.utils import get_superuser_token_headers
-
+from app.db.init_db import init_db
 
 @pytest.fixture(scope="session")
 def db() -> Generator:
     db = SessionLocal()
-    # not sure if this is needed to reload database changes during development
-    # from app.db.init_db import init_db
-    # init_db(db)
+    # intialize the database to update schema during development
+    init_db(db)
     yield db
 
 
