@@ -18,7 +18,7 @@ class User(Base):
     hashed_password = Column(String, nullable=False)
     is_active = Column(Boolean(), default=True)
     is_superuser = Column(Boolean(), default=False)
-    
+
     items = relationship("Item", back_populates="owner")
     projects = relationship("Project", back_populates="owner")
     models = relationship("Model", back_populates="owner")

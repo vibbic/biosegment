@@ -58,9 +58,7 @@ def update_model(
     model = crud.model.get(db=db, id=id)
     if not model:
         raise HTTPException(status_code=404, detail="Model not found")
-    if not crud.user.is_superuser(current_user) and (
-        model.owner_id != current_user.id
-    ):
+    if not crud.user.is_superuser(current_user) and (model.owner_id != current_user.id):
         raise HTTPException(status_code=400, detail="Not enough permissions")
     model = crud.model.update(db=db, db_obj=model, obj_in=model_in)
     return model
@@ -79,9 +77,7 @@ def read_model(
     model = crud.model.get(db=db, id=id)
     if not model:
         raise HTTPException(status_code=404, detail="Model not found")
-    if not crud.user.is_superuser(current_user) and (
-        model.owner_id != current_user.id
-    ):
+    if not crud.user.is_superuser(current_user) and (model.owner_id != current_user.id):
         raise HTTPException(status_code=400, detail="Not enough permissions")
     return model
 
@@ -99,9 +95,7 @@ def delete_model(
     model = crud.model.get(db=db, id=id)
     if not model:
         raise HTTPException(status_code=404, detail="Model not found")
-    if not crud.user.is_superuser(current_user) and (
-        model.owner_id != current_user.id
-    ):
+    if not crud.user.is_superuser(current_user) and (model.owner_id != current_user.id):
         raise HTTPException(status_code=400, detail="Not enough permissions")
     model = crud.model.remove(db=db, id=id)
     return model

@@ -27,7 +27,7 @@ class ProjectUpdate(ProjectBase):
 # Properties shared by models stored in DB
 class ProjectInDBBase(ProjectBase):
     # a project database row should have id, title, and owner_id filled in, not None
-    # -> the crud api should add an id and owner_id to the user provided title 
+    # -> the crud api should add an id and owner_id to the user provided title
     id: int
     title: str
     owner_id: int
