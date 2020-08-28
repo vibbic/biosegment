@@ -18,3 +18,5 @@ class Project(Base):
 
     owner_id = Column(Integer, ForeignKey("user.id"))
     owner = relationship("User", back_populates="projects")
+
+    datasets = relationship("Dataset", back_populates="owner")
