@@ -63,6 +63,9 @@ def display_page(pathname):
         return "404"
     return current_page.layout    
 
+# TODO turn off in production
+app.enable_dev_tools(debug=True)
+
 server = app.server
 
 if __name__ == '__main__':
