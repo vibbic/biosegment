@@ -3,6 +3,7 @@ from .crud_dataset import dataset
 from .crud_item import item
 from .crud_model import model
 from .crud_project import project
+from .crud_segmentation import segmentation
 from .crud_user import user
 
 # For a new basic set of CRUD operations you could just do

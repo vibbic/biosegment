@@ -10,6 +10,7 @@ if TYPE_CHECKING:
     from .project import Project  # noqa: F401
     from .model import Model  # noqa: F401
     from .annotation import Annotation  # noqa: F401
+    from .segmentation import Segmentation  # noqa: F401
 
 
 class User(Base):
@@ -22,5 +23,6 @@ class User(Base):
 
     items = relationship("Item", back_populates="owner")
     annotations = relationship("Annotation", back_populates="owner")
+    segmentations = relationship("Segmentation", back_populates="owner")
     projects = relationship("Project", back_populates="owner")
     models = relationship("Model", back_populates="owner")
