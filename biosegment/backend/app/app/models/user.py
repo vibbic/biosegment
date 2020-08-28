@@ -9,6 +9,7 @@ if TYPE_CHECKING:
     from .item import Item  # noqa: F401
     from .project import Project  # noqa: F401
     from .model import Model  # noqa: F401
+    from .annotation import Annotation  # noqa: F401
 
 
 class User(Base):
@@ -20,5 +21,6 @@ class User(Base):
     is_superuser = Column(Boolean(), default=False)
 
     items = relationship("Item", back_populates="owner")
+    annotations = relationship("Annotation", back_populates="owner")
     projects = relationship("Project", back_populates="owner")
     models = relationship("Model", back_populates="owner")
