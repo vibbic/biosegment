@@ -1,16 +1,17 @@
 erDiagram
-    USER ||--|| USER-NAME : has
+    USER ||--|| FULL_NAME : has
     USER ||--|| EMAIL : has
 
     USER ||--0| PROJECT : responsible-for
     USER ||--0| MODEL : responsible-for
 
 
-    MODEL ||--|| NAME : has
+    MODEL ||--|| TITLE : has
+    MODEL ||--|| DESCRIPTION : has
     MODEL ||--|| CHECKPOINT : has
 
 
-    PROJECT ||--|| NAME : has
+    PROJECT ||--|| TITLE : has
     PROJECT ||--|| START-DATE : has
     PROJECT ||--|| STOP-DATE : has
     PROJECT ||--|| DESCRIPTION : has
@@ -20,10 +21,11 @@ erDiagram
     PROJECT ||--|{ MODEL : uses
 
 
-    INTEREST ||--|| NAME : has
+    INTEREST ||--|| TITLE : has
 
 
-    DATASET ||--|| NAME : has
+    DATASET ||--|| TITLE : has
+    DATASET ||--|| DESCRIPTION : has
     DATASET ||--|| FILE-TYPE : has
     DATASET ||--|| FILE-LOCATION : has
     DATASET ||--|| RESOLUTION-X : has
@@ -37,7 +39,8 @@ erDiagram
 
     ANNOTATION ||--|| FILE-TYPE : has
     ANNOTATION ||--|| FILE-LOCATION : has
-    ANNOTATION ||--|| NAME : has
+    ANNOTATION ||--|| TITLE : has
+    ANNOTATION ||--|| DESCRIPTION : has
 
     ANNOTATION ||--|| USER : annotated-by
     ANNOTATION ||--0| SEGMENTATION : from-segmentation
@@ -45,6 +48,7 @@ erDiagram
 
     SEGMENTATION ||--|| FILE-TYPE : has
     SEGMENTATION ||--|| FILE-LOCATION : has
-    SEGMENTATION ||--|| NAME : has
+    SEGMENTATION ||--|| TITLE : has
+    SEGMENTATION ||--|| DESCRIPTION : has
 
     SEGMENTATION ||--|| MODEL : from-model
