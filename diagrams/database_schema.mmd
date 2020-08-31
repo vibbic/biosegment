@@ -2,8 +2,11 @@ erDiagram
     USER ||--|| FULL_NAME : has
     USER ||--|| EMAIL : has
 
-    USER ||--0| PROJECT : responsible-for
-    USER ||--0| MODEL : responsible-for
+    USER ||--0| PROJECT : owns
+    USER ||--0| MODEL : owns
+    USER ||--0| DATASET : owns
+    USER ||--0| SEGMENTATION : owns
+    USER ||--0| ANNOTATION : owns
 
 
     MODEL ||--|| TITLE : has
@@ -17,8 +20,8 @@ erDiagram
     PROJECT ||--|| DESCRIPTION : has
 
     PROJECT ||--|{ INTEREST : contains
-    PROJECT ||--|{ DATASET : contains
-    PROJECT ||--|{ MODEL : uses
+    PROJECT |0--|{ DATASET : contains
+    PROJECT |0--|{ MODEL : uses
 
 
     INTEREST ||--|| TITLE : has
@@ -28,7 +31,7 @@ erDiagram
     DATASET ||--|| DESCRIPTION : has
     DATASET ||--|| FILE-TYPE : has
     DATASET ||--|| LOCATION : has
-    DATASET ||--|| RESOLUTION-X : has
+    DATASET ||--|| RESOLUTION-X : hasdatasets = relationship("Dataset", back_populates="owner")
     DATASET ||--|| RESOLUTION-Y : has
     DATASET ||--|| RESOLUTION-Z : has
     DATASET ||--|| MODALITY : has
@@ -42,8 +45,7 @@ erDiagram
     ANNOTATION ||--|| TITLE : has
     ANNOTATION ||--|| DESCRIPTION : has
 
-    ANNOTATION ||--|| USER : annotated-by
-    ANNOTATION ||--0| SEGMENTATION : from-segmentation
+    ANNOTATION }|--0| SEGMENTATION : from-segmentation
 
 
     SEGMENTATION ||--|| FILE-TYPE : has
@@ -51,4 +53,4 @@ erDiagram
     SEGMENTATION ||--|| TITLE : has
     SEGMENTATION ||--|| DESCRIPTION : has
 
-    SEGMENTATION ||--|| MODEL : from-model
+    SEGMENTATION }|--|| MODEL : from-model
