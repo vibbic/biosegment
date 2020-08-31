@@ -40,9 +40,13 @@ def get_card_for_dataset(p):
 
 @app.callback([
     Output('datasets', 'children'),
-], [Input('update-button', 'n_clicks')])
-def update_datasets(clicks):
-    datasets = api.dataset.get_multi()
+], [
+    Input('update-button', 'n_clicks'),
+    Input('token', 'data')
+])
+def update_datasets(clicks, token):
+    token = api.base.get_tokens()
+    datasets = api.dataset.get_multi(token=token)
     return [[get_card_for_dataset(p) for p in datasets]]
 
 if __name__ == '__main__':

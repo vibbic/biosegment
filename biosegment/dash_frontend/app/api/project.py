@@ -1,10 +1,10 @@
-from app.api.base import Base
+from app.api import base
 
 ENTRYPOINT_BASE = "projects"
 
-def get(id):
-    return Base.get(f"{ENTRYPOINT_BASE}/{id}")
+def get(id, **kwargs):
+    return base.get(f"{ENTRYPOINT_BASE}/{id}", **kwargs)
 
-def get_multi():
-    return Base.get(ENTRYPOINT_BASE)
+def get_multi(**kwargs):
+    return base.get(ENTRYPOINT_BASE, **kwargs)
 

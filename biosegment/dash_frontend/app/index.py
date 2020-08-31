@@ -54,6 +54,7 @@ sidebar = html.Div(
 
 app.layout = html.Div([
     dcc.Location(id='url', refresh=False),
+    dcc.Store(id='token'),
     sidebar,
     html.Div(id='page-content', style=CONTENT_STYLE)
 ])

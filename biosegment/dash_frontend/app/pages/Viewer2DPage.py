@@ -9,7 +9,7 @@ from app.components.Viewer2D import Viewer2D
 # import app.api.base
 
 title="Viewer 2D"
-path="/"
+path="/viewer"
 
 DEFAULT_DATASET="EMBL Raw"
 VIEWER_ID = "viewer-1"
