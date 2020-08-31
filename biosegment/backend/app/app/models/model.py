@@ -8,6 +8,7 @@ from app.db.base_class import Base
 if TYPE_CHECKING:
     from .user import User  # noqa: F401
     from .project import Project  # noqa: F401
+    from .segmentation import Segmentation  # noqa: F401
 
 
 class Model(Base):

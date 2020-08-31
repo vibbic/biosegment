@@ -9,6 +9,7 @@ if TYPE_CHECKING:
     from .user import User  # noqa: F401
     from .dataset import Dataset  # noqa: F401
     from .model import Model  # noqa: F401
+    from .annotation import Annotation  # noqa: F401
 
 
 class Segmentation(Base):

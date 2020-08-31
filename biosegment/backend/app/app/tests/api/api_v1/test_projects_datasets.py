@@ -29,7 +29,6 @@ def test_read_project_dataset(
     client: TestClient, superuser_token_headers: dict, db: Session
 ) -> None:
     dataset = create_random_dataset(db)
-    project_id = dataset.project.id
     dataset_id = dataset.id
     response = client.get(
         f"{settings.API_V1_STR}/datasets/{dataset_id}", headers=superuser_token_headers,
