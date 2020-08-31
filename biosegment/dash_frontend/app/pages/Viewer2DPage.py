@@ -6,8 +6,10 @@ from app.app import app
 from app.DatasetStore import DatasetStore
 from app.components.Viewer2D import Viewer2D
 
+# import app.api.base
+
 title="Viewer 2D"
-path=""
+path="/"
 
 DEFAULT_DATASET="EMBL Raw"
 VIEWER_ID = "viewer-1"

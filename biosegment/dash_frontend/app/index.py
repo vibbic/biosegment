@@ -5,11 +5,19 @@ import dash_bootstrap_components as dbc
 
 from app.app import app
 from app.pages import (
-    Viewer2DPage
+    Viewer2DPage,
+    APIToken,
+    Projects,
+    Project,
+    Datasets,
 )
 
 pages = [
-    Viewer2DPage
+    Project,
+    Projects,
+    Datasets,
+    Viewer2DPage,
+    APIToken,
 ]
 
 SIDEBAR_STYLE = {
@@ -36,7 +44,7 @@ sidebar = html.Div(
             "A segmentation viewer", className="lead"
         ),
         dbc.Nav(
-            [dbc.NavLink(p.title, href=p.path, id=f"{p.title}-link") for p in pages],
+            [dbc.NavLink(p.title, href=app.get_relative_path(p.path), id=f"{p.title}-link") for p in pages],
             vertical=True,
             pills=True,
         ),
@@ -57,7 +65,12 @@ app.layout = html.Div([
 def display_page(pathname):
     current_page = None
     for page in pages:
-        if pathname == app.get_relative_path(page.path):
+        # print(pathname)
+        # print(app.get_relative_path(page.path))
+        # TODO improve routing and regex handling of ids in pathnames
+        # only works if this resolves to unique route path and there is no route
+        # do /projects/ and /project/id, not /projects/id  
+        if app.get_relative_path(page.path) in pathname:
             current_page = page
     if current_page is None:
         return "404"
