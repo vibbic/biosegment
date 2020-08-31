@@ -127,8 +127,8 @@ def read_datasets(
         project.owner_id != current_user.id
     ):
         raise HTTPException(status_code=400, detail="Not enough permissions")
-    datasets = crud.dataset.get_multi_by_owner(
-        db=db, owner_id=current_user.id, skip=skip, limit=limit
+    datasets = crud.dataset.get_multi_by_project(
+        db=db, project_id=project.id, skip=skip, limit=limit
     )
     return datasets
 
@@ -148,3 +148,46 @@ def create_dataset(
         db=db, obj_in=dataset_in, owner_id=current_user.id, project_id=id
     )
     return dataset
+
+
+@router.get("/{id}/models", response_model=List[schemas.Model])
+def read_models(
+    *,
+    db: Session = Depends(deps.get_db),
+    id: int,
+    skip: int = 0,
+    limit: int = 100,
+    current_user: models.User = Depends(deps.get_current_active_user),
+) -> Any:
+    """
+    Retrieve models for project.
+    """
+    project = crud.project.get(db=db, id=id)
+
+    if not project:
+        raise HTTPException(status_code=404, detail="Project not found")
+    if not crud.user.is_superuser(current_user) and (
+        project.owner_id != current_user.id
+    ):
+        raise HTTPException(status_code=400, detail="Not enough permissions")
+    datasets = crud.model.get_multi_by_project(
+        db=db, project_id=project.id, skip=skip, limit=limit
+    )
+    return datasets
+
+
+@router.post("/{id}/models", response_model=schemas.Dataset)
+def create_model(
+    *,
+    db: Session = Depends(deps.get_db),
+    id: int,
+    model_id: schemas.ModelCreate,
+    current_user: models.User = Depends(deps.get_current_active_user),
+) -> Any:
+    """
+    Create new model for project.
+    """
+    model = crud.model.create_with_owner(
+        db=db, obj_in=model_id, owner_id=current_user.id, project_id=id
+    )
+    return model
