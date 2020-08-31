@@ -30,5 +30,16 @@ class CRUDModel(CRUDBase[Model, ModelCreate, ModelUpdate]):
             .all()
         )
 
+    def get_multi_by_project(
+        self, db: Session, *, project_id: int, skip: int = 0, limit: int = 100
+    ) -> List[Model]:
+        return (
+            db.query(self.model)
+            .filter(Model.project_id == project_id)
+            .offset(skip)
+            .limit(limit)
+            .all()
+        )
+
 
 model = CRUDModel(Model)

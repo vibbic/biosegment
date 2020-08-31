@@ -30,5 +30,27 @@ class CRUDSegmentation(CRUDBase[Segmentation, SegmentationCreate, SegmentationUp
             .all()
         )
 
+    def get_multi_by_dataset(
+        self, db: Session, *, dataset_id: int, skip: int = 0, limit: int = 100
+    ) -> List[Segmentation]:
+        return (
+            db.query(self.model)
+            .filter(Segmentation.dataset_id == dataset_id)
+            .offset(skip)
+            .limit(limit)
+            .all()
+        )
+
+    def get_multi_by_model(
+        self, db: Session, *, model_id: int, skip: int = 0, limit: int = 100
+    ) -> List[Segmentation]:
+        return (
+            db.query(self.model)
+            .filter(Segmentation.model_id == model_id)
+            .offset(skip)
+            .limit(limit)
+            .all()
+        )
+
 
 segmentation = CRUDSegmentation(Segmentation)

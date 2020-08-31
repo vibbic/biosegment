@@ -30,5 +30,27 @@ class CRUDAnnotation(CRUDBase[Annotation, AnnotationCreate, AnnotationUpdate]):
             .all()
         )
 
+    def get_multi_by_dataset(
+        self, db: Session, *, dataset_id: int, skip: int = 0, limit: int = 100
+    ) -> List[Annotation]:
+        return (
+            db.query(self.model)
+            .filter(Annotation.dataset_id == owner_id)
+            .offset(skip)
+            .limit(limit)
+            .all()
+        )
+
+    def get_multi_by_segmentation(
+        self, db: Session, *, segmentation_id: int, skip: int = 0, limit: int = 100
+    ) -> List[Annotation]:
+        return (
+            db.query(self.model)
+            .filter(Annotation.segmentation_id == segmentation_id)
+            .offset(skip)
+            .limit(limit)
+            .all()
+        )
+
 
 annotation = CRUDAnnotation(Annotation)
