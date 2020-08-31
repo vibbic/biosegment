@@ -8,6 +8,7 @@ from app.db.base_class import Base
 if TYPE_CHECKING:
     from .user import User  # noqa: F401
     from .dataset import Dataset  # noqa: F401
+    from .model import Model  # noqa: F401
 
 
 class Project(Base):
@@ -20,4 +21,5 @@ class Project(Base):
     owner_id = Column(Integer, ForeignKey("user.id"))
     owner = relationship("User", back_populates="projects")
 
-    datasets = relationship("Dataset", back_populates="owner")
+    datasets = relationship("Dataset", back_populates="project")
+    models = relationship("Model", back_populates="project")

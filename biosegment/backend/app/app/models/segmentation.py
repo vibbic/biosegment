@@ -7,6 +7,8 @@ from app.db.base_class import Base
 
 if TYPE_CHECKING:
     from .user import User  # noqa: F401
+    from .dataset import Dataset  # noqa: F401
+    from .model import Model  # noqa: F401
 
 
 class Segmentation(Base):
@@ -18,3 +20,11 @@ class Segmentation(Base):
 
     owner_id = Column(Integer, ForeignKey("user.id"))
     owner = relationship("User", back_populates="segmentations")
+
+    dataset_id = Column(Integer, ForeignKey("dataset.id"))
+    dataset = relationship("Dataset", back_populates="segmentations")
+
+    model_id = Column(Integer, ForeignKey("model.id"))
+    model = relationship("Model", back_populates="segmentations")
+
+    annotations = relationship("Annotation", back_populates="segmentation")

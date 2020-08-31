@@ -7,6 +7,7 @@ from app.db.base_class import Base
 
 if TYPE_CHECKING:
     from .user import User  # noqa: F401
+    from .annotation import Annotation  # noqa: F401
 
 
 class Annotation(Base):
@@ -18,3 +19,9 @@ class Annotation(Base):
 
     owner_id = Column(Integer, ForeignKey("user.id"))
     owner = relationship("User", back_populates="annotations")
+
+    dataset_id = Column(Integer, ForeignKey("dataset.id"))
+    dataset = relationship("Dataset", back_populates="annotations")
+
+    segmentation_id = Column(Integer, ForeignKey("segmentation.id"))
+    segmentation = relationship("Segmentation", back_populates="annotations")

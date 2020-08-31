@@ -7,6 +7,9 @@ from app.db.base_class import Base
 
 if TYPE_CHECKING:
     from .project import Project  # noqa: F401
+    from .user import User  # noqa: F401
+    from .annotation import Annotation  # noqa: F401
+    from .segmentation import Segmentation  # noqa: F401
 
 
 class Dataset(Base):
@@ -20,5 +23,11 @@ class Dataset(Base):
     resolution_z = Column(Integer, index=True)
     modality = Column(String, index=True)
 
-    owner_id = Column(Integer, ForeignKey("project.id"))
-    owner = relationship("Project", back_populates="datasets")
+    owner_id = Column(Integer, ForeignKey("user.id"))
+    owner = relationship("User", back_populates="datasets")
+
+    project_id = Column(Integer, ForeignKey("project.id"))
+    project = relationship("Project", back_populates="datasets")
+
+    annotations = relationship("Annotation", back_populates="dataset")
+    segmentations = relationship("Segmentation", back_populates="dataset")
