@@ -105,3 +105,46 @@ def delete_project(
         raise HTTPException(status_code=400, detail="Not enough permissions")
     project = crud.project.remove(db=db, id=id)
     return project
+
+
+@router.get("/{id}/datasets", response_model=List[schemas.Dataset])
+def read_datasets(
+    *,
+    db: Session = Depends(deps.get_db),
+    id: int,
+    skip: int = 0,
+    limit: int = 100,
+    current_user: models.User = Depends(deps.get_current_active_user),
+) -> Any:
+    """
+    Retrieve datasets for project.
+    """
+    project = crud.project.get(db=db, id=id)
+
+    if not project:
+        raise HTTPException(status_code=404, detail="Project not found")
+    if not crud.user.is_superuser(current_user) and (
+        project.owner_id != current_user.id
+    ):
+        raise HTTPException(status_code=400, detail="Not enough permissions")
+    datasets = crud.dataset.get_multi_by_owner(
+        db=db, owner_id=current_user.id, skip=skip, limit=limit
+    )
+    return datasets
+
+
+@router.post("/{id}/datasets", response_model=schemas.Dataset)
+def create_dataset(
+    *,
+    db: Session = Depends(deps.get_db),
+    id: int,
+    dataset_in: schemas.DatasetCreate,
+    current_user: models.User = Depends(deps.get_current_active_user),
+) -> Any:
+    """
+    Create new dataset for project.
+    """
+    dataset = crud.dataset.create_with_owner(
+        db=db, obj_in=dataset_in, owner_id=current_user.id, project_id=id
+    )
+    return dataset
