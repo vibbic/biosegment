@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session
@@ -10,10 +10,18 @@ from app.schemas.segmentation import SegmentationCreate, SegmentationUpdate
 
 class CRUDSegmentation(CRUDBase[Segmentation, SegmentationCreate, SegmentationUpdate]):
     def create_with_owner(
-        self, db: Session, *, obj_in: SegmentationCreate, owner_id: int
+        self,
+        db: Session,
+        *,
+        obj_in: SegmentationCreate,
+        owner_id: int,
+        dataset_id: Optional[int] = None,
+        model_id: Optional[int] = None
     ) -> Segmentation:
         obj_in_data = jsonable_encoder(obj_in)
-        db_obj = self.model(**obj_in_data, owner_id=owner_id)
+        db_obj = self.model(
+            **obj_in_data, owner_id=owner_id, dataset_id=dataset_id, model_id=model_id
+        )
         db.add(db_obj)
         db.commit()
         db.refresh(db_obj)

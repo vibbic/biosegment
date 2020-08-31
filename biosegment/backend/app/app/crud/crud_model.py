@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session
@@ -10,10 +10,15 @@ from app.schemas.model import ModelCreate, ModelUpdate
 
 class CRUDModel(CRUDBase[Model, ModelCreate, ModelUpdate]):
     def create_with_owner(
-        self, db: Session, *, obj_in: ModelCreate, owner_id: int
+        self,
+        db: Session,
+        *,
+        obj_in: ModelCreate,
+        owner_id: int,
+        project_id: Optional[int] = None
     ) -> Model:
         obj_in_data = jsonable_encoder(obj_in)
-        db_obj = self.model(**obj_in_data, owner_id=owner_id)
+        db_obj = self.model(**obj_in_data, owner_id=owner_id, project_id=project_id)
         db.add(db_obj)
         db.commit()
         db.refresh(db_obj)
