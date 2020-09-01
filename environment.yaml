@@ -17,3 +17,6 @@ dependencies:
   - pandas>=1.1.0
   - pillow>=7.2.0
   - scikit-image>=0.16.2
+  - pip>=20.2.2
+  - pip:
+    - "git+https://github.com/beehiveai/compose.git"
