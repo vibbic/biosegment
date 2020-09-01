@@ -42,11 +42,12 @@ def get_card_for_project(p):
     Output('project', 'children'),
 ], [
     Input('url', 'pathname'),
+    Input('token', 'data'),
     Input('update-button-project', 'n_clicks'),
 ])
-def update_project(pathname, clicks):
+def update_project(pathname, token, clicks):
     project_id = pathname.split('/')[-1]
-    project = api.project.get(project_id)
+    project = api.project.get(project_id, token=token)
     return [get_card_for_project(project)]
 
 if __name__ == '__main__':

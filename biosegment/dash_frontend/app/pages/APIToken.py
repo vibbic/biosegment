@@ -12,8 +12,15 @@ layout = html.Div([
         children="Token",
     ),
     html.P(
-        id="token",
-        # children=str(tokens),
+        id="text-token",
     )
 ])
 
+@app.callback(
+    Output('text-token', 'children'),
+    [
+        Input('token', 'data')
+]
+)
+def display_page(token):
+    return [token]  

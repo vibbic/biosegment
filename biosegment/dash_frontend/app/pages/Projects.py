@@ -2,6 +2,7 @@ import dash_core_components as dcc
 import dash_html_components as html
 import dash_bootstrap_components as dbc
 from dash.dependencies import Input, Output
+from dash.exceptions import PreventUpdate
 
 from app.app import app
 from app import api
@@ -40,9 +41,17 @@ def get_card_for_project(p):
 
 @app.callback([
     Output('projects', 'children'),
-], [Input('update-button-projects', 'n_clicks')])
-def update_projects(clicks):
-    projects = api.project.get_multi()
+], [
+    Input('token', 'data'),
+    Input('update-button-projects', 'n_clicks'),
+])
+def update_projects(token, clicks):
+    if token is None:
+        print("Update prevented")
+        raise PreventUpdate
+    print("Updating")
+    projects = api.project.get_multi(token=token)
+    print(f"Projects {projects}")
     return [[get_card_for_project(p) for p in projects]]
 
 if __name__ == '__main__':

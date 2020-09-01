@@ -1,8 +1,7 @@
 from app.Dataset import Dataset
+from app.env import DATA_PREFIX
 
 class DatasetStore(object):
-
-    DATA_PREFIX = "/data/"
 
     __instance = None
     available = [

@@ -1,15 +1,27 @@
 import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output
+from dash.exceptions import PreventUpdate
 import dash_bootstrap_components as dbc
 
+import logging
+
 from app.app import app
+from app.api import base
+
 from app.pages import (
     Viewer2DPage,
     APIToken,
     Projects,
     Project,
     Datasets,
+)
+
+logging.basicConfig(
+    filename='all.log', 
+    filemode='w', 
+    level=logging.DEBUG,
+    format='%(asctime)s %(message)s',
 )
 
 pages = [
@@ -54,16 +66,34 @@ sidebar = html.Div(
 
 app.layout = html.Div([
     dcc.Location(id='url', refresh=False),
-    dcc.Store(id='token'),
+    dcc.Store(id='token', data=base.get_tokens(), storage_type='session'),
+    html.Div(id='start-token-update'),
     sidebar,
     html.Div(id='page-content', style=CONTENT_STYLE)
 ])
 
 @app.callback(
-    Output('page-content', 'children'),
-    [Input('url', 'pathname')]
+    Output('token', 'data'),
+    [
+        Input('start-token-update', 'children')
+]
 )
-def display_page(pathname):
+def update_token(token):
+    if token is None:
+        return base.get_tokens()
+    else:
+        raise PreventUpdate
+
+
+@app.callback(
+    Output('page-content', 'children'),
+    [
+        Input('url', 'pathname'),
+        Input('token', 'data')
+]
+)
+def display_page(pathname, token):
+    logging.debug(f"Token {token}")
     current_page = None
     for page in pages:
         # print(pathname)
