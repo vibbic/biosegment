@@ -150,22 +150,22 @@ services:
                 - traefik.http.services.${STACK_NAME?Variable not set}-flower.loadbalancer.server.port=5555
     
     backend:
-        image: '${DOCKER_IMAGE_BACKEND?Variable not set}:${TAG-latest}'
-        depends_on:
-        - db
-        env_file:
-        - .env
-        environment:
-        - SERVER_NAME=${DOMAIN?Variable not set}
-        - SERVER_HOST=https://${DOMAIN?Variable not set}
-        # Allow explicit env var override for tests
-        - SMTP_HOST=${SMTP_HOST}
         ports:
             - "8888:8888"
         volumes:
             - ./backend:/backend
             - ${ROOT_DATA_FOLDER?Variable not set}:/data:ro
+        image: '${DOCKER_IMAGE_BACKEND?Variable not set}:${TAG-latest}'
+        depends_on:
+            - db
+        env_file:
+            - .env
         environment:
+            - SERVER_NAME=${DOMAIN?Variable not set}
+            - SERVER_HOST=https://${DOMAIN?Variable not set}
+            # Allow explicit env var override for tests
+            - SMTP_HOST=${SMTP_HOST}
+            # override
             - JUPYTER=jupyter lab --ip=0.0.0.0 --allow-root --NotebookApp.custom_display_url=http://127.0.0.1:8888
             - SERVER_HOST=http://${DOMAIN?Variable not set}
         build:
@@ -177,17 +177,19 @@ services:
         # command: bash -c "while true; do sleep 1; done"  # Infinite loop to keep container live doing nothing
         command: /start-reload.sh
         labels:
+        - traefik.enable=true
+        - traefik.constraint-label-stack=${TRAEFIK_TAG?Variable not set}
+        - traefik.http.routers.${STACK_NAME?Variable not set}-backend-http.rule=PathPrefix(`/api`) || PathPrefix(`/docs`) || PathPrefix(`/redoc`)
+        - traefik.http.services.${STACK_NAME?Variable not set}-backend.loadbalancer.server.port=80
+        deploy:
+            labels:
             - traefik.enable=true
             - traefik.constraint-label-stack=${TRAEFIK_TAG?Variable not set}
             - traefik.http.routers.${STACK_NAME?Variable not set}-backend-http.rule=PathPrefix(`/api`) || PathPrefix(`/docs`) || PathPrefix(`/redoc`)
             - traefik.http.services.${STACK_NAME?Variable not set}-backend.loadbalancer.server.port=80
-        deploy:
-            labels:
-                - traefik.enable=true
-                - traefik.constraint-label-stack=${TRAEFIK_TAG?Variable not set}
-                - traefik.http.routers.${STACK_NAME?Variable not set}-backend-http.rule=PathPrefix(`/api`) || PathPrefix(`/docs`) || PathPrefix(`/redoc`)
-                - traefik.http.services.${STACK_NAME?Variable not set}-backend.loadbalancer.server.port=80
-  
+    
+
+
     celeryworker:
         image: '${DOCKER_IMAGE_CELERYWORKER?Variable not set}:${TAG-latest}'
         depends_on:
@@ -199,6 +201,7 @@ services:
             - ./backend/app:/app
             - ${ROOT_DATA_FOLDER?Variable not set}:/data:ro
         environment:
+            - SERVER_NAME=${DOMAIN?Variable not set}
             - RUN=celery worker -A app.worker -l info -Q main-queue -c 1
             - JUPYTER=jupyter lab --ip=0.0.0.0 --allow-root --NotebookApp.custom_display_url=http://127.0.0.1:8888
             - SERVER_HOST=http://${DOMAIN?Variable not set}
@@ -251,7 +254,14 @@ services:
             - traefik.constraint-label-stack=${TRAEFIK_TAG?Variable not set}
             - traefik.http.routers.${STACK_NAME?Variable not set}-dash-frontend-http.rule=PathPrefix(`/dash`)
             - traefik.http.services.${STACK_NAME?Variable not set}-dash-frontend.loadbalancer.server.port=80
-        
+    
+    gpu:
+        image: 'nvidia/cuda:9.0-base'
+        command: 'nvidia-smi'
+        device_requests:
+            - capabilities:
+                - "gpu"
+            
 
 volumes:
   app-db-data:
