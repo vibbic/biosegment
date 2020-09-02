@@ -1,0 +1,19 @@
+name: celery_neuralnets
+channels:
+  - pytorch
+  - conda-forge
+  - defaults
+dependencies:
+  - python>=3.7
+    # neuralnets
+  - future
+  - tensorboard
+  - numpy
+  - tifffile
+  - h5py
+  - scikit-image
+  - opencv
+  - progress
+  - six
+  - scikit-learn
+  - mlflow

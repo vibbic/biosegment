@@ -1,0 +1,11 @@
+name: celery_neuralnets
+channels:
+  - pytorch
+  - conda-forge
+  - defaults
+dependencies:
+  - python>=3.7
+    # neuralnets
+  - pytorch
+  - torchvision
+  - cudatoolkit=10.2

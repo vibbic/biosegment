@@ -22,7 +22,8 @@ layout = html.Div([
 
 def get_card_for_project(p):
     # print(p)
-    card = dbc.Card(
+    card = dbc.Card([
+    dbc.CardImg(src=f"https://picsum.photos/id/{p['id']}/200/150?blur=2", top=True),
     dbc.CardBody(
         [
             html.H4(p['title'], className="card-title"),
@@ -31,11 +32,12 @@ def get_card_for_project(p):
                 p['description'],
                 className="card-text",
             ),
+
             dbc.CardLink("Card link", href="#"),
             dbc.CardLink("External link", href="https://google.com"),
         ]
-    ),
-    # style={"width": "18rem"},
+    )],
+    style={"width": "18rem"},
     )
     return card
 
