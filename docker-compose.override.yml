@@ -57,9 +57,6 @@ services:
       - traefik.constraint-label-stack=${TRAEFIK_TAG?Variable not set}
       - traefik.http.routers.${STACK_NAME?Variable not set}-backend-http.rule=PathPrefix(`/api`) || PathPrefix(`/docs`) || PathPrefix(`/redoc`)
       - traefik.http.services.${STACK_NAME?Variable not set}-backend.loadbalancer.server.port=80
-    device_requests:
-      - capabilities:
-          - gpu
 
   celeryworker:
     volumes:
@@ -74,6 +71,9 @@ services:
       args:
         INSTALL_DEV: ${INSTALL_DEV-true}
         INSTALL_JUPYTER: ${INSTALL_JUPYTER-true}
+    device_requests:
+      - capabilities:
+          - gpu
 
   frontend:
     build:
