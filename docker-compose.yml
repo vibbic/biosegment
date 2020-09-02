@@ -106,6 +106,10 @@ services:
 
   queue:
     image: rabbitmq:3
+    # allow worker on host
+    ports:
+      - 5672:5672
+      - 15672:15672
     # Using the below image instead is required to enable the "Broker" tab in the flower UI:
     # image: rabbitmq:3-management
     #
