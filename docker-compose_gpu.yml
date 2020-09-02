@@ -254,13 +254,7 @@ services:
             - traefik.constraint-label-stack=${TRAEFIK_TAG?Variable not set}
             - traefik.http.routers.${STACK_NAME?Variable not set}-dash-frontend-http.rule=PathPrefix(`/dash`)
             - traefik.http.services.${STACK_NAME?Variable not set}-dash-frontend.loadbalancer.server.port=80
-    
-    gpu:
-        image: 'nvidia/cuda:9.0-base'
-        command: 'nvidia-smi'
-        device_requests:
-            - capabilities:
-                - "gpu"
+         
             
 
 volumes:
