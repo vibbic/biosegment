@@ -2,3 +2,7 @@ data/
 __pycache__/
 *.db
 *.log
+.vscode
+.mypy_cache
+docker-stack.yml
+.pytest_cache
