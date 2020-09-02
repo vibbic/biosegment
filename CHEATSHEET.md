@@ -62,13 +62,12 @@ Current workaround
 - expose rabbitMQ queue in docker-compose to host
 - run celery worker on host without virtualization
 ```
-# in backend/app
-# install environment for celery worker
-conda env update -f ../celery_pytorch_environment.yaml
-conda env update -f ../celery_celery_environment.yaml
-conda env update -f ../celery_neuralnets_environment.yaml
-
 # in gpu_worker
+# install environment for neuralnets celery worker
+conda env update -f celery_pytorch_environment.yaml
+conda env update -f celery_celery_environment.yaml
+conda env update -f celery_neuralnets_environment.yaml
+
 conda activate celery_neuralnets
 celery worker -A app.worker -l info -Q main-queue -c 1
 ```
