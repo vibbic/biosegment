@@ -7,15 +7,8 @@ Overview of the most common commands.
 Install:
 - Docker
 - Conda
+- docker-compose
 
-- Install `biosegment` conda environment
-```
-conda env remove -n biosegment
-conda env update -f environment.yaml --prune
-conda activate biosegment
-```
-
-- Use the docker-compose in the environment
 ```
 docker-compose up -d --build
 ```
@@ -40,12 +33,14 @@ Flower, administration of Celery tasks: http://localhost:5555
 Traefik UI, to see how the routes are being handled by the proxy: http://localhost:8090
 
 ## Development
-- Dash frontend and backend hotreload on file changes
+- Dash frontend and backend hot-reload on file changes
 - Database schema changes need the removal of the database volume
+
 - Backend tests
 ```
 docker-compose exec backend bash /app/tests-start.sh
 ```
+
 - Backend linting and formatting
 ```
 cd backend/app
@@ -54,4 +49,26 @@ poetry shell
 sh scripts/format.sh
 sh scripts/format-imports.sh
 sh scripts/lint.sh
+```
+
+## Run celery worker with GPU
+
+- docker-compose GPU support is very experimental, not working currently
+    - see `docker-compose_gpu.yml`
+    - docker-compose override gives errors, that's why one .yml file is needed
+    - NVIDIA driver still isn't visible then, waiting for stable support
+
+Current workaround
+- expose rabbitMQ queue in docker-compose to host
+- run celery worker on host without virtualization
+```
+# in backend/app
+# install environment for celery worker
+conda env update -f ../celery_pytorch_environment.yaml
+conda env update -f ../celery_celery_environment.yaml
+conda env update -f ../celery_neuralnets_environment.yaml
+
+# in gpu_worker
+conda activate celery_neuralnets
+celery worker -A app.worker -l info -Q main-queue -c 1
 ```
