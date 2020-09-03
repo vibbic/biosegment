@@ -13,15 +13,26 @@ router = APIRouter()
 
 logger = logging.getLogger("api")
 
-@router.post("/infer/", response_model=schemas.Msg, status_code=201)
-def test_infer(
+@router.post("/train/", response_model=schemas.Msg, status_code=201)
+def train_unet2d(
     msg: schemas.Msg,
     current_user: models.User = Depends(deps.get_current_active_superuser),
 ) -> Any:
     """
     Test neuralnets inference.
     """
-    celery_app.send_task("app.worker.infer", args=[])
+    celery_app.send_task("app.worker.train_unet2d", args=[])
+    return {"msg": "Word received"}
+
+@router.post("/infer/", response_model=schemas.Msg, status_code=201)
+def infer_unet2d(
+    msg: schemas.Msg,
+    current_user: models.User = Depends(deps.get_current_active_superuser),
+) -> Any:
+    """
+    Test neuralnets inference.
+    """
+    celery_app.send_task("app.worker.infer_unet2d", args=[])
     return {"msg": "Word received"}
 
 @router.post("/test-pytorch/", response_model=schemas.Msg, status_code=201)
