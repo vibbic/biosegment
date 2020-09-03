@@ -6,4 +6,4 @@ source ~/miniconda3/etc/profile.d/conda.sh
 # TODO detect if celery_neuralnets is installed
 conda activate celery_neuralnets
 # TODO add alternative production mode
-watchmedo auto-restart --directory=./ --pattern=*.py --recursive -- celery worker -A app.worker -l info -Q main-queue -c 1
+watchmedo auto-restart --directory=./ --pattern=*.py --recursive -- celery worker -A app.worker -l info -Q main-queue -c 2
