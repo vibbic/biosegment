@@ -15,7 +15,7 @@ def test_pytorch(word: str) -> str:
 @celery_app.task(acks_late=True)
 def infer(
     model=f"{ROOT_DATA_FOLDER}models/unet_2d/best_checkpoint.pytorch", 
-    data_dir=f"{ROOT_DATA_FOLDER}EM/EMBL/test", 
+    data_dir=f"{ROOT_DATA_FOLDER}EM/EMBL/raw", 
     input_size="256,256", 
     in_channels=1,
     test_batch_size=1,
