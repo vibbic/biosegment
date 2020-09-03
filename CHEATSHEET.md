@@ -51,6 +51,24 @@ sh scripts/format-imports.sh
 sh scripts/lint.sh
 ```
 
+## Data folder
+In `.env` a ROOT_DATA_FOLDER is defined. The structure of the folder is the following
+- ROOT_DATA_FOLDER
+    - EM
+        - EMBL
+            - raw
+                - .pngs
+            - labels
+    - models
+        - unet_2d (output folder of neuralnets training)
+            - best_checkpoint.pytorch
+    - segmentations
+        - EMBL (output folder of neuralnets inference)
+            - .pngs
+    - annotations
+
+In the future the backend will handle this folder structure.
+
 ## Run celery worker with GPU
 
 - docker-compose GPU support is very experimental, not working currently
