@@ -70,3 +70,16 @@ conda env update -f celery_neuralnets_environment.yaml
 
 bash start_worker.sh
 ```
+
+If force stopping the auto-reloading watchdog for workers (x2 Ctrl-C), some workers may linger.
+This will show up as warning when a new worker with the same name is started.
+
+View all host celery workers
+```
+ps aux|grep 'celery worker'
+```
+
+Kill them all
+```
+ps auxww | grep 'celery worker' | awk '{print $2}' | xargs kill -9
+```
