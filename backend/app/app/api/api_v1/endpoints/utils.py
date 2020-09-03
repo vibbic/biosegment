@@ -15,13 +15,14 @@ logger = logging.getLogger("api")
 
 @router.post("/train/", response_model=schemas.Msg, status_code=201)
 def train_unet2d(
-    msg: schemas.Msg,
+    args: schemas.TrainingTaskMsg,
     current_user: models.User = Depends(deps.get_current_active_superuser),
 ) -> Any:
     """
     Test neuralnets inference.
     """
-    celery_app.send_task("app.worker.train_unet2d", args=[])
+    print(args)
+    celery_app.send_task("app.worker.train_unet2d", args=args)
     return {"msg": "Word received"}
 
 @router.post("/infer/", response_model=schemas.Msg, status_code=201)
