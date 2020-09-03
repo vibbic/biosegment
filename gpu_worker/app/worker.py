@@ -17,22 +17,23 @@ def train_unet2d(
     seed=0,
     device=0,
     data_dir=f"{ROOT_DATA_FOLDER}",
-    log_dir=f"{ROOT_DATA_FOLDER}models/EMBL/test_run1",
+    log_dir=f"{ROOT_DATA_FOLDER}models/EMBL/test_run2",
+    retrain_model=f"{ROOT_DATA_FOLDER}models/2d/2d.pytorch",
     print_stats=50,
-    input_size="256,256",
+    input_size=(256,256),
     fm=1,
     levels=4,
     dropout=0.0,
     norm="instance",
     activation="relu",
     in_channels=1,
-    classes_of_interest="0,1,2",
-    orientations="0",
+    classes_of_interest=(0,1,2),
+    orientations=(0,),
     loss="ce",
     lr=1e-3,
     step_size=10,
     gamma=0.9,
-    epochs=200,
+    epochs=50,
     len_epoch=100,
     test_freq=1,
     train_batch_size=1,
@@ -40,6 +41,7 @@ def train_unet2d(
 ) -> str:
     import os
 
+    import torch
     import torch.optim as optim
     from torch.utils.data import DataLoader
     from torchvision.transforms import Compose
@@ -52,9 +54,6 @@ def train_unet2d(
     from neuralnets.util.tools import set_seed
     from neuralnets.util.validation import validate
 
-    input_size = [int(item) for item in input_size.split(',')]
-    classes_of_interest = [int(c) for c in classes_of_interest.split(',')]
-    orientations = [int(c) for c in orientations.split(',')]
     loss_fn = get_loss_function(loss)
 
     """
@@ -96,7 +95,10 @@ def train_unet2d(
         Build the network
     """
     print_frm('Building the network')
-    net = UNet2D(in_channels=in_channels, feature_maps=fm, levels=levels, dropout_enc=dropout,
+    if retrain_model:
+        net = torch.load(retrain_model)
+    else:
+        net = UNet2D(in_channels=in_channels, feature_maps=fm, levels=levels, dropout_enc=dropout,
                 dropout_dec=dropout, norm=norm, activation=activation, coi=classes_of_interest)
 
     """
@@ -117,14 +119,15 @@ def train_unet2d(
 
 @celery_app.task(acks_late=True)
 def infer_unet2d(
-    model=f"{ROOT_DATA_FOLDER}models/unet_2d/best_checkpoint.pytorch",
+    # model=f"{ROOT_DATA_FOLDER}models/unet_2d/best_checkpoint.pytorch",
     # model=f"{ROOT_DATA_FOLDER}models/2d/2d.pytorch", 
+    model=f"{ROOT_DATA_FOLDER}models/EMBL/test_run2/best_checkpoint.pytorch", 
     data_dir=f"{ROOT_DATA_FOLDER}EM/EMBL/raw",
     labels_dir=f"{ROOT_DATA_FOLDER}EM/EMBL/labels",
-    input_size="256,256", 
+    input_size=(256,256), 
     in_channels=1,
     test_batch_size=1,
-    orientations="0",
+    orientations=(0,),
     len_epoch=100,
     write_dir=f"{ROOT_DATA_FOLDER}segmentations/EMBL",
     classes_of_interest=(0, 1, 2)
@@ -161,9 +164,6 @@ def infer_unet2d(
             is_maximum_for_interest = maximums == i
             image_array[is_maximum_for_interest] = i
         write_volume(image_array, write_dir, type=type, index_inc=1)
-
-    input_size = [int(item) for item in input_size.split(',')]
-    orientations = [int(c) for c in orientations.split(',')]
 
     input_shape = (1, input_size[0], input_size[1])
 
