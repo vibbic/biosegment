@@ -1,4 +1,4 @@
-from typing import Optional, List
+from typing import List, Optional
 
 from pydantic import BaseModel
 
@@ -32,5 +32,3 @@ class TrainingTaskMsg(BaseModel):
     test_freq: Optional[int]
     train_batch_size: Optional[int]
     trest_batch_size: Optional[int]
-
-

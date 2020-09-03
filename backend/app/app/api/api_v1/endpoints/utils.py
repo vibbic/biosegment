@@ -1,5 +1,5 @@
+import logging
 from typing import Any
-import logging 
 
 from fastapi import APIRouter, Depends
 from pydantic.networks import EmailStr
@@ -13,6 +13,7 @@ router = APIRouter()
 
 logger = logging.getLogger("api")
 
+
 @router.post("/train/", response_model=schemas.Msg, status_code=201)
 def train_unet2d(
     args: schemas.TrainingTaskMsg,
@@ -25,6 +26,7 @@ def train_unet2d(
     celery_app.send_task("app.worker.train_unet2d", args=args)
     return {"msg": "Word received"}
 
+
 @router.post("/infer/", response_model=schemas.Msg, status_code=201)
 def infer_unet2d(
     msg: schemas.Msg,
@@ -36,6 +38,7 @@ def infer_unet2d(
     celery_app.send_task("app.worker.infer_unet2d", args=[])
     return {"msg": "Word received"}
 
+
 @router.post("/test-pytorch/", response_model=schemas.Msg, status_code=201)
 def test_pytorch(
     msg: schemas.Msg,
@@ -46,6 +49,7 @@ def test_pytorch(
     """
     celery_app.send_task("app.worker.test_pytorch", args=[msg.msg])
     return {"msg": "Word received"}
+
 
 @router.post("/test-celery/", response_model=schemas.Msg, status_code=201)
 def test_celery(
