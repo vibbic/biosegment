@@ -1,5 +1,8 @@
 from app.Dataset import Dataset
-from app.env import DATA_PREFIX
+from app.env import ROOT_DATA_FOLDER
+
+EM_FOLDER = f"{ROOT_DATA_FOLDER}EM/"
+SEGMENTATION_FOLDER = f"{ROOT_DATA_FOLDER}segmentations/"
 
 class DatasetStore(object):
 
@@ -7,23 +10,28 @@ class DatasetStore(object):
     available = [
         {
             "name": "EMBL Raw",
-            "slices": f"{DATA_PREFIX}EMBL/raw/",
-            "labels": f"{DATA_PREFIX}EMBL/labels/"
+            "slices": f"{EM_FOLDER}EMBL/raw/",
+            "labels": f"{EM_FOLDER}EMBL/labels/"
+        },
+        {
+            "name": "EMBL Segmentation",
+            "slices": f"{EM_FOLDER}EMBL/raw/",
+            "labels": f"{SEGMENTATION_FOLDER}EMBL/"
         },
         {
             "name": "EMBL Test",
-            "slices": f"{DATA_PREFIX}EMBL/test/",
-            "labels": f"{DATA_PREFIX}EMBL/test_labels/"
+            "slices": f"{EM_FOLDER}EMBL/test/",
+            "labels": f"{EM_FOLDER}EMBL/test_labels/"
         },
         {
             "name": "EMBL Validation",
-            "slices": f"{DATA_PREFIX}EMBL/val/",
-            "labels": f"{DATA_PREFIX}EMBL/val_labels/"
+            "slices": f"{EM_FOLDER}EMBL/val/",
+            "labels": f"{EM_FOLDER}EMBL/val_labels/"
         },
         {
             "name": "EMBL Training",
-            "slices": f"{DATA_PREFIX}EMBL/train/",
-            "labels": f"{DATA_PREFIX}EMBL/train_labels/"
+            "slices": f"{EM_FOLDER}EMBL/train/",
+            "labels": f"{EM_FOLDER}EMBL/train_labels/"
         }
     ]
 
