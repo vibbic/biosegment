@@ -5,10 +5,10 @@ Overview of the most common commands.
 ## Installation
 
 Install:
-- Docker
-- Conda
-- docker-compose
-
+- [Docker](https://docs.docker.com/get-docker/)
+- [Conda](https://docs.conda.io/en/latest/miniconda.html)
+- [docker-compose](https://docs.docker.com/compose/install/)
+    - at least `version 1.26.2, build eefe0d31`
 ```
 docker-compose up -d --build
 ```
