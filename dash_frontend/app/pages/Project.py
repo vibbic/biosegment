@@ -30,8 +30,11 @@ def get_card_for_project(p):
                 p['description'],
                 className="card-text",
             ),
-            dbc.CardLink("Card link", href="#"),
-            dbc.CardLink("External link", href="https://google.com"),
+            html.P(
+                str(p['datasets']),
+                className="card-text",
+            ),
+            dbc.CardLink("Datasets", href=f"http://localhost/dash/project/{p['id']}/datasets"),
         ]
     ),
     # style={"width": "18rem"},
@@ -48,6 +51,8 @@ def get_card_for_project(p):
 def update_project(pathname, token, clicks):
     project_id = pathname.split('/')[-1]
     project = api.project.get(project_id, token=token)
+    datasets = api.dataset.get_multi_for_project(project_id, token=token)
+    project['datasets'] = datasets
     return [get_card_for_project(project)]
 
 if __name__ == '__main__':

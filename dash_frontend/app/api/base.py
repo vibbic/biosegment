@@ -71,3 +71,21 @@ def get(path, token, headers={}, **kwargs):
     assert r.status_code == 200
     logging.debug(R"f {r}")
     return r.json()
+
+def post(path, token, headers={}, **kwargs):
+    assert token is not None
+    logging.debug("POST using token")
+    logging.debug(f"Path {path}")
+    r = requests.post(
+        f"{API_ROOT}{path}", 
+        headers={
+            'Authorization': 'Bearer ' + token, 
+            # **headers
+        },
+        timeout=1,
+        **kwargs
+    )
+    assert r.status_code == 200
+    logging.debug(R"f {r}")
+    return r.json()
+

@@ -15,6 +15,7 @@ from app.pages import (
     Projects,
     Project,
     Datasets,
+    Dataset
 )
 
 logging.basicConfig(
@@ -28,6 +29,7 @@ pages = [
     Project,
     Projects,
     Datasets,
+    Dataset,
     Viewer2DPage,
     APIToken,
 ]
