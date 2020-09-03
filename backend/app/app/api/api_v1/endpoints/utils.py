@@ -1,4 +1,5 @@
 from typing import Any
+import logging 
 
 from fastapi import APIRouter, Depends
 from pydantic.networks import EmailStr
@@ -9,6 +10,19 @@ from app.core.celery_app import celery_app
 from app.utils import send_test_email
 
 router = APIRouter()
+
+logger = logging.getLogger("api")
+
+@router.post("/infer/", response_model=schemas.Msg, status_code=201)
+def test_infer(
+    msg: schemas.Msg,
+    current_user: models.User = Depends(deps.get_current_active_superuser),
+) -> Any:
+    """
+    Test neuralnets inference.
+    """
+    celery_app.send_task("app.worker.infer", args=[])
+    return {"msg": "Word received"}
 
 @router.post("/test-pytorch/", response_model=schemas.Msg, status_code=201)
 def test_pytorch(
