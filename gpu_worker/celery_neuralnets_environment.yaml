@@ -12,8 +12,10 @@ dependencies:
   - tifffile
   - h5py
   - scikit-image
-  - opencv
   - progress
   - six
   - scikit-learn
-  - mlflow
+  - opencv==4.2.0
+  - pip
+  - pip: 
+    - neuralnets
