@@ -117,7 +117,8 @@ def train_unet2d(
 
 @celery_app.task(acks_late=True)
 def infer_unet2d(
-    model=f"{ROOT_DATA_FOLDER}models/2d/2d.pytorch", 
+    model=f"{ROOT_DATA_FOLDER}models/unet_2d/best_checkpoint.pytorch",
+    # model=f"{ROOT_DATA_FOLDER}models/2d/2d.pytorch", 
     data_dir=f"{ROOT_DATA_FOLDER}EM/EMBL/raw",
     labels_dir=f"{ROOT_DATA_FOLDER}EM/EMBL/labels",
     input_size="256,256", 
@@ -133,7 +134,7 @@ def infer_unet2d(
     import numpy as np
 
     from neuralnets.util.io import print_frm, read_png, write_volume
-    from neuralnets.util.validation import segment_multichannel
+    from neuralnets.util.validation import segment
     from neuralnets.data.datasets import StronglyLabeledVolumeDataset, UnlabeledVolumeDataset
 
     def infer(net, data, input_size, in_channels=1, batch_size=1, write_dir=None,
@@ -141,24 +142,30 @@ def infer_unet2d(
         # compute segmentation for each orientation and average results
         segmentation = np.zeros((net.out_channels, *data.shape))
         for orientation in orientations:
-            segmentation += segment_multichannel(data, net, input_size, train=False, in_channels=in_channels, batch_size=batch_size,
+            segmentation += segment(data, net, input_size, train=False, in_channels=in_channels, batch_size=batch_size,
                                     track_progress=track_progress, device=device, orientation=orientation, normalization=normalization)
         segmentation = segmentation / len(orientations)
         return segmentation
 
-    def write_out(write_dir, segmentation, threshold=0.5, classes_of_interest=(0, 1, 2), type='pngseq'):
+    def write_out(write_dir, segmentation, threshold=0.2, classes_of_interest=(0, 1, 2), type='pngseq'):
+        # (3, 64, 512, 512)
+        # print(segmentation.shape)
+        image_array = np.zeros(segmentation.shape[1:])
+        maximums = np.argmax(segmentation, axis=0)
+        # print(segmentation[0].shape)
+        # print(maximums.shape)
+        # print(np.max(maximums))
+        # print(np.min(maximums))
+        # image_array = np.zeros((256, 256))
         for i in range(1, len(classes_of_interest)):
-            s = segmentation[i]
-            above_indices =  s > threshold
-            below_indices =  s <= threshold
-            s[above_indices] = i
-            s[below_indices] = 0
-            write_volume(s, write_dir, type=type)
+            is_maximum_for_interest = maximums == i
+            image_array[is_maximum_for_interest] = i
+        write_volume(image_array, write_dir, type=type, index_inc=1)
 
     input_size = [int(item) for item in input_size.split(',')]
     orientations = [int(c) for c in orientations.split(',')]
 
-    input_shape = (2, input_size[0], input_size[1])
+    input_shape = (1, input_size[0], input_size[1])
 
     print_frm('Reading dataset')
     # TODO support multiple dataset classes (labeled, unlabeled)
