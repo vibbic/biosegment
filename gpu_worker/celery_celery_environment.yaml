@@ -7,12 +7,4 @@ dependencies:
   - python>=3.7
     # celery
   - celery
-  - tenacity
-  - pip
-  - pydantic
-  - raven
-  - psycopg2
-  - requests
-  - pip
-  - pip:
-    - pydantic[email]
+  - watchdog

@@ -1,2 +1,9 @@
+#!/bin/bash
+set -xe
+
+# TODO remove hardcoded conda location
+source ~/miniconda3/etc/profile.d/conda.sh
+# TODO detect if celery_neuralnets is installed
 conda activate celery_neuralnets
-celery worker -A app.worker -l info -Q main-queue -c 1
+# TODO add alternative production mode
+watchmedo auto-restart --directory=./ --pattern=*.py --recursive -- celery worker -A app.worker -l info -Q main-queue -c 1
