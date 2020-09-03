@@ -1,5 +1,6 @@
 from app.celery_app import celery_app
 
+ROOT_DATA_FOLDER="/home/brombaut/workspace/biosegment/data/"
 
 @celery_app.task(acks_late=True)
 def test_pytorch(word: str) -> str:
@@ -11,25 +12,38 @@ def test_pytorch(word: str) -> str:
     word = f"{current_device} {device_count} {device_name} {is_available}"
     return f"test task return {word}"
 
+@celery_app.task(acks_late=True)
 def infer(
-    model="unet_2d/best_checkpoint.pytorch", 
-    data_dir="/data/EMBL/test", 
+    model=f"{ROOT_DATA_FOLDER}models/unet_2d/best_checkpoint.pytorch", 
+    data_dir=f"{ROOT_DATA_FOLDER}EM/EMBL/test", 
     input_size="256,256", 
     in_channels=1,
     test_batch_size=1,
     orientations="0",
-    len_epoch=100
+    len_epoch=100,
+    write_dir=f"{ROOT_DATA_FOLDER}segmentations/EMBL"
 ):
     import os
-
     import torch
     import numpy as np
 
-    from app.neuralnets.util.io import print_frm, read_png, write_volume
-    from app.neuralnets.util.validation import segment
-    from app.neuralnets.data.datasets import StronglyLabeledVolumeDataset, UnlabeledVolumeDataset
+    from neuralnets.util.io import print_frm, read_png, write_volume
+    from neuralnets.util.validation import segment
+    from neuralnets.data.datasets import StronglyLabeledVolumeDataset, UnlabeledVolumeDataset
 
-    from app.neuralnets.inference.inference import infer, write_out
+    def infer(net, data, input_size, in_channels=1, batch_size=1, write_dir=None,
+             val_file=None, writer=None, epoch=0, track_progress=False, device=0, orientations=(0,), normalization='unit'):
+        # compute segmentation for each orientation and average results
+        segmentation = np.zeros((net.out_channels, *data.shape))
+        for orientation in orientations:
+            segmentation += segment(data, net, input_size, train=False, in_channels=in_channels, batch_size=batch_size,
+                                    track_progress=track_progress, device=device, orientation=orientation, normalization=normalization)
+        segmentation = segmentation / len(orientations)
+        return segmentation
+
+    def write_out(write_dir, segmentation, classes_of_interest=(0, 1), type='pngseq'):
+        for i in range(1, len(classes_of_interest)):
+            write_volume(255 * segmentation[i], write_dir, type=type)
 
     input_size = [int(item) for item in input_size.split(',')]
     orientations = [int(c) for c in orientations.split(',')]
