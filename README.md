@@ -1,5 +1,9 @@
 # BioSegment
 
+A segmentation viewer.
+
+View `CHEATSHEET.md` for a summary of the information below.
+
 ## Backend Requirements
 
 * [Docker](https://www.docker.com/).
