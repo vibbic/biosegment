@@ -73,14 +73,16 @@ layout = html.Div([
 @app.callback(
     Output("progress", "animated"),
     [
-        Input("new-segmentation-name", "value"),
-        Input("selected-model-name", "value"),
         Input("start-new-segmentation", "n_clicks"),
-        Input('token', 'data'),
     ],
-    [State("progress", "animated")]
+    [
+        State("new-segmentation-name", "value"),
+        State("selected-model-name", "value"),
+        State('token', 'data'),
+        State("progress", "animated"),
+    ]
 )
-def start_segmentation(new_segmentation_name, selected_model, n, token, animated):
+def start_segmentation(n, new_segmentation_name, selected_model, token, animated):
     if animated:
         return False
     if n:
