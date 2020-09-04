@@ -10,7 +10,7 @@ from app.app import app
 from app.DatasetStore import DatasetStore
 from app.components.Viewer2D import Viewer2D
 from app.components.Progress import progress
-from app.api.utils import infer
+from app.api.utils import infer, poll_task, test_celery
 
 WORKER_ROOT_DATA_FOLDER="/home/brombaut/workspace/biosegment/data/"
 
@@ -68,10 +68,50 @@ layout = html.Div([
         id="selected-segmentation-name",
     ),
     viewer.layout(),
+    dcc.Store(id="task-id"),
+    dcc.Interval(id="task-polling", disabled=True)
 ])
 
 @app.callback(
-    Output("progress", "animated"),
+    [
+        Output("progress", "animated"),
+    ],
+    [
+        Input("task-polling", "n_intervals"),
+    ],
+    [
+        State("task-id", "data"),
+        State('token', 'data'),
+    ]
+)
+def dash_poll_task(n_intervals, task_id_data, token):
+    try:
+        task_id = task_id_data["task_id"]["task_id"]
+    except:
+        logging.debug("Not task id")
+        raise PreventUpdate
+    if not task_id:
+        logging.debug("Not task id2")
+        raise PreventUpdate
+    logging.debug(f"Task id {task_id}")
+    try:
+        response = poll_task(token=token, json={"task_id": task_id})
+    except:
+        logging.debug(f"Polling failed")
+        raise PreventUpdate
+    logging.debug(f"Response {response}")
+    state = response["state"]
+    if state == "PROGRESS":
+        return [True]
+    elif state == "PENDING":
+        return [False]
+    raise PreventUpdate
+
+@app.callback(
+    [
+        Output("task-id", "data"),
+        Output("task-polling", "disabled"),
+    ],
     [
         Input("start-new-segmentation", "n_clicks"),
     ],
@@ -79,12 +119,12 @@ layout = html.Div([
         State("new-segmentation-name", "value"),
         State("selected-model-name", "value"),
         State('token', 'data'),
-        State("progress", "animated"),
+        State("task-polling", "disabled"),
     ]
 )
-def start_segmentation(n, new_segmentation_name, selected_model, token, animated):
-    if animated:
-        return False
+def start_segmentation(n, new_segmentation_name, selected_model, token, no_polling):
+    if not no_polling:
+        raise PreventUpdate
     if n:
         logging.debug
         assert selected_model
@@ -97,8 +137,10 @@ def start_segmentation(n, new_segmentation_name, selected_model, token, animated
             "classes_of_interest": [0, 1, 2]
         }
         logging.debug(f"Start segmentation body: {body}")
-        infer(token=token, json=body)
-        return True
+        # task_id = infer(token=token, json=body)
+        task_id = test_celery(token=token, json={"timeout": 10})
+        return {"task_id": task_id}, False
+    raise PreventUpdate
 
 # @app.callback(
 #     [Output("progress", "value"), Output("progress", "children")],

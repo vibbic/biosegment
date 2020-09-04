@@ -87,7 +87,10 @@ def post(path, token, headers={}, **kwargs):
     assert token is not None
     logging.debug("POST using token")
     logging.debug(f"Path {path}")
-    payload = kwargs["json"]
+    try:
+        payload = kwargs["json"]
+    except:
+        payload = None
     logging.debug(f"JSON {payload}")
     r = requests.post(
         f"{API_ROOT}{path}", 
@@ -98,7 +101,7 @@ def post(path, token, headers={}, **kwargs):
             'Accept': 'application/json',
         },
         timeout=1,
-        data=json.dumps(payload)
+        json = payload
     )
     assert r.status_code == 200 or r.status_code == 201
     logging.debug(R"f {r}")

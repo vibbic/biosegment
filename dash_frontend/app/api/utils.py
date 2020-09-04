@@ -10,3 +10,14 @@ def get_multi(**kwargs):
 
 def infer(**kwargs):
     return base.post(f"{ENTRYPOINT_BASE}/infer/", **kwargs)
+
+def poll_task(**kwargs):
+    return base.post(f"{ENTRYPOINT_BASE}/poll-task/", **kwargs)
+
+def test_celery(json={"timeout": 10}, **kwargs):
+    try:
+        timeout = json["timeout"]
+    except:
+        # TODO
+        timeout = 10
+    return base.post(f"{ENTRYPOINT_BASE}/test-celery/?timeout={timeout}", **kwargs)
