@@ -12,4 +12,5 @@ from .segmentation import (
 )
 from .token import Token, TokenPayload
 from .training_task_msg import TrainingTaskMsg
+from .infer_task_msg import InferTaskMsg
 from .user import User, UserCreate, UserInDB, UserUpdate
