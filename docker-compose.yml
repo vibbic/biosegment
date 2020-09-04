@@ -105,18 +105,12 @@ services:
         - traefik.http.services.${STACK_NAME?Variable not set}-pgadmin.loadbalancer.server.port=5050
 
   queue:
-    image: rabbitmq:3
+    image: redis:latest
     # allow worker on host
     ports:
-      - 5672:5672
-      - 15672:15672
+      - 6379:6379
     volumes:
-      - "/etc/timezone:/etc/timezone:ro"
-      - "/etc/localtime:/etc/localtime:ro"
-    # Using the below image instead is required to enable the "Broker" tab in the flower UI:
-    # image: rabbitmq:3-management
-    #
-    # You also have to change the flower command
+      - "queue-data:/data"
   
   flower:
     image: mher/flower
@@ -126,7 +120,7 @@ services:
     env_file:
       - .env
     command:
-      - "--broker=amqp://guest@queue:5672//"
+      - "--broker=redis://queue:6379/0"
       # For the "Broker" tab to work in the flower UI, uncomment the following command argument,
       # and change the queue service's image as well
       # - "--broker_api=http://guest:guest@queue:15672/api//"
@@ -203,6 +197,7 @@ services:
 
 volumes:
   app-db-data:
+  queue-data:
 
 networks:
   traefik-public:

@@ -8,3 +8,6 @@ dependencies:
     # celery
   - celery
   - watchdog
+  - pip
+  - pip:
+      - celery[redis]
