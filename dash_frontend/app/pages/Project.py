@@ -19,6 +19,26 @@ layout = html.Div([
     )
 ])
 
+def get_comp_for_dataset(d):
+    card = dbc.Card(
+    dbc.CardBody(
+        [
+            html.H4(d['title'], className="card-title"),
+            # html.H6("Card subtitle", className="card-subtitle"),
+            html.P(
+                d['description'],
+                className="card-text",
+            ),
+            html.P(
+                className="card-text",
+            ),
+            dbc.CardLink("Go to Dataset", href=f"http://localhost/dash/dataset/{d['id']}"),
+        ]
+    ),
+    # style={"width": "18rem"},
+    )
+    return card
+
 def get_card_for_project(p):
     # print(p)
     card = dbc.Card(
@@ -30,11 +50,10 @@ def get_card_for_project(p):
                 p['description'],
                 className="card-text",
             ),
-            html.P(
-                str(p['datasets']),
-                className="card-text",
-            ),
             dbc.CardLink("Datasets", href=f"http://localhost/dash/project/{p['id']}/datasets"),
+            dbc.Row(
+                [get_comp_for_dataset(d) for d in p['datasets']]
+            )
         ]
     ),
     # style={"width": "18rem"},

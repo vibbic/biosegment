@@ -33,8 +33,7 @@ def get_card_for_project(p):
                 className="card-text",
             ),
 
-            dbc.CardLink("Card link", href="#"),
-            dbc.CardLink("External link", href="https://google.com"),
+            dbc.CardLink("Go to Project", href=f"http://localhost/dash/project/{p['id']}"),
         ]
     )],
     style={"width": "18rem"},
