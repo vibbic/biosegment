@@ -1,6 +1,7 @@
 import dash_html_components as html
 import dash_core_components as dcc
 from dash.dependencies import Input, Output, State
+from dash.exceptions import PreventUpdate
 import plotly.graph_objects as go
 
 from app.app import app
@@ -9,9 +10,11 @@ from app.DatasetStore import DatasetStore
 
 from app.components.BasicComponent import BasicComponent
 
-def add_layout_images_to_fig(fig, dataset, slice_id, update_ranges=True):
+def add_layout_images_to_fig(fig, segmentation, dataset, slice_id, update_ranges=True):
     """ images is a sequence of PIL Image objects """
-    images = [("slice", dataset.get_slice(slice_id)), ("label", dataset.get_label(slice_id))]
+    if not segmentation:
+        raise PreventUpdate
+    images = [("slice", dataset.get_slice(slice_id)), ("label", dataset.get_label(segmentation, slice_id))]
     for t_im in images:
         # if image is a path to an image, load the image to get its size
         is_slice = t_im[0] == "slice"
@@ -99,6 +102,7 @@ class Viewer2D(BasicComponent):
         app.callback(
             Output(f'{main_id}-graph', 'figure'),
             [
+                Input(f'{main_id}-current-segmentation-name', 'data'),
                 Input(f'{main_id}-current-dataset-name', 'data'),
                 Input(f'{main_id}-slice-id', 'value')
             ]
@@ -125,6 +129,7 @@ class Viewer2D(BasicComponent):
                     ]
                 },
             ),
+            dcc.Store(id=f'{self.main_id}-current-segmentation-name'),
             dcc.Store(id=f'{self.main_id}-current-dataset-name', data=self.default_dataset),
             dcc.Store(id=f'{self.main_id}-dataset-dimensions', data={"min": 0, "max": 63}),
             dcc.Store(id=f'{self.main_id}-slice-number-top', data=0),
@@ -143,8 +148,8 @@ class Viewer2D(BasicComponent):
         return min_slice, max_slice, marks, 10
     
     @staticmethod
-    def update_fig(current_dataset, slice_id):
+    def update_fig(current_segmentation, current_dataset, slice_id):
         fig = make_default_figure()
-        add_layout_images_to_fig(fig=fig, dataset=DatasetStore.get_dataset(current_dataset), slice_id=slice_id)
+        add_layout_images_to_fig(fig=fig, segmentation=current_segmentation, dataset=DatasetStore.get_dataset(current_dataset), slice_id=slice_id)
         return fig
 

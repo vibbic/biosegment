@@ -2,8 +2,18 @@
 import json
 import requests
 import logging
+import http.client
+
 # from requests_oauthlib import OAuth2Session
 from app.env import API_DOMAIN
+
+http.client.HTTPConnection.debuglevel = 1
+
+logging.basicConfig()
+logging.getLogger().setLevel(logging.DEBUG)
+requests_log = logging.getLogger("requests.packages.urllib3")
+requests_log.setLevel(logging.DEBUG)
+requests_log.propagate = True
 
 # TODO remove credentials and use client secret
 ROOT_USERNAME = "admin@biosegment.irc.ugent.be"
@@ -62,7 +72,8 @@ def get(path, token, headers={}, **kwargs):
     r = requests.get(
         f"{API_ROOT}{path}", 
         headers={
-            'Authorization': 'Bearer ' + token, 
+            'Authorization': 'Bearer ' + token,
+            'Accept': 'application/json',
             # **headers
         },
         timeout=1,
@@ -76,16 +87,20 @@ def post(path, token, headers={}, **kwargs):
     assert token is not None
     logging.debug("POST using token")
     logging.debug(f"Path {path}")
+    payload = kwargs["json"]
+    logging.debug(f"JSON {payload}")
     r = requests.post(
         f"{API_ROOT}{path}", 
         headers={
             'Authorization': 'Bearer ' + token, 
             # **headers
+            'Content-type': 'application/json', 
+            'Accept': 'application/json',
         },
         timeout=1,
-        **kwargs
+        data=json.dumps(payload)
     )
-    assert r.status_code == 200
+    assert r.status_code == 200 or r.status_code == 201
     logging.debug(R"f {r}")
     return r.json()
 
