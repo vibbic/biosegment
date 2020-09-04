@@ -1,4 +1,8 @@
+
 from app.celery_app import celery_app
+from celery.utils.log import get_task_logger
+
+logger = get_task_logger(__name__)
 
 ROOT_DATA_FOLDER="/home/brombaut/workspace/biosegment/data/"
 
@@ -122,12 +126,12 @@ def infer_unet2d(
     # model=f"{ROOT_DATA_FOLDER}models/unet_2d/best_checkpoint.pytorch",
     # model=f"{ROOT_DATA_FOLDER}models/2d/2d.pytorch", 
     model=f"{ROOT_DATA_FOLDER}models/EMBL/test_run2/best_checkpoint.pytorch", 
-    data_dir=f"{ROOT_DATA_FOLDER}EM/EMBL/raw",
+    data_dir=f"{ROOT_DATA_FOLDER}segmentations/EMBL/default",
     labels_dir=f"{ROOT_DATA_FOLDER}EM/EMBL/labels",
     input_size=(256,256), 
     in_channels=1,
     test_batch_size=1,
-    orientations=(0,),
+    orientations=[0],
     len_epoch=100,
     write_dir=f"{ROOT_DATA_FOLDER}segmentations/EMBL",
     classes_of_interest=(0, 1, 2)
@@ -164,6 +168,23 @@ def infer_unet2d(
             is_maximum_for_interest = maximums == i
             image_array[is_maximum_for_interest] = i
         write_volume(image_array, write_dir, type=type, index_inc=1)
+
+    assert model != "string"
+    if model[0] != "/":
+        model = f"{ROOT_DATA_FOLDER}{model}"
+    if data_dir[0] != "/":
+        data_dir = f"{ROOT_DATA_FOLDER}{data_dir}"
+    if labels_dir[0] != "/":
+        labels_dir = f"{ROOT_DATA_FOLDER}{labels_dir}"
+    if write_dir[0] != "/":
+        write_dir = f"{ROOT_DATA_FOLDER}{write_dir}"
+        
+    logger.info(f"data_dir {data_dir}")
+    logger.info(f"model {model}")
+    assert os.path.isfile(model)
+    assert os.path.isdir(data_dir)
+    assert os.path.isdir(labels_dir)
+    assert os.path.isdir(write_dir)
 
     input_shape = (1, input_size[0], input_size[1])
 
