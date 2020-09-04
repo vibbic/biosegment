@@ -20,22 +20,21 @@ def train_unet2d(
     current_user: models.User = Depends(deps.get_current_active_superuser),
 ) -> Any:
     """
-    Test neuralnets inference.
+    Train UNet2D model.
     """
-    print(args)
-    celery_app.send_task("app.worker.train_unet2d", args=args)
+    celery_app.send_task("app.worker.train_unet2d", kwargs=dict(args))
     return {"msg": "Word received"}
 
 
 @router.post("/infer/", response_model=schemas.Msg, status_code=201)
 def infer_unet2d(
-    msg: schemas.Msg,
+    args: schemas.InferTaskMsg,
     current_user: models.User = Depends(deps.get_current_active_superuser),
 ) -> Any:
     """
-    Test neuralnets inference.
+    Segment using UNet2D model.
     """
-    celery_app.send_task("app.worker.infer_unet2d", args=[])
+    celery_app.send_task("app.worker.infer_unet2d", kwargs=dict(args))
     return {"msg": "Word received"}
 
 

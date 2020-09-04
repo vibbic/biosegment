@@ -31,4 +31,4 @@ class TrainingTaskMsg(BaseModel):
     len_epoch: Optional[int]
     test_freq: Optional[int]
     train_batch_size: Optional[int]
-    trest_batch_size: Optional[int]
+    test_batch_size: Optional[int]
