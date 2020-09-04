@@ -7,4 +7,3 @@ class TaskState(BaseModel):
     state: str
     current: Optional[int]
     total: Optional[int]
-

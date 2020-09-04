@@ -11,8 +11,8 @@ from .segmentation import (
     SegmentationInDB,
     SegmentationUpdate,
 )
-from .token import Token, TokenPayload
-from .training_task import TrainingTask
 from .task import Task
 from .task_state import TaskState
+from .token import Token, TokenPayload
+from .training_task import TrainingTask
 from .user import User, UserCreate, UserInDB, UserUpdate
