@@ -1,10 +1,9 @@
 import logging
-import json
 from typing import Any, Optional
 
+from celery.result import AsyncResult
 from fastapi import APIRouter, Depends
 from pydantic.networks import EmailStr
-from celery.result import AsyncResult
 
 from app import models, schemas
 from app.api import deps
@@ -16,7 +15,7 @@ router = APIRouter()
 logger = logging.getLogger("api")
 
 
-@router.post("/train/", response_model=schemas.Msg, status_code=201)
+@router.post("/train/", response_model=schemas.Task, status_code=201)
 def train_unet2d(
     args: schemas.TrainingTask,
     current_user: models.User = Depends(deps.get_current_active_superuser),
@@ -24,11 +23,12 @@ def train_unet2d(
     """
     Train UNet2D model.
     """
-    celery_app.send_task("app.worker.train_unet2d", kwargs=dict(args))
-    return {"msg": "Word received"}
+    task = celery_app.send_task("app.worker.train_unet2d", kwargs=dict(args))
+    logging.debug(task)
+    return {"task_id": f"{task}"}
 
 
-@router.post("/infer/", response_model=schemas.Msg, status_code=201)
+@router.post("/infer/", response_model=schemas.Task, status_code=201)
 def infer_unet2d(
     args: schemas.InferTask,
     current_user: models.User = Depends(deps.get_current_active_superuser),
@@ -36,11 +36,12 @@ def infer_unet2d(
     """
     Segment using UNet2D model.
     """
-    celery_app.send_task("app.worker.infer_unet2d", kwargs=dict(args))
-    return {"msg": "Word received"}
+    task = celery_app.send_task("app.worker.infer_unet2d", kwargs=dict(args))
+    logging.debug(task)
+    return {"task_id": f"{task}"}
 
 
-@router.post("/test-pytorch/", response_model=schemas.Msg, status_code=201)
+@router.post("/test-pytorch/", response_model=schemas.Task, status_code=201)
 def test_pytorch(
     msg: schemas.Msg,
     current_user: models.User = Depends(deps.get_current_active_superuser),
@@ -48,8 +49,9 @@ def test_pytorch(
     """
     Test Celery worker and Pytorch.
     """
-    celery_app.send_task("app.worker.test_pytorch", args=[msg.msg])
-    return {"msg": "Word received"}
+    task = celery_app.send_task("app.worker.test_pytorch", args=[msg.msg])
+    logging.debug(task)
+    return {"task_id": f"{task}"}
 
 
 @router.post("/test-celery/", response_model=schemas.Task, status_code=201)
@@ -64,6 +66,7 @@ def test_celery(
     logging.debug(task)
     return {"task_id": f"{task}"}
 
+
 @router.post("/poll-task/", response_model=schemas.TaskState, status_code=200)
 def poll_task(
     task: schemas.Task,
@@ -72,15 +75,14 @@ def poll_task(
     """
     Poll Celery task.
     """
-    result = AsyncResult(task.task_id,app=celery_app)
+    result = AsyncResult(task.task_id, app=celery_app)
     state = result.state
-    response = {
-        "state": state
-    }
+    response = {"state": state}
     if state == "PROGRESS":
         response["current"] = result.info.get("current")
         response["total"] = result.info.get("total")
     return response
+
 
 @router.post("/test-email/", response_model=schemas.Msg, status_code=201)
 def test_email(
