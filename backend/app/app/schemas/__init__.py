@@ -1,6 +1,6 @@
 from .annotation import Annotation, AnnotationCreate, AnnotationInDB, AnnotationUpdate
 from .dataset import Dataset, DatasetCreate, DatasetInDB, DatasetUpdate
-from .infer_task_msg import InferTaskMsg
+from .infer_task import InferTask
 from .item import Item, ItemCreate, ItemInDB, ItemUpdate
 from .model import Model, ModelCreate, ModelInDB, ModelUpdate
 from .msg import Msg
@@ -12,5 +12,7 @@ from .segmentation import (
     SegmentationUpdate,
 )
 from .token import Token, TokenPayload
-from .training_task_msg import TrainingTaskMsg
+from .training_task import TrainingTask
+from .task import Task
+from .task_state import TaskState
 from .user import User, UserCreate, UserInDB, UserUpdate

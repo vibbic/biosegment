@@ -3,7 +3,7 @@ from typing import List, Optional
 from pydantic import BaseModel
 
 
-class InferTaskMsg(BaseModel):
+class InferTask(BaseModel):
     model: str
     data_dir: str
     labels_dir: str

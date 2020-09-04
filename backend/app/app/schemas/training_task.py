@@ -3,7 +3,7 @@ from typing import List, Optional
 from pydantic import BaseModel
 
 
-class TrainingTaskMsg(BaseModel):
+class TrainingTask(BaseModel):
     data_dir: str
     log_dir: str
     input_size: List[int]
