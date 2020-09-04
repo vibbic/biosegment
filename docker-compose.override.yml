@@ -40,7 +40,7 @@ services:
     ports:
       - "8888:8888"
     volumes:
-      - ./backend:/backend
+      - ./backend/app:/app
       - ${ROOT_DATA_FOLDER?Variable not set}:/data:ro
     environment:
       - JUPYTER=jupyter lab --ip=0.0.0.0 --allow-root --NotebookApp.custom_display_url=http://127.0.0.1:8888
