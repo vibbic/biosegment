@@ -6,8 +6,17 @@ logger = get_task_logger(__name__)
 
 ROOT_DATA_FOLDER="/home/brombaut/workspace/biosegment/data/"
 
-@celery_app.task(acks_late=True)
-def test_pytorch(word: str) -> str:
+def create_meta(current, total):
+    return {
+        "current": current,
+        "total": total
+    }
+
+@celery_app.task(bind=True, acks_late=True)
+def test_pytorch(
+    self,
+    word: str,
+) -> str:
     import torch
     current_device = torch.cuda.current_device()
     device_count = torch.cuda.device_count()
@@ -16,8 +25,9 @@ def test_pytorch(word: str) -> str:
     word = f"{current_device} {device_count} {device_name} {is_available}"
     return f"test task return {word}"
 
-@celery_app.task(acks_late=True)
+@celery_app.task(bind=True, acks_late=True)
 def train_unet2d(
+    self,
     seed=0,
     device=0,
     data_dir=f"{ROOT_DATA_FOLDER}",
@@ -121,8 +131,9 @@ def train_unet2d(
 
 
 
-@celery_app.task(acks_late=True)
+@celery_app.task(bind=True, acks_late=True)
 def infer_unet2d(
+    self,
     # model=f"{ROOT_DATA_FOLDER}models/unet_2d/best_checkpoint.pytorch",
     # model=f"{ROOT_DATA_FOLDER}models/2d/2d.pytorch", 
     model=f"{ROOT_DATA_FOLDER}models/EMBL/test_run2/best_checkpoint.pytorch", 
@@ -148,9 +159,12 @@ def infer_unet2d(
              val_file=None, writer=None, epoch=0, track_progress=False, device=0, orientations=(0,), normalization='unit'):
         # compute segmentation for each orientation and average results
         segmentation = np.zeros((net.out_channels, *data.shape))
+        progress=3
         for orientation in orientations:
             segmentation += segment(data, net, input_size, train=False, in_channels=in_channels, batch_size=batch_size,
                                     track_progress=track_progress, device=device, orientation=orientation, normalization=normalization)
+            progress += 1
+            self.update_state(state="PROGRESS", meta=create_meta(progress, 10))
         segmentation = segmentation / len(orientations)
         return segmentation
 
@@ -205,7 +219,9 @@ def infer_unet2d(
     print_frm('Loading model')
     net = torch.load(model)
     print_frm('Segmenting')
+    self.update_state(state="PROGRESS", meta=create_meta(1, 10))
     segmentation = infer(net, test.data, orientations=orientations, input_size=input_size, in_channels=in_channels)
 
     if write_dir:
-         write_out(write_dir, segmentation, classes_of_interest=classes_of_interest)
+        self.update_state(state="PROGRESS", meta=create_meta(9, 10))
+        write_out(write_dir, segmentation, classes_of_interest=classes_of_interest)
