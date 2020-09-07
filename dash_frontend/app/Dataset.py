@@ -7,43 +7,37 @@ from PIL import Image
 from skimage import io as skio
 from app.image_utils import label_to_colors
 from app.env import ROOT_DATA_FOLDER
+import app.api as api 
 
 class Dataset:
 
-    def __init__(self, slices_folder):
+    def __init__(self, dataset_id, token):
+        self.dataset_id = dataset_id
+        self.token = token
+
+        dataset = api.dataset.get(dataset_id, token=token)
+        slices_folder=f"{ROOT_DATA_FOLDER}{dataset['location']}"
+        self.project_id = dataset['owner_id']
+        logging.debug(f"Slices folder: {slices_folder}")
         assert os.path.exists(slices_folder)
         self.slices_folder = slices_folder
         self.slices = sorted(get_folder_list(slices_folder))
     
-    @staticmethod
-    def get_models_available():
-        return [
-            {
-                "label": "Untrained UNet2D",
-                "value": "models/2d/2d.pytorch"
-            },
-            {
-                "label": "Retrained UNet2D",
-                "value": "models/EMBL/test_run2/best_checkpoint.pytorch"
-            }
-        ]
+    def get_models_available(self, token):
+        models = api.model.get_multi_for_project(self.project_id, token=self.token)
+        logging.debug(f"Models: {models}")
+        return [{
+            "label": m["title"],
+            "value": m["location"],
+        } for m in models]
 
-    @staticmethod
-    def get_segmentations_available():
-        return [
-            {
-                "label": "Ground Truth",
-                "value": "segmentations/EMBL/labels/"
-            },
-            {
-                "label": "Untrained UNet2D Segmentation",
-                "value": "segmentations/EMBL/untrained"
-            },
-            {
-                "label": "Retrained UNet2D Segmentation",
-                "value": "segmentations/EMBL/retrained"
-            }
-        ]
+    def get_segmentations_available(self, token):
+        segmentations = api.segmentation.get_multi_for_dataset(self.dataset_id, token=self.token)
+        logging.debug(f"Segmentations: {segmentations}")
+        return [{
+            "label": m["title"],
+            "value": m["location"],
+        } for m in segmentations]
 
     def get_slice(self, slice_id):
         path = self.slices[slice_id]

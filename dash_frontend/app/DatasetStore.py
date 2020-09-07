@@ -1,17 +1,12 @@
+import logging
+
 from app.Dataset import Dataset
 from app.env import ROOT_DATA_FOLDER
-
-EM_FOLDER = f"{ROOT_DATA_FOLDER}EM/"
+import app.api as api
 
 class DatasetStore(object):
 
     __instance = None
-    available = [
-        {
-            "name": "EMBL",
-            "slices": f"{EM_FOLDER}EMBL/raw/"
-        },
-    ]
 
     def __init__(self):
         """ Virtually private constructor. """
@@ -28,10 +23,12 @@ class DatasetStore(object):
         return DatasetStore.__instance
 
     @staticmethod
-    def get_names_available():
-        return [d["name"] for d in DatasetStore.available]
+    def get_names_available(token):
+        datasets = api.dataset.get_multi(token=token)
+        logging.debug(f"Datasets: {datasets}")
+        # task_id = test_celery(token=token, json={"timeout": 10})
+        return datasets
 
     @staticmethod
-    def get_dataset(name):
-        metadata = [d for d in DatasetStore.available if d["name"] == name][0]
-        return Dataset(slices_folder=metadata["slices"])
+    def get_dataset(dataset_id, token):
+        return Dataset(dataset_id, token)

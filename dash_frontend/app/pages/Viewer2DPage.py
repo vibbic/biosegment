@@ -11,6 +11,7 @@ from app.DatasetStore import DatasetStore
 from app.components.Viewer2D import Viewer2D
 from app.components.TaskProgress import task_progress
 from app.api.utils import infer, poll_task, test_celery
+from app.api.dataset import get_multi
 
 WORKER_ROOT_DATA_FOLDER="/home/brombaut/workspace/biosegment/data/"
 
@@ -30,10 +31,6 @@ layout = html.Div([
     ),
     dcc.Dropdown(
         id="selected-dataset-name",
-        options=[
-            {"label": name, "value": name} for name in DatasetStore.get_names_available()
-        ],
-        value=DEFAULT_DATASET,
     ),
     html.H3(
         "Run segmentation"
@@ -69,6 +66,28 @@ layout = html.Div([
     ),
     viewer.layout(),
 ])
+
+@app.callback(
+    Output("selected-dataset-name", "options"),
+    [
+        Input('token', 'data')
+    ]
+)
+def get_dataset_options(token):
+    if token:
+        try:
+            datasets = DatasetStore.get_names_available(token=token)
+            if not datasets:
+                raise PreventUpdate
+            options = [{
+                "label": d["title"],
+                "value": d["id"],
+            } for d in datasets]
+            logging.debug(f"Datasets options: {options}")
+            return options
+        except:
+            raise PreventUpdate
+    raise PreventUpdate
 
 @app.callback(
     [
@@ -109,25 +128,44 @@ def select_segmentation(value):
 
 @app.callback([
     Output(f'selected-model-name', 'options'),
-], [Input('selected-dataset-name', 'value')])
-def change_model_options(name):
-    options = DatasetStore.get_dataset(name).get_models_available()
-    return [options]
+], [
+    Input('selected-dataset-name', 'value')
+], [
+    State('token', 'data')
+]
+)
+def change_model_options(name, token):
+    if name:
+        options = DatasetStore.get_dataset(name, token).get_models_available(token)
+        return [options]
+    raise PreventUpdate
 
 @app.callback([
     Output(f'selected-segmentation-name', 'options'),
-], [Input('selected-dataset-name', 'value')])
-def change_segmentation_options(name):
-    options = DatasetStore.get_dataset(name).get_segmentations_available()
-    return [options]
+], [
+    Input('selected-dataset-name', 'value')
+], [
+    State('token', 'data')
+]
+)
+def change_segmentation_options(name, token):
+    if name:
+        options = DatasetStore.get_dataset(name, token).get_segmentations_available(token)
+        return [options]
+    raise PreventUpdate
 
 @app.callback([
     Output(f'{VIEWER_ID}-current-dataset-name', 'data'),
     Output(f'{VIEWER_ID}-dataset-dimensions', 'data'),
-], [Input('selected-dataset-name', 'value')])
-def change_dataset(name):
-    dataset = DatasetStore.get_dataset(name)
-    return name, dataset.get_dimensions()
+], [
+    Input('selected-dataset-name', 'value')
+], [State('token', 'data')]
+)
+def change_dataset(name, token):
+    if name:
+        dataset = DatasetStore.get_dataset(name, token)
+        return name, dataset.get_dimensions()
+    raise PreventUpdate
 
 if __name__ == '__main__':
     app.layout = layout

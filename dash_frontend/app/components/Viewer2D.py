@@ -103,8 +103,12 @@ class Viewer2D(BasicComponent):
             Output(f'{main_id}-graph', 'figure'),
             [
                 Input(f'{main_id}-current-segmentation-name', 'data'),
-                Input(f'{main_id}-current-dataset-name', 'data'),
+                # TODO
+                Input('selected-dataset-name', 'value'),
                 Input(f'{main_id}-slice-id', 'value')
+            ],
+            [
+                State('token', 'data')
             ]
         )(Viewer2D.update_fig)
 
@@ -148,8 +152,10 @@ class Viewer2D(BasicComponent):
         return min_slice, max_slice, marks, 10
     
     @staticmethod
-    def update_fig(current_segmentation, current_dataset, slice_id):
+    def update_fig(current_segmentation, current_dataset, slice_id, token):
+        if not current_dataset:
+            raise PreventUpdate
         fig = make_default_figure()
-        add_layout_images_to_fig(fig=fig, segmentation=current_segmentation, dataset=DatasetStore.get_dataset(current_dataset), slice_id=slice_id)
+        add_layout_images_to_fig(fig=fig, segmentation=current_segmentation, dataset=DatasetStore.get_dataset(current_dataset, token), slice_id=slice_id)
         return fig
 
