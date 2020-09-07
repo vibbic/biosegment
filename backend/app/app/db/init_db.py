@@ -4,10 +4,34 @@ from app import crud, schemas
 from app.core.config import settings
 from app.db.base import Base  # noqa: F401
 
+def add_dataset(db, user, project, model, name):
+    title = f"{name} Dataset"
+    dataset_in = schemas.DatasetCreate(
+            title=title,
+            description=f"{title} description",
+            location=f"EM/{name}/raw/"
+    )
+    dataset = crud.dataset.create_with_owner(db, obj_in=dataset_in, owner_id=user.id, project_id=project.id)
+
+    segmentation_in = schemas.SegmentationCreate(
+            title="Ground Truth",
+            description=f"{name} Ground Truth",
+            location=f"segmentations/{name}/labels/"
+    )
+    ground_truth = crud.segmentation.create_with_owner(
+        db, 
+        obj_in=segmentation_in, 
+        owner_id=user.id, 
+        dataset_id=dataset.id,
+        # TODO make model optional
+        model_id=model.id
+    )
+    return dataset, ground_truth
+
+
 # make sure all SQL Alchemy models are imported (app.db.base) before initializing DB
 # otherwise, SQL Alchemy might fail to initialize relationships properly
 # for more details: https://github.com/tiangolo/full-stack-fastapi-postgresql/issues/28
-
 
 def init_db(db: Session) -> None:
     # TODO remove in testing
@@ -35,14 +59,6 @@ def init_db(db: Session) -> None:
     )
     main_project = crud.project.create_with_owner(db, obj_in=project_in, owner_id=user.id)
 
-    # add EMBL dataset
-    dataset_in = schemas.DatasetCreate(
-            title="EMBL Dataset",
-            description="EMBL Dataset description",
-            location="EM/EMBL/raw/"
-    )
-    embl_dataset = crud.dataset.create_with_owner(db, obj_in=dataset_in, owner_id=user.id, project_id=main_project.id)
-
     # add untrained unet2d model
     model_in = schemas.ModelCreate(
             title="Untrained UNet2D",
@@ -51,6 +67,9 @@ def init_db(db: Session) -> None:
     )
     untrained_unet2d = crud.model.create_with_owner(db, obj_in=model_in, owner_id=user.id, project_id=main_project.id)
 
+    # add EMBL dataset
+    embl_dataset, embl_ground_truth = add_dataset(db, user, main_project, untrained_unet2d, "EMBL")
+
     # add unet2d model trained on ground truth
     model_in = schemas.ModelCreate(
             title="Trained UNet2D",
@@ -58,21 +77,6 @@ def init_db(db: Session) -> None:
             location="models/EMBL/test_run2/best_checkpoint.pytorch"
     )
     trained_unet2d = crud.model.create_with_owner(db, obj_in=model_in, owner_id=user.id, project_id=main_project.id)
-
-    # add ground truth segmentation
-    segmentation_in = schemas.SegmentationCreate(
-            title="Ground Truth",
-            description="EMBL Ground Truth",
-            location="segmentations/EMBL/labels/"
-    )
-    ground_truth = crud.segmentation.create_with_owner(
-        db, 
-        obj_in=segmentation_in, 
-        owner_id=user.id, 
-        dataset_id=embl_dataset.id,
-        # TODO make model optional
-        model_id=untrained_unet2d.id
-    )
 
     # add untrained unet2d segmentation
     segmentation_in = schemas.SegmentationCreate(
@@ -101,5 +105,10 @@ def init_db(db: Session) -> None:
         dataset_id=embl_dataset.id,
         model_id=trained_unet2d.id
     )
-
-
+    
+    # add EPFL dataset
+    embl_dataset, embl_ground_truth = add_dataset(db, user, main_project, untrained_unet2d, "EPFL")
+    # add Kasthuri dataset
+    embl_dataset, embl_ground_truth = add_dataset(db, user, main_project, untrained_unet2d, "Kasthuri")
+    # add VNC dataset
+    embl_dataset, embl_ground_truth = add_dataset(db, user, main_project, untrained_unet2d, "VNC")
