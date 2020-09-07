@@ -10,8 +10,7 @@ from app.app import app
 from app.DatasetStore import DatasetStore
 from app.components.Viewer2D import Viewer2D
 from app.components.TaskProgress import task_progress
-from app.api.utils import infer, poll_task, test_celery
-from app.api.dataset import get_multi
+from app import api
 
 WORKER_ROOT_DATA_FOLDER="/home/brombaut/workspace/biosegment/data/"
 
@@ -105,6 +104,7 @@ def start_segmentation(n, new_segmentation_name, selected_model):
     if n:
         assert selected_model
         body = {
+            "title": new_segmentation_name,
             "model": selected_model,
             "data_dir": f"EM/EMBL/raw",
             "labels_dir": f"EM/EMBL/labels",
@@ -113,7 +113,8 @@ def start_segmentation(n, new_segmentation_name, selected_model):
             "classes_of_interest": [0, 1, 2]
         }
         logging.debug(f"Start segmentation body: {body}")
-        task_id = infer(json=body)
+        # task_id = api.utils.infer(json=body)
+        task_id = api.segmentation.create(json=body)
         # task_id = test_celery(json={"timeout": 10})
         return [{"task_id": task_id}]
     raise PreventUpdate

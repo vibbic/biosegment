@@ -7,7 +7,7 @@ from dash.dependencies import Input, Output, State
 from dash.exceptions import PreventUpdate
 
 from app.app import app
-from app.api.utils import poll_task
+from app import api
 
 
 task_progress = html.Div(
@@ -43,7 +43,7 @@ def dash_poll_task(n_intervals, task_id_data):
         return [0, 100, True, "0%", "primary", True]
     logging.debug(f"Task id {task_id}")
     try:
-        response = poll_task(json={"task_id": task_id})
+        response = api.utils.poll_task(json={"task_id": task_id})
     except:
         logging.debug(f"Polling failed")
         raise PreventUpdate

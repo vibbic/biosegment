@@ -8,6 +8,7 @@ from .project import Project, ProjectCreate, ProjectInDB, ProjectUpdate
 from .segmentation import (
     Segmentation,
     SegmentationCreate,
+    SegmentationCreateFromModel,
     SegmentationInDB,
     SegmentationUpdate,
 )

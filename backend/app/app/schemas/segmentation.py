@@ -1,7 +1,7 @@
 from typing import Optional
 
 from pydantic import BaseModel
-
+from app.schemas.infer_task import InferTask
 
 # Shared properties
 class SegmentationBase(BaseModel):
@@ -15,6 +15,8 @@ class SegmentationBase(BaseModel):
 class SegmentationCreate(SegmentationBase):
     title: str
 
+class SegmentationCreateFromModel(InferTask):
+    title: str
 
 # Properties to receive on segmentation update
 class SegmentationUpdate(SegmentationBase):

@@ -105,6 +105,6 @@ def post(path, headers={}, **kwargs):
         json = payload
     )
     assert r.status_code == 200 or r.status_code == 201
-    logging.debug(R"f {r}")
+    logging.debug(f"f {r}")
     return r.json()
 

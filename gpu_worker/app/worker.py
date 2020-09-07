@@ -145,7 +145,8 @@ def infer_unet2d(
     orientations=[0],
     len_epoch=100,
     write_dir=f"{ROOT_DATA_FOLDER}segmentations/EMBL",
-    classes_of_interest=(0, 1, 2)
+    classes_of_interest=(0, 1, 2),
+    **kwargs,
 ):
     import os
     import torch
@@ -231,3 +232,22 @@ def infer_unet2d(
     if write_dir:
         self.update_state(state="PROGRESS", meta=create_meta(9, 10))
         write_out(write_dir, segmentation, classes_of_interest=classes_of_interest)
+    
+    # TODO use on_success syntax
+    # if metadata for segmentation creation is present
+    if len(kwargs) > 0:
+        logger.info(f"Running subtask with kwargs {kwargs}")
+        task = celery_app.send_task(
+            "app.worker.create_segmentation_from_inference", 
+            # TODO better routing of tasks
+            queue="main-queue",
+            kwargs={
+            "obj_in": {
+                "title": kwargs["title"],
+                "location": kwargs["location"],
+            },
+            "owner_id": 1,
+        })
+        logger.info(f"Subtask {task}")
+    else:
+        logger.info(f"Not subtask with kwargs {kwargs}")

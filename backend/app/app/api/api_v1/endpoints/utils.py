@@ -1,5 +1,5 @@
 import logging
-from typing import Any, Optional
+from typing import Any, Optional, Union
 
 from celery.result import AsyncResult
 from fastapi import APIRouter, Depends
@@ -30,7 +30,7 @@ def train_unet2d(
 
 @router.post("/infer/", response_model=schemas.Task, status_code=201)
 def infer_unet2d(
-    args: schemas.InferTask,
+    args: Union[schemas.InferTask, schemas.SegmentationCreateFromModel],
     current_user: models.User = Depends(deps.get_current_active_superuser),
 ) -> Any:
     """

@@ -1,10 +1,13 @@
-from typing import Any, List
+from typing import Any, List, Union
+import logging
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from app import crud, models, schemas
 from app.api import deps
+from .utils import infer_unet2d
+from app.core.celery_app import celery_app
 
 router = APIRouter()
 
@@ -28,21 +31,52 @@ def read_segmentations(
     return segmentations
 
 
-@router.post("/", response_model=schemas.Segmentation)
+@router.post("/", response_model=Union[schemas.Segmentation, schemas.Task])
 def create_segmentation(
     *,
     db: Session = Depends(deps.get_db),
-    segmentation_in: schemas.SegmentationCreate,
+    segmentation_in: schemas.SegmentationCreateFromModel,
     current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
-    Create new segmentation.
+    Create new segmentation, possibly from a model.
     """
-    segmentation = crud.segmentation.create_with_owner(
-        db=db, obj_in=segmentation_in, owner_id=current_user.id
-    )
-    return segmentation
+    logging.info("Creating segmentation")
 
+    # TODO check which part of Union
+    try:
+        if segmentation_in.model:
+            from_model = True
+    except:
+            from_model = True
+    if from_model:
+        # TODO better handling of future model location
+        logging.info(f"Creating segmentation from model {segmentation_in}")
+
+        kwargs = dict(segmentation_in)
+        kwargs["location"] = segmentation_in.data_dir + "/best_checkpoint.pytorch"
+        task = celery_app.send_task("app.worker.infer_unet2d", args=[], kwargs=kwargs)
+        return {"task_id": f"{task}"}
+    else:
+        segmentation = crud.segmentation.create_with_owner(
+            db=db, obj_in=segmentation_in, owner_id=current_user.id
+        )
+        return segmentation
+
+# @router.post("/", response_model=schemas.Segmentation)
+# def create_segmentation_from_model(
+#     *,
+#     db: Session = Depends(deps.get_db),
+#     segmentation_in: schemas.SegmentationCreateFromModel,
+#     current_user: models.User = Depends(deps.get_current_active_user),
+# ) -> Any:
+#     """
+#     Create new segmentation from a model.
+#     """
+#     segmentation = crud.segmentation.create_with_owner(
+#         db=db, obj_in=segmentation_in, owner_id=current_user.id
+#     )
+#     return segmentation
 
 @router.put("/{id}", response_model=schemas.Segmentation)
 def update_segmentation(
