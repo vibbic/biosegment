@@ -92,13 +92,13 @@ def train_unet2d(
                         RandomDeformation_2D(input_shape[1:], grid_size=(64, 64), sigma=0.01, device=device,
                                             include_segmentation=True),
                         AddNoise(sigma_max=0.05, include_segmentation=True)])
-    train = StronglyLabeledVolumeDataset(os.path.join(data_dir, 'EM/EMBL/train'),
-                                        os.path.join(data_dir, 'EM/EMBL/train_labels'),
+    train = StronglyLabeledVolumeDataset(os.path.join(data_dir, 'train'),
+                                        os.path.join(data_dir, 'train_labels'),
                                         input_shape=input_shape, len_epoch=len_epoch, type='pngseq',
                                         in_channels=in_channels, batch_size=train_batch_size,
                                         orientations=orientations)
-    test = StronglyLabeledVolumeDataset(os.path.join(data_dir, 'EM/EMBL/test'),
-                                        os.path.join(data_dir, 'EM/EMBL/test_labels'),
+    test = StronglyLabeledVolumeDataset(os.path.join(data_dir, 'test'),
+                                        os.path.join(data_dir, 'test_labels'),
                                         input_shape=input_shape, len_epoch=len_epoch, type='pngseq',
                                         in_channels=in_channels, batch_size=test_batch_size,
                                         orientations=orientations)
@@ -193,11 +193,17 @@ def infer_unet2d(
     if write_dir[0] != "/":
         write_dir = f"{ROOT_DATA_FOLDER}{write_dir}"
         
-    logger.info(f"data_dir {data_dir}")
     logger.info(f"model {model}")
     assert os.path.isfile(model)
+    logger.info(f"data_dir {data_dir}")
     assert os.path.isdir(data_dir)
+    logger.info(f"labels_dir {labels_dir}")
     assert os.path.isdir(labels_dir)
+    logger.info(f"write_dir {write_dir}")
+    try:
+        os.mkdir(write_dir)
+    except OSError as error:
+        logger.error("Write dir already exists: {write_dir}")
     assert os.path.isdir(write_dir)
 
     input_shape = (1, input_size[0], input_size[1])
