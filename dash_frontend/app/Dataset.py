@@ -11,11 +11,9 @@ import app.api as api
 
 class Dataset:
 
-    def __init__(self, dataset_id, token):
+    def __init__(self, dataset_id):
         self.dataset_id = dataset_id
-        self.token = token
-
-        dataset = api.dataset.get(dataset_id, token=token)
+        dataset = api.dataset.get(dataset_id)
         slices_folder=f"{ROOT_DATA_FOLDER}{dataset['location']}"
         self.project_id = dataset['owner_id']
         logging.debug(f"Slices folder: {slices_folder}")
@@ -23,16 +21,16 @@ class Dataset:
         self.slices_folder = slices_folder
         self.slices = sorted(get_folder_list(slices_folder))
     
-    def get_models_available(self, token):
-        models = api.model.get_multi_for_project(self.project_id, token=self.token)
+    def get_models_available(self):
+        models = api.model.get_multi_for_project(self.project_id)
         logging.debug(f"Models: {models}")
         return [{
             "label": m["title"],
             "value": m["location"],
         } for m in models]
 
-    def get_segmentations_available(self, token):
-        segmentations = api.segmentation.get_multi_for_dataset(self.dataset_id, token=self.token)
+    def get_segmentations_available(self):
+        segmentations = api.segmentation.get_multi_for_dataset(self.dataset_id)
         logging.debug(f"Segmentations: {segmentations}")
         return [{
             "label": m["title"],

@@ -33,7 +33,7 @@ def get_card_for_project(p):
                 className="card-text",
             ),
 
-            dbc.CardLink("Go to Project", href=f"http://localhost/dash/project/{p['id']}"),
+            dbc.CardLink("Go to Project", href=f"http://localhost/dash/projects/{p['id']}"),
         ]
     )],
     style={"width": "18rem"},
@@ -43,16 +43,10 @@ def get_card_for_project(p):
 @app.callback([
     Output('projects', 'children'),
 ], [
-    Input('token', 'data'),
     Input('update-button-projects', 'n_clicks'),
 ])
-def update_projects(token, clicks):
-    if token is None:
-        print("Update prevented")
-        raise PreventUpdate
-    print("Updating")
-    projects = api.project.get_multi(token=token)
-    print(f"Projects {projects}")
+def update_projects(clicks):
+    projects = api.project.get_multi()
     return [[get_card_for_project(p) for p in projects]]
 
 if __name__ == '__main__':

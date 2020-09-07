@@ -7,7 +7,7 @@ from app.app import app
 from app import api
 
 title="Project"
-path="/project"
+path="/projects"
 
 layout = html.Div([
     html.P(
@@ -32,7 +32,7 @@ def get_comp_for_dataset(d):
             html.P(
                 className="card-text",
             ),
-            dbc.CardLink("Go to Dataset", href=f"http://localhost/dash/dataset/{d['id']}"),
+            dbc.CardLink("Go to Dataset", href=f"http://localhost/dash/datasets/{d['id']}"),
         ]
     ),
     # style={"width": "18rem"},
@@ -50,7 +50,7 @@ def get_card_for_project(p):
                 p['description'],
                 className="card-text",
             ),
-            dbc.CardLink("Datasets", href=f"http://localhost/dash/project/{p['id']}/datasets"),
+            dbc.CardLink("Datasets", href=f"http://localhost/dash/projects/{p['id']}/datasets"),
             dbc.Row(
                 [get_comp_for_dataset(d) for d in p['datasets']]
             )
@@ -64,13 +64,12 @@ def get_card_for_project(p):
     Output('project', 'children'),
 ], [
     Input('url', 'pathname'),
-    Input('token', 'data'),
     Input('update-button-project', 'n_clicks'),
 ])
-def update_project(pathname, token, clicks):
+def update_project(pathname, clicks):
     project_id = pathname.split('/')[-1]
-    project = api.project.get(project_id, token=token)
-    datasets = api.dataset.get_multi_for_project(project_id, token=token)
+    project = api.project.get(project_id)
+    datasets = api.dataset.get_multi_for_project(project_id)
     project['datasets'] = datasets
     return [get_card_for_project(project)]
 

@@ -47,8 +47,7 @@ def get_tokens():
     logging.debug(data)
     logging.debug(TOKEN_URL)
     try:
-        access_token_response = requests.post(TOKEN_URL, data=data, 
-        timeout=1,
+        access_token_response = requests.post(TOKEN_URL, data=data, timeout=1,
         # auth=(client_id, client_secret)
         )
         logging.debug(access_token_response)
@@ -59,15 +58,18 @@ def get_tokens():
         tokens = new_tokens
         # print(Base.tokens)
         token = tokens['access_token']
-        logging.debug(token)
+        logging.debug(f"Token type: {type(token)}")
     except Exception as e:
         logging.debug(f"Error {e}")
         token = None
-    return token
+    return str(token)
     
-def get(path, token, headers={}, **kwargs):
-    assert token is not None
-    logging.debug("GET using token")
+
+token = get_tokens()
+
+def get(path, headers={}, **kwargs):
+    global token
+    logging.debug(f"GET using token {token}")
     logging.debug(f"Path {path}")
     r = requests.get(
         f"{API_ROOT}{path}", 
@@ -76,16 +78,15 @@ def get(path, token, headers={}, **kwargs):
             'Accept': 'application/json',
             # **headers
         },
-        timeout=1,
-        **kwargs
+        timeout=1
     )
     assert r.status_code == 200
-    logging.debug(R"f {r}")
+    logging.debug(f"f {r}")
     return r.json()
 
-def post(path, token, headers={}, **kwargs):
-    assert token is not None
-    logging.debug("POST using token")
+def post(path, headers={}, **kwargs):
+    global token
+    logging.debug(f"POST using token {token}")
     logging.debug(f"Path {path}")
     try:
         payload = kwargs["json"]

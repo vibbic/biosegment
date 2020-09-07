@@ -25,13 +25,18 @@ logging.basicConfig(
     format='%(asctime)s %(message)s',
 )
 
-pages = [
-    Project,
+# all pages for in navbar (no details)
+navigation_pages = [
     Projects,
     Datasets,
-    Dataset,
     Viewer2DPage,
     APIToken,
+]
+
+# details
+details = [
+    Project,
+    Dataset,
 ]
 
 SIDEBAR_STYLE = {
@@ -58,7 +63,7 @@ sidebar = html.Div(
             "A segmentation viewer", className="lead"
         ),
         dbc.Nav(
-            [dbc.NavLink(p.title, href=app.get_relative_path(p.path), id=f"{p.title}-link") for p in pages],
+            [dbc.NavLink(p.title, href=app.get_relative_path(p.path), id=f"{p.title}-link") for p in navigation_pages],
             vertical=True,
             pills=True,
         ),
@@ -68,43 +73,26 @@ sidebar = html.Div(
 
 app.layout = html.Div([
     dcc.Location(id='url', refresh=False),
-    dcc.Store(id='token', data=base.get_tokens(), storage_type='session'),
-    html.Div(id='start-token-update'),
     sidebar,
     html.Div(id='page-content', style=CONTENT_STYLE)
 ])
-
-@app.callback(
-    Output('token', 'data'),
-    [
-        Input('start-token-update', 'children')
-]
-)
-def update_token(token):
-    if token is None:
-        return base.get_tokens()
-    else:
-        raise PreventUpdate
 
 
 @app.callback(
     Output('page-content', 'children'),
     [
         Input('url', 'pathname'),
-        Input('token', 'data')
 ]
 )
-def display_page(pathname, token):
-    logging.debug(f"Token {token}")
+def display_page(pathname):
     current_page = None
-    for page in pages:
-        # print(pathname)
-        # print(app.get_relative_path(page.path))
-        # TODO improve routing and regex handling of ids in pathnames
-        # only works if this resolves to unique route path and there is no route
-        # do /projects/ and /project/id, not /projects/id  
-        if app.get_relative_path(page.path) in pathname:
+    for page in navigation_pages:
+        if app.get_relative_path(page.path) == pathname:
             current_page = page
+    if current_page is None:
+        for page in details:
+            if app.get_relative_path(page.path) in pathname:
+                current_page = page
     if current_page is None:
         return "404"
     return current_page.layout    

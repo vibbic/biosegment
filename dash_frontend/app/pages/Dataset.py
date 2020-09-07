@@ -7,7 +7,7 @@ from app.app import app
 from app import api
 
 title="Dataset"
-path="/dataset"
+path="/datasets"
 
 layout = html.Div([
     html.P(
@@ -43,12 +43,10 @@ def get_card_for_dataset(p):
 ], [
     Input('url', 'pathname'),
     Input('update-dataset-button', 'n_clicks'),
-    Input('token', 'data')
 ])
-def update_datasets(pathname, clicks, token):
+def update_datasets(pathname, clicks):
     dataset_id = pathname.split('/')[-1]
-    token = api.base.get_tokens()
-    dataset = api.dataset.get(id=dataset_id, token=token)
+    dataset = api.dataset.get(id=dataset_id)
     return [get_card_for_dataset(dataset)]
 
 if __name__ == '__main__':

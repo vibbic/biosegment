@@ -23,12 +23,12 @@ class DatasetStore(object):
         return DatasetStore.__instance
 
     @staticmethod
-    def get_names_available(token):
-        datasets = api.dataset.get_multi(token=token)
+    def get_names_available():
+        datasets = api.dataset.get_multi()
         logging.debug(f"Datasets: {datasets}")
-        # task_id = test_celery(token=token, json={"timeout": 10})
+        # task_id = test_celery(json={"timeout": 10})
         return datasets
 
     @staticmethod
-    def get_dataset(dataset_id, token):
-        return Dataset(dataset_id, token)
+    def get_dataset(dataset_id):
+        return Dataset(dataset_id)

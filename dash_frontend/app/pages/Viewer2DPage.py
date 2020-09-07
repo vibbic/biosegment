@@ -70,13 +70,13 @@ layout = html.Div([
 @app.callback(
     Output("selected-dataset-name", "options"),
     [
-        Input('token', 'data')
+        Input('url', 'pathname')
     ]
 )
-def get_dataset_options(token):
-    if token:
+def get_dataset_options(pathname):
+    if pathname:
         try:
-            datasets = DatasetStore.get_names_available(token=token)
+            datasets = DatasetStore.get_names_available()
             if not datasets:
                 raise PreventUpdate
             options = [{
@@ -98,11 +98,10 @@ def get_dataset_options(token):
     ],
     [
         State("new-segmentation-name", "value"),
-        State("selected-model-name", "value"),
-        State('token', 'data')
+        State("selected-model-name", "value")
     ]
 )
-def start_segmentation(n, new_segmentation_name, selected_model, token):
+def start_segmentation(n, new_segmentation_name, selected_model):
     if n:
         assert selected_model
         body = {
@@ -114,8 +113,8 @@ def start_segmentation(n, new_segmentation_name, selected_model, token):
             "classes_of_interest": [0, 1, 2]
         }
         logging.debug(f"Start segmentation body: {body}")
-        task_id = infer(token=token, json=body)
-        # task_id = test_celery(token=token, json={"timeout": 10})
+        task_id = infer(json=body)
+        # task_id = test_celery(json={"timeout": 10})
         return [{"task_id": task_id}]
     raise PreventUpdate
 
@@ -130,13 +129,10 @@ def select_segmentation(value):
     Output(f'selected-model-name', 'options'),
 ], [
     Input('selected-dataset-name', 'value')
-], [
-    State('token', 'data')
-]
-)
-def change_model_options(name, token):
+])
+def change_model_options(name):
     if name:
-        options = DatasetStore.get_dataset(name, token).get_models_available(token)
+        options = DatasetStore.get_dataset(name).get_models_available()
         return [options]
     raise PreventUpdate
 
@@ -144,13 +140,11 @@ def change_model_options(name, token):
     Output(f'selected-segmentation-name', 'options'),
 ], [
     Input('selected-dataset-name', 'value')
-], [
-    State('token', 'data')
 ]
 )
-def change_segmentation_options(name, token):
+def change_segmentation_options(name):
     if name:
-        options = DatasetStore.get_dataset(name, token).get_segmentations_available(token)
+        options = DatasetStore.get_dataset(name).get_segmentations_available()
         return [options]
     raise PreventUpdate
 
@@ -159,11 +153,10 @@ def change_segmentation_options(name, token):
     Output(f'{VIEWER_ID}-dataset-dimensions', 'data'),
 ], [
     Input('selected-dataset-name', 'value')
-], [State('token', 'data')]
-)
-def change_dataset(name, token):
+])
+def change_dataset(name):
     if name:
-        dataset = DatasetStore.get_dataset(name, token)
+        dataset = DatasetStore.get_dataset(name)
         return name, dataset.get_dimensions()
     raise PreventUpdate
 

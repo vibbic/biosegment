@@ -29,12 +29,9 @@ task_progress = html.Div(
     [
         Input("task-polling", "n_intervals"),
         Input("task-id", "data"),
-    ],
-    [
-        State('token', 'data'),
     ]
 )
-def dash_poll_task(n_intervals, task_id_data, token):
+def dash_poll_task(n_intervals, task_id_data):
     try:
         task_id = task_id_data["task_id"]["task_id"]
     except:
@@ -45,7 +42,7 @@ def dash_poll_task(n_intervals, task_id_data, token):
         return [0, 100, True, "0%", True]
     logging.debug(f"Task id {task_id}")
     try:
-        response = poll_task(token=token, json={"task_id": task_id})
+        response = poll_task(json={"task_id": task_id})
     except:
         logging.debug(f"Polling failed")
         raise PreventUpdate
