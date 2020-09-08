@@ -9,7 +9,8 @@ from dash.exceptions import PreventUpdate
 from app.app import app
 from app.DatasetStore import DatasetStore
 from app.components.Viewer2D import Viewer2D
-from app.components.TaskProgress import task_progress
+from app.components.SegmentationRunner import segmentation_runner_layout
+from app.components.DatasetSelector import dataset_selector_layout
 from app import api
 
 WORKER_ROOT_DATA_FOLDER="/home/brombaut/workspace/biosegment/data/"
@@ -25,46 +26,39 @@ VIEWER_ID = "viewer-1"
 viewer = Viewer2D(main_id="viewer-1", default_dataset=DEFAULT_DATASET)
 
 layout = html.Div([
-    html.P(
-        "Selected dataset"
+    dbc.Row(
+        dbc.Col(
+            dataset_selector_layout,
+            width=12,
+        )
     ),
-    dcc.Dropdown(
-        id="selected-dataset-name",
-    ),
-    html.H3(
-        "Run segmentation"
-    ),
-    html.P(
-        "Selected model"
-    ),
-    dcc.Dropdown(
-        id="selected-model-name",
-    ),
-    html.P(
-        "New segmentation name"
-    ),
-    dcc.Input(
-        id="new-segmentation-name",
-        value="New segmentation 1",
-        type="text",
-    ),
-    dbc.Button(
-        "Start new segmentation",
-        id="start-new-segmentation",
-        color="primary", className="mr-1"
-    ),
-    task_progress,
-    html.H3(
-        "Viewer"
-    ),
-    html.P(
-        "Selected segmentation"
-    ),
-    html.Button('Update segmentation options', id='update-button-segmentations-options'),
-    dcc.Dropdown(
-        id="selected-segmentation-name",
-    ),
-    viewer.layout(),
+    dbc.Row([
+        dbc.Col(
+            segmentation_runner_layout,
+            md=12,
+            lg=6,
+        ),
+        dbc.Col(
+            [
+                html.H3(
+                    "Viewer"
+                ),
+                html.P(
+                    "Selected segmentation"
+                ),
+                html.Button('Update segmentation options', id='update-button-segmentations-options'),
+                dcc.Dropdown(
+                    id="selected-segmentation-name",
+                ),
+                viewer.layout(),
+            ],
+            md=12,
+            lg=6
+        )
+]),
+    # Store for user created masks
+    # data is a list of dicts describing shapes
+    dcc.Store(id="masks", data={"shapes": []}),
 ])
 
 @app.callback(
