@@ -60,6 +60,7 @@ layout = html.Div([
     html.P(
         "Selected segmentation"
     ),
+    html.Button('Update segmentation options', id='update-button-segmentations-options'),
     dcc.Dropdown(
         id="selected-segmentation-name",
     ),
@@ -131,7 +132,7 @@ def select_segmentation(value):
 @app.callback([
     Output(f'selected-model-name', 'options'),
 ], [
-    Input('selected-dataset-name', 'value')
+    Input('selected-dataset-name', 'value'),
 ])
 def change_model_options(name):
     if name:
@@ -142,10 +143,11 @@ def change_model_options(name):
 @app.callback([
     Output(f'selected-segmentation-name', 'options'),
 ], [
-    Input('selected-dataset-name', 'value')
+    Input('selected-dataset-name', 'value'),
+    Input('update-button-segmentations-options', 'n_clicks')
 ]
 )
-def change_segmentation_options(name):
+def change_segmentation_options(name, n_clicks):
     if name:
         options = DatasetStore.get_dataset(name).get_segmentations_available()
         return [options]
