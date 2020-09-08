@@ -1,3 +1,6 @@
+import logging
+
+import dash
 import dash_html_components as html
 import dash_core_components as dcc
 from dash.dependencies import Input, Output, State
@@ -105,9 +108,18 @@ class Viewer2D(BasicComponent):
                 Input(f'{main_id}-current-segmentation-name', 'data'),
                 # TODO
                 Input('selected-dataset-name', 'value'),
-                Input(f'{main_id}-slice-id', 'value')
+                Input(f'{main_id}-slice-id', 'value'),
+            ], [
+                State(f'{main_id}-annotations', 'data'),
+                State(f'{main_id}-graph', 'figure')
             ]
         )(Viewer2D.update_fig)
+        app.callback(
+            Output(f'{self.main_id}-annotations', 'data'),
+            [
+                Input(f'{main_id}-graph', 'relayoutData'),
+            ]
+        )(Viewer2D.update_annotations)
 
 
     def layout(self):
@@ -135,6 +147,7 @@ class Viewer2D(BasicComponent):
             dcc.Store(id=f'{self.main_id}-dataset-dimensions', data={"min": 0, "max": 63}),
             dcc.Store(id=f'{self.main_id}-slice-number-top', data=0),
             dcc.Store(id=f'{self.main_id}-slice-number-side', data=0),
+            dcc.Store(id=f'{self.main_id}-annotations', data=None),
         ])
 
     @staticmethod
@@ -149,10 +162,25 @@ class Viewer2D(BasicComponent):
         return min_slice, max_slice, marks, 10
     
     @staticmethod
-    def update_fig(current_segmentation, current_dataset, slice_id):
+    def update_annotations(graph_relayoutData):
+        cbcontext = [p["prop_id"] for p in dash.callback_context.triggered][0]
+        logging.debug(f"Update: {cbcontext}")
+        # TODO remove hardcoded id
+        if cbcontext == "viewer-1-graph.relayoutData":
+            if "shapes" in graph_relayoutData.keys():
+                shapes = graph_relayoutData["shapes"]
+                logging.debug(f"Shapes: {shapes}")
+        raise PreventUpdate
+
+    @staticmethod
+    def update_fig(current_segmentation, current_dataset, slice_id, annotations, fig):
+        if fig is None:
+            fig = make_default_figure()
         if not current_dataset or not slice_id:
-            raise PreventUpdate
+            fig = make_default_figure()
+            return fig
         fig = make_default_figure()
+        logging.debug(f"Fig: {fig}")
         add_layout_images_to_fig(fig=fig, segmentation=current_segmentation, dataset=DatasetStore.get_dataset(current_dataset), slice_id=slice_id)
         return fig
 
