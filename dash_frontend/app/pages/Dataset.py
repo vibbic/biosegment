@@ -2,6 +2,7 @@ import dash_core_components as dcc
 import dash_html_components as html
 import dash_bootstrap_components as dbc
 from dash.dependencies import Input, Output
+from dash.exceptions import PreventUpdate
 
 from app.app import app
 from app import api
@@ -46,6 +47,11 @@ def get_card_for_dataset(p):
 ])
 def update_datasets(pathname, clicks):
     dataset_id = pathname.split('/')[-1]
+    try: 
+        # prevent GET /api/v1/datasets/viewer when browsing
+        int(dataset_id)
+    except ValueError:
+        raise PreventUpdate
     dataset = api.dataset.get(id=dataset_id)
     return [get_card_for_dataset(dataset)]
 
