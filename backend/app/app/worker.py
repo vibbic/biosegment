@@ -31,11 +31,11 @@ def test_celery(self, timeout: int) -> str:
 
 
 @celery_app.task(base=DatabaseTask, bind=True, acks_late=True)
-def create_segmentation_from_inference(self, obj_in, owner_id):
+def create_segmentation_from_inference(self, obj_in, owner_id, dataset_id, model_id):
     from app import crud
 
-    logger.info("obj_in is {obj_in}")
+    logger.info(f"obj_in is {obj_in}")
     segmentation = crud.segmentation.create_with_owner(
-            db=self.db, obj_in=obj_in, owner_id=owner_id
+            db=self.db, obj_in=obj_in, owner_id=owner_id, dataset_id=dataset_id, model_id=model_id
     )
     return segmentation.id

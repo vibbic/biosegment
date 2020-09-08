@@ -54,7 +54,7 @@ def create_segmentation(
         logging.info(f"Creating segmentation from model {segmentation_in}")
 
         kwargs = dict(segmentation_in)
-        kwargs["location"] = segmentation_in.data_dir + "/best_checkpoint.pytorch"
+        kwargs["location"] = segmentation_in.write_dir
         task = celery_app.send_task("app.worker.infer_unet2d", args=[], kwargs=kwargs)
         return {"task_id": f"{task}"}
     else:

@@ -247,6 +247,8 @@ def infer_unet2d(
                 "location": kwargs["location"],
             },
             "owner_id": 1,
+            "dataset_id": kwargs["dataset_id"],
+            "model_id": kwargs["model_id"],
         })
         logger.info(f"Subtask {task}")
     else:

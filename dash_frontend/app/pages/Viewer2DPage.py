@@ -106,6 +106,8 @@ def start_segmentation(n, new_segmentation_name, selected_model):
         body = {
             "title": new_segmentation_name,
             "model": selected_model,
+            "model_id": 1,
+            "dataset_id": 1,
             "data_dir": f"EM/EMBL/raw",
             "labels_dir": f"EM/EMBL/labels",
             "write_dir": f"segmentations/EMBL/{new_segmentation_name}",

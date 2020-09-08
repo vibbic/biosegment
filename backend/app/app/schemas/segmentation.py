@@ -17,6 +17,8 @@ class SegmentationCreate(SegmentationBase):
 
 class SegmentationCreateFromModel(InferTask):
     title: str
+    model_id: int
+    dataset_id: int
 
 # Properties to receive on segmentation update
 class SegmentationUpdate(SegmentationBase):
