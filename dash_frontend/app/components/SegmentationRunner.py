@@ -4,28 +4,37 @@ import dash_html_components as html
 
 from app.components.TaskProgress import task_progress
 
-segmentation_runner_layout = html.Div([
-    html.H3(
-        "Run segmentation"
+segmentation_runner_layout = dbc.Card([
+    html.H4(
+        "Run segmentation",
+        className="card-title"
     ),
-    html.P(
-        "Selected model"
+    dbc.FormGroup(
+        [
+            dbc.Label("Selected model"),
+            dcc.Dropdown(
+                id="selected-model-name",
+            ),
+        ]
     ),
-    dcc.Dropdown(
-        id="selected-model-name",
+    dbc.FormGroup(
+        [
+            dbc.Label("New segmentation name"),
+            dcc.Input(
+                id="new-segmentation-name",
+                value="New segmentation 1",
+                type="text",
+            ),
+        ]
     ),
-    html.P(
-        "New segmentation name"
-    ),
-    dcc.Input(
-        id="new-segmentation-name",
-        value="New segmentation 1",
-        type="text",
-    ),
-    dbc.Button(
-        "Start new segmentation",
-        id="start-new-segmentation",
-        color="primary", className="mr-1"
-    ),
-    task_progress,
-])
+    dbc.FormGroup(
+        [
+            dbc.Button(
+                "Start new segmentation",
+                id="start-new-segmentation",
+                color="primary", className="mr-1"
+            ),
+            task_progress,
+        ]
+    ),    
+], body=True)

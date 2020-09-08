@@ -11,6 +11,7 @@ from app.DatasetStore import DatasetStore
 from app.components.Viewer2D import Viewer2D
 from app.components.SegmentationRunner import segmentation_runner_layout
 from app.components.DatasetSelector import dataset_selector_layout
+from app.components.Interests import interests_layout
 from app import api
 
 WORKER_ROOT_DATA_FOLDER="/home/brombaut/workspace/biosegment/data/"
@@ -25,37 +26,45 @@ VIEWER_ID = "viewer-1"
 
 viewer = Viewer2D(main_id="viewer-1", default_dataset=DEFAULT_DATASET)
 
-layout = html.Div([
-    dbc.Row(
-        dbc.Col(
-            dataset_selector_layout,
-            width=12,
-        )
-    ),
-    dbc.Row([
-        dbc.Col(
-            segmentation_runner_layout,
-            md=12,
-            lg=6,
+layout = dbc.Container(
+    children=[
+        html.H1("Viewer 2D"),
+        html.Hr(),
+        dbc.Row(
+            dbc.Col(dataset_selector_layout),
+            style={
+                "marginBottom": "10px"
+            }
         ),
-        dbc.Col(
-            [
-                html.H3(
-                    "Viewer"
-                ),
-                html.P(
-                    "Selected segmentation"
-                ),
-                html.Button('Update segmentation options', id='update-button-segmentations-options'),
-                dcc.Dropdown(
-                    id="selected-segmentation-name",
-                ),
-                viewer.layout(),
-            ],
-            md=12,
-            lg=6
-        )
-]),
+        dbc.Row([
+            dbc.Col([
+                segmentation_runner_layout,
+                interests_layout,
+                ],
+                md=12,
+                lg=6,
+            ),
+            dbc.Col(
+                dbc.Card(
+                [
+                    html.H3(
+                        "Viewer"
+                    ),
+                    html.P(
+                        "Selected segmentation"
+                    ),
+                    html.Button('Update segmentation options', id='update-button-segmentations-options'),
+                    dcc.Dropdown(
+                        id="selected-segmentation-name",
+                    ),
+                    viewer.layout(),
+                ], body=True),
+                md=12,
+                lg=6
+            )
+        ], style={
+                "marginBottom": "10px"
+            }),
     # Store for user created masks
     # data is a list of dicts describing shapes
     dcc.Store(id="masks", data={"shapes": []}),

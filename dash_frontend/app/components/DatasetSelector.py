@@ -1,14 +1,14 @@
 import dash_html_components as html
 import dash_core_components as dcc
+import dash_bootstrap_components as dbc
 
-dataset_selector_layout = html.Div(
-[
-    html.H1("Viewer 2D"),
-    html.P(
-        "Selected dataset"
-    ),
-    dcc.Dropdown(
-        id="selected-dataset-name",
-    ),
-]
-)
+dataset_selector_layout = dbc.Card([
+    dbc.FormGroup(
+        [
+            dbc.Label("Selected dataset"),
+            dcc.Dropdown(
+                id="selected-dataset-name",
+            ),
+        ]
+    )
+], body=True)
