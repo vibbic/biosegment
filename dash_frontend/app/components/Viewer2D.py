@@ -12,9 +12,9 @@ from app.components.BasicComponent import BasicComponent
 
 def add_layout_images_to_fig(fig, segmentation, dataset, slice_id, update_ranges=True):
     """ images is a sequence of PIL Image objects """
-    if not segmentation:
-        raise PreventUpdate
-    images = [("slice", dataset.get_slice(slice_id)), ("label", dataset.get_label(segmentation, slice_id))]
+    images = [("slice", dataset.get_slice(slice_id))]
+    if segmentation:
+        images.append(("label", dataset.get_label(segmentation, slice_id)))
     for t_im in images:
         # if image is a path to an image, load the image to get its size
         is_slice = t_im[0] == "slice"
@@ -150,7 +150,7 @@ class Viewer2D(BasicComponent):
     
     @staticmethod
     def update_fig(current_segmentation, current_dataset, slice_id):
-        if not current_dataset:
+        if not current_dataset or not slice_id:
             raise PreventUpdate
         fig = make_default_figure()
         add_layout_images_to_fig(fig=fig, segmentation=current_segmentation, dataset=DatasetStore.get_dataset(current_dataset), slice_id=slice_id)
