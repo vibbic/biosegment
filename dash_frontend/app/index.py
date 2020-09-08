@@ -11,7 +11,6 @@ from app.api import base
 
 from app.pages import (
     Viewer2DPage,
-    APIToken,
     Projects,
     Project,
     Datasets,
@@ -30,7 +29,6 @@ navigation_pages = [
     Projects,
     Datasets,
     Viewer2DPage,
-    APIToken,
 ]
 
 # details
