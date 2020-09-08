@@ -1,12 +1,11 @@
-from typing import Any, List, Union
 import logging
+from typing import Any, List, Union
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from app import crud, models, schemas
 from app.api import deps
-from .utils import infer_unet2d
 from app.core.celery_app import celery_app
 
 router = APIRouter()
@@ -48,7 +47,7 @@ def create_segmentation(
         if segmentation_in.model:
             from_model = True
     except:
-            from_model = True
+        from_model = True
     if from_model:
         # TODO better handling of future model location
         logging.info(f"Creating segmentation from model {segmentation_in}")
@@ -62,6 +61,7 @@ def create_segmentation(
             db=db, obj_in=segmentation_in, owner_id=current_user.id
         )
         return segmentation
+
 
 # @router.post("/", response_model=schemas.Segmentation)
 # def create_segmentation_from_model(
@@ -77,6 +77,7 @@ def create_segmentation(
 #         db=db, obj_in=segmentation_in, owner_id=current_user.id
 #     )
 #     return segmentation
+
 
 @router.put("/{id}", response_model=schemas.Segmentation)
 def update_segmentation(
