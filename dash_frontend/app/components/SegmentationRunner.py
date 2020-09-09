@@ -27,6 +27,14 @@ segmentation_runner_layout = dbc.Card([
     ),
     dbc.FormGroup(
         [
+            dbc.Label("Selected annotation"),
+            dcc.Dropdown(
+                id="selected-annotation-name",
+            ),
+        ]
+    ),
+    dbc.FormGroup(
+        [
             dbc.Label("New segmentation name"),
             dcc.Input(
                 id="new-segmentation-name",
@@ -46,6 +54,17 @@ segmentation_runner_layout = dbc.Card([
         ]
     ),    
 ], body=True)
+
+@app.callback([
+    Output(f'selected-annotation-name', 'options'),
+], [
+    Input('selected-dataset-name', 'value'),
+])
+def change_model_options(name):
+    if name:
+        options = DatasetStore.get_dataset(name).get_annotations_available()
+        return [options]
+    raise PreventUpdate
 
 @app.callback([
     Output(f'selected-model-name', 'options'),
@@ -68,9 +87,10 @@ def change_model_options(name):
     [
         State("new-segmentation-name", "value"),
         State("selected-model-name", "value"),
+        State("selected-annotation-name", "value"),
     ]
 )
-def start_segmentation(n, new_segmentation_name, selected_model):
+def start_segmentation(n, new_segmentation_name, selected_model, selected_annotation):
     if n:
         assert selected_model
         body = {
@@ -79,7 +99,7 @@ def start_segmentation(n, new_segmentation_name, selected_model):
             "model_id": 1,
             "dataset_id": 1,
             "data_dir": f"EM/EMBL/raw",
-            "labels_dir": f"EM/EMBL/labels",
+            "labels_dir": selected_annotation,
             "write_dir": f"segmentations/EMBL/{new_segmentation_name}",
             "input_size": [512,512],
             "classes_of_interest": [0, 1, 2]

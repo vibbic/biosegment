@@ -30,6 +30,14 @@ class Dataset:
             "value": m["location"],
         } for m in models]
 
+    def get_annotations_available(self):
+        annotations = api.annotation.get_multi_for_dataset(self.dataset_id)
+        logging.debug(f"Annotations: {annotations}")
+        return [{
+            "label": a["title"],
+            "value": a["location"],
+        } for a in annotations]
+    
     def get_segmentations_available(self):
         segmentations = api.segmentation.get_multi_for_dataset(self.dataset_id)
         logging.debug(f"Segmentations: {segmentations}")
