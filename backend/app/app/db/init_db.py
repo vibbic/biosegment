@@ -45,7 +45,7 @@ def add_dataset(
 
 
 def init_db(db: Session) -> None:
-    # TODO remove in testing
+    # TODO remove in production
     # clean database of testing data
     Base.metadata.drop_all(bind=db.get_bind())
 
