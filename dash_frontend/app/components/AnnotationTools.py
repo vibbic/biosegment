@@ -1,4 +1,5 @@
 import logging
+import os 
 
 import dash_bootstrap_components as dbc
 import dash_core_components as dcc
@@ -8,24 +9,10 @@ from dash.exceptions import PreventUpdate
 
 from app.app import app
 from app import api
+from app.DatasetStore import DatasetStore
+from app.shape_utils import annotations_to_png, class_to_color, color_to_class, DEFAULT_STROKE_WIDTH, NUM_LABEL_CLASSES, class_labels
 
-import plotly.express as px
-
-DEFAULT_STROKE_WIDTH = 3  # gives line width of 2^3 = 8
-# the number of different classes for labels
-NUM_LABEL_CLASSES = 3
-class_label_colormap = px.colors.qualitative.Light24
-class_labels = list(range(NUM_LABEL_CLASSES))
-# we can't have less colors than classes
-assert NUM_LABEL_CLASSES <= len(class_label_colormap)
-
-def class_to_color(n):
-    return class_label_colormap[n]
-
-def color_to_class(c):
-    return class_label_colormap.index(c)
-
-interests_layout = dbc.Card(
+annotation_tools_layout = dbc.Card(
     dbc.CardBody([
         html.H5("Annotation tools", className="card-title"),
         # Label class chosen with buttons
@@ -54,22 +41,33 @@ interests_layout = dbc.Card(
             ),
             html.H6(id="stroke-width-display"),
         ]),
+        dbc.FormGroup([
+            dbc.Label("New annotations name"),
+            dcc.Input(
+                id="new-annotation-name",
+                type="text",
+                value="New annotation 1",
+            ),
+            dbc.Button(
+                "Save new annotation",
+                id="save-new-annotation",
+            )
+        ]),
         dbc.Label("Annotations"),
         html.P(id="masks-display"),     
     ]),
     id="right-column"
 )
 
-@app.callback(
-    
-        Output("masks-display", "children")
-    ,
-    [
-        Input("annotations", "data"),
-    ]
+@app.callback(    
+    Output("masks-display", "children")
+,
+[
+    Input("annotations", "data"),
+]
 )
 def show_annotations(annotations_data):
-    logging.debug(f"annotations: {annotations_data}")
+    # logging.debug(f"annotations: {annotations_data}")
     try:
         annotations = annotations_data
         return html.Ul(
@@ -87,3 +85,28 @@ def show_annotations(annotations_data):
         logging.debug(f"Error displaying annotations: {e}")
         raise PreventUpdate
 
+@app.callback(    
+    # not needed
+    Output("save-new-annotation", "value"),
+[
+    Input("save-new-annotation", "n_clicks"),
+], [
+    State("annotations", "data"),
+    State("selected-dataset-name", "value"),
+    State("new-annotation-name", "value"),
+]
+)
+def save_annotations(n_clicks, annotations_data, dataset_id, new_annotation_name):
+    if not n_clicks:
+        raise PreventUpdate
+    annotation_folder = f"/data/segmentations/{DatasetStore.get_dataset(dataset_id).get_title()}/{new_annotation_name}"
+    try:
+        for slice_id, annotations in annotations_data.items():
+            try:
+                os.makedirs(annotation_folder)
+            except OSError as error:
+                logging.debug(error)
+            annotations_to_png(width=512, height=512, annotations=annotations, write_to=f"{annotation_folder}/{int(slice_id):04d}.png")
+    except Exception as e:
+        logging.debug(f"Error saving annotations: {e}")
+        raise PreventUpdate

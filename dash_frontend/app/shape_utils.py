@@ -2,11 +2,25 @@ import logging
 
 from cairosvg import svg2png
 import skimage
+import plotly.express as px
 import PIL.Image
 import io
 import numpy as np
-from app.components.Interests import color_to_class
 import logging
+
+DEFAULT_STROKE_WIDTH = 3  # gives line width of 2^3 = 8
+# the number of different classes for labels
+NUM_LABEL_CLASSES = 3
+class_label_colormap = px.colors.qualitative.Light24
+class_labels = list(range(NUM_LABEL_CLASSES))
+# we can't have less colors than classes
+assert NUM_LABEL_CLASSES <= len(class_label_colormap)
+
+def class_to_color(n):
+    return class_label_colormap[n]
+
+def color_to_class(c):
+    return class_label_colormap.index(c)
 
 def shape_to_svg_code(shape):
     stroke_width = shape["line"]["width"]

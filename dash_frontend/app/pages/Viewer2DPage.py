@@ -5,7 +5,7 @@ import dash_bootstrap_components as dbc
 from app.components.Viewer2D import viewer_layout
 from app.components.SegmentationRunner import segmentation_runner_layout
 from app.components.DatasetSelector import dataset_selector_layout
-from app.components.Interests import interests_layout
+from app.components.AnnotationTools import annotation_tools_layout
 
 WORKER_ROOT_DATA_FOLDER="/home/brombaut/workspace/biosegment/data/"
 
@@ -24,7 +24,7 @@ layout = dbc.Container(
                 dbc.Row(
                     [
                         dbc.Col(segmentation_runner_layout),
-                        dbc.Col(interests_layout),
+                        dbc.Col(annotation_tools_layout),
                     ]
             )]),
             dbc.Col(

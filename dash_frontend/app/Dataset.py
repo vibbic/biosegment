@@ -14,6 +14,7 @@ class Dataset:
     def __init__(self, dataset_id):
         self.dataset_id = dataset_id
         dataset = api.dataset.get(dataset_id)
+        self.title = dataset["title"]
         slices_folder=f"{ROOT_DATA_FOLDER}{dataset['location']}"
         self.project_id = dataset['owner_id']
         logging.debug(f"Slices folder: {slices_folder}")
@@ -59,6 +60,9 @@ class Dataset:
         })
         png = Image.fromarray(recolored_image_array)
         return png
+
+    def get_title(self):
+        return self.title
 
     def get_dimensions(self):
         return {

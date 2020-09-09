@@ -12,7 +12,7 @@ from app.Dataset import Dataset
 from app.DatasetStore import DatasetStore
 
 from app.components.BasicComponent import BasicComponent
-from app.components.Interests import class_to_color
+from app.shape_utils import class_to_color
 
 
 DEFAULT_LABEL_CLASS = 0
@@ -199,6 +199,7 @@ def create_annotation(shape, slice_id):
         ),
         Input("stroke-width", "value"),
     ], [
+        State(f'viewer-slice-id', 'value'),
         # State(f'viewer-graph', 'figure'),
         State("annotations", "data"),
     ]
@@ -207,12 +208,13 @@ def update_fig(
     # inputs
     current_segmentation, 
     current_dataset, 
-    slice_id,
+    slice_id_update,
     graph_relayoutData,
     any_label_class_button_value,
     stroke_width_value,
     # states
     # fig, 
+    slice_id,
     annotations_data,
 ):
     cbcontext = [p["prop_id"] for p in dash.callback_context.triggered][0]
@@ -222,6 +224,10 @@ def update_fig(
         fig = make_default_figure()
         return [fig, annotations_data, None]
 
+    # TODO fix confusion
+    # keys are strings, not ints
+    slice_id = str(slice_id)
+
     if cbcontext == "viewer-graph.relayoutData":
         if "shapes" in graph_relayoutData.keys():
             # TODO support for editing annotations
@@ -230,11 +236,12 @@ def update_fig(
             try:
                 old_shapes = annotations_data[slice_id]
             except:
+                logging.debug(f"No annotation entry for slice {slice_id} and keys {annotations_data.keys()}, creating one")
                 annotations_data[slice_id] = []
                 old_shapes = []
             annotations_data[slice_id] += [s for s in new_shapes if s not in old_shapes] 
-        else:
-            return dash.no_update
+        # else:
+        #     return dash.no_update
 
     stroke_width = int(round(2 ** (stroke_width_value)))
     # find label class value by finding button with the most recent click
@@ -249,6 +256,7 @@ def update_fig(
     try:
         current_annotations = annotations_data[slice_id]
     except:
+        logging.debug(f"No annotations to draw, keys are: {annotations_data.keys()}")
         current_annotations = []
 
     fig = make_default_figure(
@@ -256,8 +264,8 @@ def update_fig(
         stroke_width=stroke_width,
         shapes=current_annotations,
     )
-    logging.debug(f"Fig: {fig}")
-    add_layout_images_to_fig(fig=fig, segmentation=current_segmentation, dataset=DatasetStore.get_dataset(current_dataset), slice_id=slice_id)
+    # logging.debug(f"Fig: {fig}")
+    add_layout_images_to_fig(fig=fig, segmentation=current_segmentation, dataset=DatasetStore.get_dataset(current_dataset), slice_id=int(slice_id))
     fig.update_layout(uirevision="segmentation")
     return (
         fig,
