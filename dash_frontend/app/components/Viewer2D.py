@@ -115,7 +115,7 @@ viewer_layout = html.Div([
     dcc.Store(id=f'viewer-annotations', data=None),
     # Store for user created masks
     # data is a list of dicts describing shapes
-    dcc.Store(id="masks", data={"shapes": []}),
+    dcc.Store(id="masks", data={"annotations": []}),
 ])
 
 @app.callback([
@@ -177,6 +177,12 @@ def change_dataset_dimensions(name):
         return [dataset.get_dimensions()]
     raise PreventUpdate
 
+def create_annotation(shape, slice_id):
+    return {
+        "slice_id": slice_id,
+        "shape": shape,
+    }
+
 @app.callback(
     [
         Output(f'viewer-graph', 'figure'),
@@ -196,7 +202,7 @@ def change_dataset_dimensions(name):
         Input("stroke-width", "value"),
     ], [
         State(f'viewer-annotations', 'data'),
-        State(f'viewer-graph', 'figure'),
+        # State(f'viewer-graph', 'figure'),
         State("masks", "data"),
     ]
 )
@@ -210,19 +216,23 @@ def update_fig(
     stroke_width_value,
     # states
     annotations, 
-    fig, 
+    # fig, 
     masks_data,
 ):
     cbcontext = [p["prop_id"] for p in dash.callback_context.triggered][0]
-    if fig is None:
-        fig = make_default_figure()
+    # if fig is None:
+    #     fig = make_default_figure()
     if not current_dataset or not slice_id:
         fig = make_default_figure()
         return [fig, masks_data, None]
 
-    if cbcontext == "graph.relayoutData":
+    if cbcontext == "viewer-graph.relayoutData":
         if "shapes" in graph_relayoutData.keys():
-            masks_data["shapes"] = graph_relayoutData["shapes"]
+            # TODO support for editing annotations
+            # TODO use set
+            annotations_on_viewer = [create_annotation(shape, slice_id) for shape in graph_relayoutData["shapes"]]
+            new_annotations = [a for a in annotations_on_viewer if a not in masks_data["annotations"]] 
+            masks_data["annotations"] += new_annotations
         else:
             return dash.no_update
 
@@ -239,7 +249,7 @@ def update_fig(
     fig = make_default_figure(
         stroke_color=class_to_color(label_class_value),
         stroke_width=stroke_width,
-        shapes=masks_data["shapes"],
+        shapes=[a["shape"] for a in masks_data["annotations"] if a["slice_id"] == slice_id],
     )
     logging.debug(f"Fig: {fig}")
     add_layout_images_to_fig(fig=fig, segmentation=current_segmentation, dataset=DatasetStore.get_dataset(current_dataset), slice_id=slice_id)

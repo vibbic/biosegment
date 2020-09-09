@@ -53,8 +53,26 @@ interests_layout = dbc.Card(
                 value=DEFAULT_STROKE_WIDTH,
             ),
             html.H6(id="stroke-width-display"),
-        ])        
+        ]),
+        dbc.Label("Annotations"),
+        html.P(id="masks-display"),     
     ]),
     id="right-column"
 )
+
+@app.callback(
+    [
+        Output("masks-display", "children"),
+    ],
+    [
+        Input("masks", "data"),
+    ]
+)
+def show_masks(masks_data):
+    logging.debug(f"Masks: {masks_data}")
+    try:
+        annotations = masks_data["annotations"]
+        return [[html.Li(f"Slice {a['slice_id']}") for a in annotations]]
+    except:
+        raise PreventUpdate
 
