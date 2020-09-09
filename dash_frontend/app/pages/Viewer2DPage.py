@@ -32,18 +32,15 @@ layout = dbc.Container(
         html.Hr(),
         dbc.Row(
             dbc.Col(dataset_selector_layout),
-            style={
-                "marginBottom": "10px"
-            }
         ),
         dbc.Row([
             dbc.Col([
-                segmentation_runner_layout,
-                interests_layout,
-                ],
-                md=12,
-                lg=6,
-            ),
+                dbc.Row(
+                    [
+                        dbc.Col(segmentation_runner_layout),
+                        dbc.Col(interests_layout),
+                    ]
+            )]),
             dbc.Col(
                 dbc.Card(
                 [
@@ -60,11 +57,9 @@ layout = dbc.Container(
                     viewer.layout(),
                 ], body=True),
                 md=12,
-                lg=6
+                lg=6,
             )
-        ], style={
-                "marginBottom": "10px"
-            }),
+        ]),
     # Store for user created masks
     # data is a list of dicts describing shapes
     dcc.Store(id="masks", data={"shapes": []}),
