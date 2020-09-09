@@ -4,11 +4,14 @@ channels:
   - defaults
 dependencies:
   - python>=3.8
+  # dash
   - dash>=1.10.2
   - dash-bootstrap-components>=0.10.5
   - pandas>=1.1.0
+  # image viewer
   - pillow>=7.2.0
   - scikit-image>=0.16.2
+  - cairosvg>=2.4.2
   # run server
   - gunicorn>=20.0.4
   # backend api

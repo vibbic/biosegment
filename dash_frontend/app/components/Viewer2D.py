@@ -12,7 +12,8 @@ from app.Dataset import Dataset
 from app.DatasetStore import DatasetStore
 
 from app.components.BasicComponent import BasicComponent
-from app.components.Interests import class_to_color
+from app.components.Interests import class_to_color, color_to_class
+
 
 DEFAULT_LABEL_CLASS = 0
 
@@ -178,9 +179,14 @@ def change_dataset_dimensions(name):
     raise PreventUpdate
 
 def create_annotation(shape, slice_id):
+    try:
+        interest = color_to_class(shape["line"]["color"])
+    except:
+        interest = None
     return {
         "slice_id": slice_id,
         "shape": shape,
+        "interest": interest,
     }
 
 @app.callback(
