@@ -124,6 +124,19 @@ def init_db(db: Session) -> None:
         model_id=trained_unet2d.id,
     )
 
+    # add mitos 1 annotation
+    annotation_in = schemas.AnnotationCreate(
+        title="mitos 1",
+        description="mitos 1 description",
+        location="annotations/EMBL Dataset/mitos 1",
+    )
+    crud.annotation.create_with_owner(
+        db,
+        obj_in=annotation_in,
+        owner_id=user.id,
+        dataset_id=embl_dataset.id
+    )
+
     # add EPFL dataset
     embl_dataset, embl_ground_truth = add_dataset(
         db, user, main_project, untrained_unet2d, "EPFL"
