@@ -1,3 +1,5 @@
+import logging 
+
 from cairosvg import svg2png
 import skimage
 import PIL.Image
@@ -6,12 +8,29 @@ import numpy as np
 
 import logging
 
-def annotation_to_svg_code(annotation, fig=None, width=None, height=None):
+def shape_to_svg_code(shape, interest):
+    stroke_width = shape["line"]["width"]
+    # TODO support more classes of interest
+    hexpart = f"0{interest}"
+    stroke_color = f"#{hexpart}{hexpart}{hexpart}"
+    logging.debug(f"stroke_color: {stroke_color}")
+    path = shape["path"]
+    return f"""
+<path
+    stroke="{stroke_color}"
+    stroke-width="{stroke_width}"
+    d="{path}"
+    fill-opacity="0"
+/>
+"""
+
+def annotations_to_svg_code(annotations, fig=None, width=None, height=None):
     """
     fig is the plotly.py figure which shape resides in (to get width and height)
     and shape is one of the shapes the figure contains.
     """
-    shape = annotation["shape"]
+    # TODO make sure background annotation is on top
+    # TODO order of annotations
     if fig is not None:
         # get width and height
         wrange = next(fig.select_xaxes())["range"]
@@ -20,40 +39,23 @@ def annotation_to_svg_code(annotation, fig=None, width=None, height=None):
     else:
         if width is None or height is None:
             raise ValueError("If fig is None, you must specify width and height")
-    interest = annotation["interest"]
-    # TODO support more classes of interest
-    hexcode_interest = "#060606" if interest == 1 else "#090909"
-    fmt_dict = dict(
-        width=width,
-        height=height,
-        stroke_width=shape["line"]["width"],
-        path=shape["path"],
-        stroke_color=hexcode_interest,
-    )
-    return """
+    return f"""
 <svg
     width="{width}"
     height="{height}"
     viewBox="0 0 {width} {height}"
 >
 <rect width="100%" height="100%" fill="black" />
-<path
-    stroke="{stroke_color}"
-    stroke-width="{stroke_width}"
-    d="{path}"
-    fill-opacity="0"
-/>
+{''.join([shape_to_svg_code(a["shape"], a["interest"]) for a in annotations])}
 </svg>
-""".format(
-        **fmt_dict
-    )
+"""
 
-def annotation_to_png(fig=None, annotation=None, width=None, height=None, write_to=None):
+def annotations_to_png(fig=None, annotations=None, width=None, height=None, write_to=None):
     """
     Like svg2png, if write_to is None, returns a bytestring. If it is a path
     to a file it writes to this file and returns None.
     """
-    svg_code = annotation_to_svg_code(fig=fig, annotation=annotation, width=width, height=height)
+    svg_code = annotations_to_svg_code(fig=fig, annotations=annotations, width=width, height=height)
     r = svg2png(bytestring=svg_code, write_to=write_to)
     logging.debug(f"svg2png return {r}")
     return r

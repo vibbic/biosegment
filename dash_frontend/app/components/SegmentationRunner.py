@@ -10,7 +10,7 @@ from dash.exceptions import PreventUpdate
 from app.components.TaskProgress import task_progress
 from app.DatasetStore import DatasetStore
 from app import api
-from app.shape_utils import annotation_to_png
+from app.shape_utils import annotations_to_png
 
 segmentation_runner_layout = dbc.Card([
     html.H4(
@@ -86,11 +86,16 @@ def start_segmentation(n, new_segmentation_name, selected_model, masks_data):
             "classes_of_interest": [0, 1, 2]
         }
         logging.debug(f"Start segmentation body: {body}")
+        write_annotations = []
+        slice_id = None
         for annotation in masks_data["annotations"]:
-            shape = annotation["shape"]
-            slice_id = annotation["slice_id"]
-            logging.debug(f"Writing shape for slice {slice_id}")
-            annotation_to_png(width=512, height=512, annotation=annotation, write_to=f"/data/segmentations/{slice_id}.png")
+            if not write_annotations:
+                write_annotations.append(annotation)
+                slice_id = annotation["slice_id"]
+            else:
+                if annotation["slice_id"] == slice_id:
+                    write_annotations.append(annotation)
+        annotations_to_png(width=512, height=512, annotations=write_annotations, write_to=f"/data/segmentations/{slice_id}.png")
         raise PreventUpdate
         # task_id = api.utils.infer(json=body)
         task_id = api.segmentation.create(json=body)
