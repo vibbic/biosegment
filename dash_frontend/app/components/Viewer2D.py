@@ -12,6 +12,9 @@ from app.Dataset import Dataset
 from app.DatasetStore import DatasetStore
 
 from app.components.BasicComponent import BasicComponent
+from app.components.Interests import class_to_color
+
+DEFAULT_LABEL_CLASS = 0
 
 def add_layout_images_to_fig(fig, segmentation, dataset, slice_id, update_ranges=True):
     """ images is a sequence of PIL Image objects """
@@ -174,32 +177,78 @@ def change_dataset_dimensions(name):
         return [dataset.get_dimensions()]
     raise PreventUpdate
 
-if __name__ == '__main__':
-    app.layout = layout
-    app.run_server(debug=True)
-
 @app.callback(
-    Output(f'viewer-graph', 'figure'),
+    [
+        Output(f'viewer-graph', 'figure'),
+        Output("masks", "data"),
+        Output("stroke-width-display", "children"),
+    ],
     [
         Input(f'selected-segmentation-name', 'value'),
         # TODO
         Input('selected-dataset-name', 'value'),
         Input(f'viewer-slice-id', 'value'),
+        Input("viewer-graph", "relayoutData"),
+        Input(
+            {"type": "label-class-button", "index": dash.dependencies.ALL},
+            "n_clicks_timestamp",
+        ),
+        Input("stroke-width", "value"),
     ], [
         State(f'viewer-annotations', 'data'),
-        State(f'viewer-graph', 'figure')
+        State(f'viewer-graph', 'figure'),
+        State("masks", "data"),
     ]
 )
-def update_fig(current_segmentation, current_dataset, slice_id, annotations, fig):
+def update_fig(
+    # inputs
+    current_segmentation, 
+    current_dataset, 
+    slice_id,
+    graph_relayoutData,
+    any_label_class_button_value,
+    stroke_width_value,
+    # states
+    annotations, 
+    fig, 
+    masks_data,
+):
+    cbcontext = [p["prop_id"] for p in dash.callback_context.triggered][0]
     if fig is None:
         fig = make_default_figure()
     if not current_dataset or not slice_id:
         fig = make_default_figure()
-        return fig
-    fig = make_default_figure()
+        return [fig, masks_data, None]
+
+    if cbcontext == "graph.relayoutData":
+        if "shapes" in graph_relayoutData.keys():
+            masks_data["shapes"] = graph_relayoutData["shapes"]
+        else:
+            return dash.no_update
+
+    stroke_width = int(round(2 ** (stroke_width_value)))
+    # find label class value by finding button with the most recent click
+    if any_label_class_button_value is None:
+        label_class_value = DEFAULT_LABEL_CLASS
+    else:
+        label_class_value = max(
+            enumerate(any_label_class_button_value),
+            key=lambda t: 0 if t[1] is None else t[1],
+        )[0]
+
+    fig = make_default_figure(
+        stroke_color=class_to_color(label_class_value),
+        stroke_width=stroke_width,
+        shapes=masks_data["shapes"],
+    )
     logging.debug(f"Fig: {fig}")
     add_layout_images_to_fig(fig=fig, segmentation=current_segmentation, dataset=DatasetStore.get_dataset(current_dataset), slice_id=slice_id)
-    return fig
+    fig.update_layout(uirevision="segmentation")
+    return (
+        fig,
+        masks_data,
+        "Stroke width: %d" % (stroke_width,)
+    )
 
 
 # @app.callback(
@@ -308,3 +357,7 @@ def update_fig(current_segmentation, current_dataset, slice_id, annotations, fig
 #         classifier_store_data,
 #         classified_image_store_data,
 #     )
+
+if __name__ == '__main__':
+    app.layout = viewer_layout
+    app.run_server(debug=True)

@@ -13,8 +13,7 @@ import plotly.express as px
 
 DEFAULT_STROKE_WIDTH = 3  # gives line width of 2^3 = 8
 # the number of different classes for labels
-NUM_LABEL_CLASSES = 2
-DEFAULT_LABEL_CLASS = 0
+NUM_LABEL_CLASSES = 3
 class_label_colormap = px.colors.qualitative.Light24
 class_labels = list(range(NUM_LABEL_CLASSES))
 # we can't have less colors than classes
@@ -26,31 +25,36 @@ def class_to_color(n):
 def color_to_class(c):
     return class_label_colormap.index(c)
 
-interests_layout = dbc.Card([
-        html.H6("Label class"),
+interests_layout = dbc.Card(
+    dbc.CardBody([
+        html.H5("Annotation tools", className="card-title"),
         # Label class chosen with buttons
-        html.Div(
-            id="label-class-buttons",
-            children=[
-                html.Button(
-                    "%2d" % (n,),
-                    id={"type": "label-class-button", "index": n},
-                    style={"background-color": class_to_color(c)},
-                )
-                for n, c in enumerate(class_labels)
-            ],
-        ),
-        html.H6(id="stroke-width-display"),
-        # Slider for specifying stroke width
-        dcc.Slider(
-            id="stroke-width",
-            min=0,
-            max=6,
-            step=0.1,
-            value=DEFAULT_STROKE_WIDTH,
-        ),
-    ],
-    body=True,
-    id="right-column",
+        dbc.FormGroup([
+            dbc.Label("Classes of interest"),
+            html.Div(
+                        id="label-class-buttons",
+                        children=[
+                            html.Button(
+                                "%2d" % (n,),
+                                id={"type": "label-class-button", "index": n},
+                                style={"background-color": class_to_color(c)},
+                            )
+                            for n, c in enumerate(class_labels)
+                        ],
+                    ),
+        ]),
+        dbc.FormGroup([
+            dbc.Label("Stroke width"),
+            dcc.Slider(
+                id="stroke-width",
+                min=0,
+                max=6,
+                step=0.1,
+                value=DEFAULT_STROKE_WIDTH,
+            ),
+            html.H6(id="stroke-width-display"),
+        ])        
+    ]),
+    id="right-column"
 )
 
