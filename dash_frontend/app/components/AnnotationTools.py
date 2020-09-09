@@ -99,7 +99,7 @@ def show_annotations(annotations_data):
 def save_annotations(n_clicks, annotations_data, dataset_id, new_annotation_name):
     if not n_clicks:
         raise PreventUpdate
-    annotation_folder = f"/data/segmentations/{DatasetStore.get_dataset(dataset_id).get_title()}/{new_annotation_name}"
+    annotation_folder = f"/data/annotations/{DatasetStore.get_dataset(dataset_id).get_title()}/{new_annotation_name}"
     try:
         for slice_id, annotations in annotations_data.items():
             try:
