@@ -5,6 +5,7 @@ import logging
 import http.client
 
 from requests_toolbelt import sessions
+from requests.packages.urllib3.util.retry import Retry
 
 # from requests_oauthlib import OAuth2Session
 from app.env import API_DOMAIN
@@ -21,8 +22,9 @@ TOKEN_URL = 'login/access-token'
 
 http_session = sessions.BaseUrlSession(base_url=API_ROOT)
 
+retries = Retry(total=3, backoff_factor=1, status_forcelist=[429, 500, 502, 503, 504])
 # Mount it for both http and https usage
-adapter = TimeoutHTTPAdapter(timeout=2.5)
+adapter = TimeoutHTTPAdapter(max_retries=retries)
 http_session.mount("https://", adapter)
 http_session.mount("http://", adapter)
 
@@ -59,7 +61,7 @@ def get_tokens():
     logging.debug(data)
     logging.debug(TOKEN_URL)
     try:
-        access_token_response = http_session.post(TOKEN_URL, data=data, timeout=1,
+        access_token_response = http_session.post(TOKEN_URL, data=data, timeout=5,
         # auth=(client_id, client_secret)
         )
         logging.debug(access_token_response)
@@ -72,13 +74,13 @@ def get_tokens():
         token = tokens['access_token']
         logging.debug(f"Token type: {type(token)}")
     except Exception as e:
-        logging.error(f"Error {e}")
-        raise e
+        logging.warning(f"Exception {e}")
+        return None
     return str(token)
-    
-
 
 token = get_tokens()
+while token is None:
+    token = get_tokens()
 
 def get(path, headers={}, **kwargs):
     global token
