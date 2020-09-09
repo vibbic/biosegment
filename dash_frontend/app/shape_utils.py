@@ -5,11 +5,15 @@ import skimage
 import PIL.Image
 import io
 import numpy as np
-
+from app.components.Interests import color_to_class
 import logging
 
-def shape_to_svg_code(shape, interest):
+def shape_to_svg_code(shape):
     stroke_width = shape["line"]["width"]
+    try:
+        interest = color_to_class(shape["line"]["color"])
+    except:
+        interest = None
     # TODO support more classes of interest
     hexpart = f"0{interest}"
     stroke_color = f"#{hexpart}{hexpart}{hexpart}"
@@ -46,7 +50,7 @@ def annotations_to_svg_code(annotations, fig=None, width=None, height=None):
     viewBox="0 0 {width} {height}"
 >
 <rect width="100%" height="100%" fill="black" />
-{''.join([shape_to_svg_code(a["shape"], a["interest"]) for a in annotations])}
+{''.join([shape_to_svg_code(a) for a in annotations])}
 </svg>
 """
 

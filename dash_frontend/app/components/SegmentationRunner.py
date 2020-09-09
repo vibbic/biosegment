@@ -68,10 +68,10 @@ def change_model_options(name):
     [
         State("new-segmentation-name", "value"),
         State("selected-model-name", "value"),
-        State("masks", "data"),
+        State("annotations", "data"),
     ]
 )
-def start_segmentation(n, new_segmentation_name, selected_model, masks_data):
+def start_segmentation(n, new_segmentation_name, selected_model, annotations_data):
     if n:
         assert selected_model
         body = {
@@ -86,16 +86,8 @@ def start_segmentation(n, new_segmentation_name, selected_model, masks_data):
             "classes_of_interest": [0, 1, 2]
         }
         logging.debug(f"Start segmentation body: {body}")
-        write_annotations = []
-        slice_id = None
-        for annotation in masks_data["annotations"]:
-            if not write_annotations:
-                write_annotations.append(annotation)
-                slice_id = annotation["slice_id"]
-            else:
-                if annotation["slice_id"] == slice_id:
-                    write_annotations.append(annotation)
-        annotations_to_png(width=512, height=512, annotations=write_annotations, write_to=f"/data/segmentations/{slice_id}.png")
+        for slice_id, annotations in annotations_data.items():
+            annotations_to_png(width=512, height=512, annotations=annotations, write_to=f"/data/segmentations/{slice_id}.png")
         raise PreventUpdate
         # task_id = api.utils.infer(json=body)
         task_id = api.segmentation.create(json=body)

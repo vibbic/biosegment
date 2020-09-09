@@ -61,18 +61,29 @@ interests_layout = dbc.Card(
 )
 
 @app.callback(
+    
+        Output("masks-display", "children")
+    ,
     [
-        Output("masks-display", "children"),
-    ],
-    [
-        Input("masks", "data"),
+        Input("annotations", "data"),
     ]
 )
-def show_masks(masks_data):
-    logging.debug(f"Masks: {masks_data}")
+def show_annotations(annotations_data):
+    logging.debug(f"annotations: {annotations_data}")
     try:
-        annotations = masks_data["annotations"]
-        return [[html.Li(f"Slice {a['slice_id']}") for a in annotations]]
-    except:
+        annotations = annotations_data
+        return html.Ul(
+            [
+                html.Div([
+                    html.P(f"Slice {slice_id}"),
+                    html.Ul(
+                        [
+                            html.Li(f"Color {annotation['line']['color']}") for annotation in annotations
+                        ]
+                    )
+                ]) for slice_id, annotations in annotations_data.items()
+            ])
+    except Exception as e:
+        logging.debug(f"Error displaying annotations: {e}")
         raise PreventUpdate
 

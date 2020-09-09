@@ -12,7 +12,7 @@ from app.Dataset import Dataset
 from app.DatasetStore import DatasetStore
 
 from app.components.BasicComponent import BasicComponent
-from app.components.Interests import class_to_color, color_to_class
+from app.components.Interests import class_to_color
 
 
 DEFAULT_LABEL_CLASS = 0
@@ -114,22 +114,29 @@ viewer_layout = html.Div([
     dcc.Store(id=f'viewer-slice-number-top', data=0),
     dcc.Store(id=f'viewer-slice-number-side', data=0),
     dcc.Store(id=f'viewer-annotations', data=None),
-    # Store for user created masks
-    # data is a list of dicts describing shapes
-    dcc.Store(id="masks", data={"annotations": []}),
+    # Store for annotations
+    # data is a dict with slice_id as keys and list of shapes as values
+    # shapes are dicts given by the Plotly graph
+    # the line color is the interest class
+    dcc.Store(id="annotations", data={}),
 ])
 
 @app.callback([
     Output(f'selected-segmentation-name', 'options'),
+    Output(f'selected-segmentation-name', 'value'),
 ], [
     Input('selected-dataset-name', 'value'),
     Input('update-button-segmentations-options', 'n_clicks')
+], [
+    State(f'selected-segmentation-name', 'value')
 ]
 )
-def change_segmentation_options(name, n_clicks):
+def change_segmentation_options(name, n_clicks, current_segmentation):
     if name:
         options = DatasetStore.get_dataset(name).get_segmentations_available()
-        return [options]
+        if current_segmentation is None and options:
+            current_segmentation = options[0]["value"]
+        return [options, current_segmentation]
     raise PreventUpdate
 
 @app.callback(
@@ -152,21 +159,6 @@ def update_slider(dimensions):
     marks = { i: str(i) for i in range(0, max_slice, 10)}
     return min_slice, max_slice, marks, 10
     
-@app.callback(
-Output(f'viewer-annotations', 'data'),
-[
-    Input(f'viewer-graph', 'relayoutData'),
-])
-def update_annotations(graph_relayoutData):
-    cbcontext = [p["prop_id"] for p in dash.callback_context.triggered][0]
-    logging.debug(f"Update: {cbcontext}")
-    # TODO remove hardcoded id
-    if cbcontext == "viewer-1-graph.relayoutData":
-        if "shapes" in graph_relayoutData.keys():
-            shapes = graph_relayoutData["shapes"]
-            logging.debug(f"Shapes: {shapes}")
-    raise PreventUpdate
-
 @app.callback([
     Output(f'viewer-dataset-dimensions', 'data'),
 ], [
@@ -192,7 +184,7 @@ def create_annotation(shape, slice_id):
 @app.callback(
     [
         Output(f'viewer-graph', 'figure'),
-        Output("masks", "data"),
+        Output("annotations", "data"),
         Output("stroke-width-display", "children"),
     ],
     [
@@ -207,9 +199,8 @@ def create_annotation(shape, slice_id):
         ),
         Input("stroke-width", "value"),
     ], [
-        State(f'viewer-annotations', 'data'),
         # State(f'viewer-graph', 'figure'),
-        State("masks", "data"),
+        State("annotations", "data"),
     ]
 )
 def update_fig(
@@ -221,24 +212,27 @@ def update_fig(
     any_label_class_button_value,
     stroke_width_value,
     # states
-    annotations, 
     # fig, 
-    masks_data,
+    annotations_data,
 ):
     cbcontext = [p["prop_id"] for p in dash.callback_context.triggered][0]
     # if fig is None:
     #     fig = make_default_figure()
     if not current_dataset or not slice_id:
         fig = make_default_figure()
-        return [fig, masks_data, None]
+        return [fig, annotations_data, None]
 
     if cbcontext == "viewer-graph.relayoutData":
         if "shapes" in graph_relayoutData.keys():
             # TODO support for editing annotations
             # TODO use set
-            annotations_on_viewer = [create_annotation(shape, slice_id) for shape in graph_relayoutData["shapes"]]
-            new_annotations = [a for a in annotations_on_viewer if a not in masks_data["annotations"]] 
-            masks_data["annotations"] += new_annotations
+            new_shapes = graph_relayoutData["shapes"]
+            try:
+                old_shapes = annotations_data[slice_id]
+            except:
+                annotations_data[slice_id] = []
+                old_shapes = []
+            annotations_data[slice_id] += [s for s in new_shapes if s not in old_shapes] 
         else:
             return dash.no_update
 
@@ -252,127 +246,24 @@ def update_fig(
             key=lambda t: 0 if t[1] is None else t[1],
         )[0]
 
+    try:
+        current_annotations = annotations_data[slice_id]
+    except:
+        current_annotations = []
+
     fig = make_default_figure(
         stroke_color=class_to_color(label_class_value),
         stroke_width=stroke_width,
-        shapes=[a["shape"] for a in masks_data["annotations"] if a["slice_id"] == slice_id],
+        shapes=current_annotations,
     )
     logging.debug(f"Fig: {fig}")
     add_layout_images_to_fig(fig=fig, segmentation=current_segmentation, dataset=DatasetStore.get_dataset(current_dataset), slice_id=slice_id)
     fig.update_layout(uirevision="segmentation")
     return (
         fig,
-        masks_data,
+        annotations_data,
         "Stroke width: %d" % (stroke_width,)
     )
-
-
-# @app.callback(
-#     [
-#         Output("viewer-graph", "figure"),
-#         Output("masks", "data"),
-#         Output("stroke-width-display", "children"),
-#     ],
-#     [
-#         Input("graph", "relayoutData"),
-#         Input(
-#             {"type": "label-class-button", "index": dash.dependencies.ALL},
-#             "n_clicks_timestamp",
-#         ),
-#         Input("stroke-width", "value"),
-#         Input("sigma-range-slider", "value"),
-#     ],
-#     [State("masks", "data"),],
-# )
-# def annotation_react(
-#     graph_relayoutData,
-#     any_label_class_button_value,
-#     stroke_width_value,
-#     show_segmentation_value,
-#     download_button_n_clicks,
-#     download_image_button_n_clicks,
-#     segmentation_features_value,
-#     sigma_range_slider_value,
-#     masks_data,
-# ):
-#     classified_image_store_data = dash.no_update
-#     classifier_store_data = dash.no_update
-#     cbcontext = [p["prop_id"] for p in dash.callback_context.triggered][0]
-#     if cbcontext in ["segmentation-features.value", "sigma-range-slider.value"] or (
-#         ("Show segmentation" in show_segmentation_value)
-#         and (len(masks_data["shapes"]) > 0)
-#     ):
-#         segmentation_features_dict = {
-#             "intensity": False,
-#             "edges": False,
-#             "texture": False,
-#         }
-#         for feat in segmentation_features_value:
-#             segmentation_features_dict[feat] = True
-#         t1 = time()
-#         features = compute_features(
-#             img,
-#             **segmentation_features_dict,
-#             sigma_min=sigma_range_slider_value[0],
-#             sigma_max=sigma_range_slider_value[1],
-#         )
-#         t2 = time()
-#         print(t2 - t1)
-#     if cbcontext == "graph.relayoutData":
-#         if "shapes" in graph_relayoutData.keys():
-#             masks_data["shapes"] = graph_relayoutData["shapes"]
-#         else:
-#             return dash.no_update
-#     stroke_width = int(round(2 ** (stroke_width_value)))
-#     # find label class value by finding button with the most recent click
-#     if any_label_class_button_value is None:
-#         label_class_value = DEFAULT_LABEL_CLASS
-#     else:
-#         label_class_value = max(
-#             enumerate(any_label_class_button_value),
-#             key=lambda t: 0 if t[1] is None else t[1],
-#         )[0]
-
-#     fig = make_default_figure(
-#         stroke_color=class_to_color(label_class_value),
-#         stroke_width=stroke_width,
-#         shapes=masks_data["shapes"],
-#     )
-#     # We want the segmentation to be computed
-#     if ("Show segmentation" in show_segmentation_value) and (
-#         len(masks_data["shapes"]) > 0
-#     ):
-#         segimgpng = None
-#         try:
-#             feature_opts = dict(segmentation_features_dict=segmentation_features_dict)
-#             feature_opts["sigma_min"] = sigma_range_slider_value[0]
-#             feature_opts["sigma_max"] = sigma_range_slider_value[1]
-#             segimgpng, clf = show_segmentation(
-#                 DEFAULT_IMAGE_PATH, masks_data["shapes"], features, feature_opts
-#             )
-#             if cbcontext == "download-button.n_clicks":
-#                 classifier_store_data = clf
-#             if cbcontext == "download-image-button.n_clicks":
-#                 classified_image_store_data = plot_common.pil_image_to_uri(
-#                     blend_image_and_classified_regions_pil(
-#                         PIL.Image.open(DEFAULT_IMAGE_PATH), segimgpng
-#                     )
-#                 )
-#         except ValueError:
-#             # if segmentation fails, draw nothing
-#             pass
-#         images_to_draw = []
-#         if segimgpng is not None:
-#             images_to_draw = [segimgpng]
-#         fig = plot_common.add_layout_images_to_fig(fig, images_to_draw)
-#     fig.update_layout(uirevision="segmentation")
-#     return (
-#         fig,
-#         masks_data,
-#         "Stroke width: %d" % (stroke_width,),
-#         classifier_store_data,
-#         classified_image_store_data,
-#     )
 
 if __name__ == '__main__':
     app.layout = viewer_layout

@@ -22,11 +22,13 @@ dataset_selector_layout = dbc.Card([
 ], body=True)
 
 @app.callback(
+[
     Output("selected-dataset-name", "options"),
-    [
-        Input('url', 'pathname')
-    ]
-)
+    Output("selected-dataset-name", "value"),
+],
+[
+    Input('url', 'pathname')
+])
 def get_dataset_options(pathname):
     if pathname:
         try:
@@ -37,8 +39,9 @@ def get_dataset_options(pathname):
                 "label": d["title"],
                 "value": d["id"],
             } for d in datasets]
+            value = datasets[0]["id"]
             logging.debug(f"Datasets options: {options}")
-            return options
+            return [options, value]
         except:
             raise PreventUpdate
     raise PreventUpdate
