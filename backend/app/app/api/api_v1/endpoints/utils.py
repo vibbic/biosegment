@@ -67,7 +67,7 @@ def infer_unet2d(
         raise HTTPException(status_code=404, detail="Dataset not found")
     data_dir = dataset.location
 
-    model = crud.model.get(db=db, id=args.model_id).location
+    model = crud.model.get(db=db, id=args.model_id)
     if not model:
         raise HTTPException(status_code=404, detail="Model not found")
     model = model.location
