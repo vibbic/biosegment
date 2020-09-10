@@ -24,10 +24,8 @@ def color_to_class(c):
 
 def shape_to_svg_code(shape):
     stroke_width = shape["line"]["width"]
-    try:
-        interest = color_to_class(shape["line"]["color"])
-    except:
-        interest = None
+    interest = color_to_class(shape["line"]["color"])
+
     # background = 0, interest 1 = 1,...
     # 1 == 0x01 and 255 == 0xFF
     hexpart = hex(interest)[2:].zfill(2)
