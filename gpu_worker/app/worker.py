@@ -1,10 +1,16 @@
+import os
 
 from app.celery_app import celery_app
 from celery.utils.log import get_task_logger
 
 logger = get_task_logger(__name__)
 
-ROOT_DATA_FOLDER="/home/brombaut/workspace/biosegment/data/"
+try:  
+   ROOT_DATA_FOLDER = os.environ["ROOT_DATA_FOLDER"]
+except KeyError: 
+   import sys
+   print("Please set the environment variable ROOT_DATA_FOLDER in .env")
+   sys.exit(1)
 
 def create_meta(current, total):
     return {
@@ -28,11 +34,11 @@ def test_pytorch(
 @celery_app.task(bind=True, acks_late=True)
 def train_unet2d(
     self,
+    data_dir,
+    log_dir,
+    retrain_model = None,
     seed=0,
     device=0,
-    data_dir=f"{ROOT_DATA_FOLDER}",
-    log_dir=f"{ROOT_DATA_FOLDER}models/EMBL/test_run2",
-    retrain_model=f"{ROOT_DATA_FOLDER}models/2d/2d.pytorch",
     print_stats=50,
     input_size=(256,256),
     fm=1,
@@ -134,17 +140,14 @@ def train_unet2d(
 @celery_app.task(bind=True, acks_late=True)
 def infer_unet2d(
     self,
-    # model=f"{ROOT_DATA_FOLDER}models/unet_2d/best_checkpoint.pytorch",
-    # model=f"{ROOT_DATA_FOLDER}models/2d/2d.pytorch", 
-    model=f"{ROOT_DATA_FOLDER}models/EMBL/test_run2/best_checkpoint.pytorch", 
-    data_dir=f"{ROOT_DATA_FOLDER}segmentations/EMBL/default",
-    labels_dir=f"{ROOT_DATA_FOLDER}EM/EMBL/labels",
+    data_dir,
+    model,
+    write_dir,
     input_size=(256,256), 
     in_channels=1,
     test_batch_size=1,
     orientations=[0],
     len_epoch=100,
-    write_dir=f"{ROOT_DATA_FOLDER}segmentations/EMBL",
     classes_of_interest=(0, 1, 2),
     **kwargs,
 ):
@@ -189,8 +192,6 @@ def infer_unet2d(
         model = f"{ROOT_DATA_FOLDER}{model}"
     if data_dir[0] != "/":
         data_dir = f"{ROOT_DATA_FOLDER}{data_dir}"
-    if labels_dir[0] != "/":
-        labels_dir = f"{ROOT_DATA_FOLDER}{labels_dir}"
     if write_dir[0] != "/":
         write_dir = f"{ROOT_DATA_FOLDER}{write_dir}"
         
@@ -198,8 +199,6 @@ def infer_unet2d(
     assert os.path.isfile(model)
     logger.info(f"data_dir {data_dir}")
     assert os.path.isdir(data_dir)
-    logger.info(f"labels_dir {labels_dir}")
-    assert os.path.isdir(labels_dir)
     logger.info(f"write_dir {write_dir}")
     try:
         os.mkdir(write_dir)
@@ -216,9 +215,7 @@ def infer_unet2d(
     #                                 in_channels=in_channels, batch_size=test_batch_size,
     #                                 orientations=orientations)
 
-    test = StronglyLabeledVolumeDataset(data_dir,
-                                    labels_dir,
-                                    coi=classes_of_interest,
+    test = UnlabeledVolumeDataset(data_dir,
                                     input_shape=input_shape, len_epoch=len_epoch, type='pngseq',
                                     in_channels=in_channels, batch_size=test_batch_size,
                                     orientations=orientations)
