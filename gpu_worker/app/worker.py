@@ -219,8 +219,6 @@ def infer_unet2d(
         write_dir.mkdir(parents=True)
     except FileExistsError:
          logger.error("Write dir already exists: {write_dir}")
-    except FileExistsError:
-         logger.error("Write dir already exists: {write_dir}")
 
     input_shape = (1, input_size[0], input_size[1])
 
