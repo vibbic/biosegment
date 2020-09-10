@@ -133,8 +133,10 @@ viewer_layout = html.Div([
 )
 def change_segmentation_options(name, n_clicks, current_segmentation):
     if name:
+        cbcontext = [p["prop_id"] for p in dash.callback_context.triggered][0]
         options = DatasetStore.get_dataset(name).get_segmentations_available()
-        if current_segmentation is None and options:
+        # open first segmentation 1. as default or 2. on dataset change
+        if (current_segmentation is None and options) or cbcontext == "selected-dataset-name.value":
             current_segmentation = options[0]["value"]
         return [options, current_segmentation]
     raise PreventUpdate
