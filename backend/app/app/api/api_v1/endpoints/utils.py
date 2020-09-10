@@ -1,5 +1,5 @@
 import logging
-from typing import Any, Optional
+from typing import Any
 
 from celery.result import AsyncResult
 from fastapi import APIRouter, Depends, HTTPException
@@ -102,7 +102,7 @@ def test_pytorch(
 
 @router.post("/test-celery/", response_model=schemas.Task, status_code=201)
 def test_celery(
-    timeout: Optional[int],
+    timeout: int,
     current_user: models.User = Depends(deps.get_current_active_superuser),
 ) -> Any:
     """
