@@ -6,6 +6,7 @@ from app.components.Viewer2D import viewer_layout
 from app.components.SegmentationRunner import segmentation_runner_layout
 from app.components.DatasetSelector import dataset_selector_layout
 from app.components.AnnotationTools import annotation_tools_layout
+from app.components.ModelRetrainer import model_retrainer_layout
 
 WORKER_ROOT_DATA_FOLDER="/home/brombaut/workspace/biosegment/data/"
 
@@ -24,9 +25,15 @@ layout = dbc.Container(
                 dbc.Row(
                     [
                         dbc.Col(segmentation_runner_layout),
+                        dbc.Col(model_retrainer_layout),
+                    ]
+            ),
+                dbc.Row(
+                    [
                         dbc.Col(annotation_tools_layout),
                     ]
-            )]),
+                )
+            ]),
             dbc.Col(
                 dbc.Card(
                 [

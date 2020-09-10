@@ -10,18 +10,19 @@ from dash.exceptions import PreventUpdate
 from app.components.TaskProgress import task_progress
 from app.DatasetStore import DatasetStore
 from app import api
-from app.shape_utils import annotations_to_png
 
-segmentation_runner_layout = dbc.Card([
+PREFIX = "retrainer"
+
+model_retrainer_layout = dbc.Card([
     html.H4(
-        "Run segmentation",
+        "Model retrainer",
         className="card-title"
     ),
     dbc.FormGroup(
         [
             dbc.Label("Selected model"),
             dcc.Dropdown(
-                id="selected-model-name",
+                id=f"{PREFIX}-selected-model-name",
             ),
         ]
     ),
@@ -29,16 +30,16 @@ segmentation_runner_layout = dbc.Card([
         [
             dbc.Label("Selected annotation"),
             dcc.Dropdown(
-                id="selected-annotation-name",
+                id=f"{PREFIX}-selected-annotation-name",
             ),
         ]
     ),
     dbc.FormGroup(
         [
-            dbc.Label("New segmentation name"),
+            dbc.Label("New model name"),
             dcc.Input(
-                id="new-segmentation-name",
-                value="New segmentation 1",
+                id=f"{PREFIX}-new-model-name",
+                value="New model 1",
                 type="text",
             ),
         ]
@@ -46,8 +47,8 @@ segmentation_runner_layout = dbc.Card([
     dbc.FormGroup(
         [
             dbc.Button(
-                "Start new segmentation",
-                id="start-new-segmentation",
+                "Retrain model",
+                id=f"{PREFIX}-start-retraining",
                 color="primary", className="mr-1"
             ),
             task_progress,
@@ -56,18 +57,18 @@ segmentation_runner_layout = dbc.Card([
 ], body=True)
 
 @app.callback([
-    Output(f'selected-annotation-name', 'options'),
+    Output(f"{PREFIX}-selected-annotation-name", 'options'),
 ], [
-    Input('selected-dataset-name', 'value'),
+    Input("selected-dataset-name", 'value'),
 ])
-def change_model_options(name):
+def change_annotation_options(name):
     if name:
         options = DatasetStore.get_dataset(name).get_annotations_available()
         return [options]
     raise PreventUpdate
 
 @app.callback([
-    Output(f'selected-model-name', 'options'),
+    Output(f'{PREFIX}-selected-model-name', 'options'),
 ], [
     Input('selected-dataset-name', 'value'),
 ])
@@ -79,32 +80,31 @@ def change_model_options(name):
 
 @app.callback(
     [
-        Output("task-id", "data"),
+        Output(f'{PREFIX}-task-id', "data"),
     ],
     [
-        Input("start-new-segmentation", "n_clicks"),
+        Input(f'{PREFIX}-start-retraining', "n_clicks"),
     ],
     [
-        State("new-segmentation-name", "value"),
-        State("selected-model-name", "value"),
-        State("selected-annotation-name", "value"),
+        State(f'{PREFIX}-new-model-name', "value"),
+        State(f'{PREFIX}-model-name', "value"),
+        State(f'{PREFIX}-annotation-name', "value"),
     ]
 )
-def start_segmentation(n, new_segmentation_name, selected_model, selected_annotation):
+def start_model_retraining(n, new_model_name, selected_model, selected_annotation):
     if n:
         assert selected_model
         body = {
-            "title": new_segmentation_name,
-            "model": selected_model,
+            "title": new_model_name,
+            "retrain_model": selected_model,
             "model_id": 1,
             "dataset_id": 1,
-            "data_dir": f"EM/EMBL/raw",
             "labels_dir": selected_annotation,
-            "write_dir": f"segmentations/EMBL/{new_segmentation_name}",
+            "log_dir": f"segmentations/EMBL/{new_model_name}",
             "input_size": [512,512],
             "classes_of_interest": [0, 1, 2]
         }
         logging.debug(f"Start segmentation body: {body}")
-        task_id = api.utils.infer(json=body)
+        task_id = api.utils.train(json=body)
         return [{"task_id": task_id}]
     raise PreventUpdate
