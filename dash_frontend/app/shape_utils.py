@@ -63,7 +63,7 @@ def annotations_to_svg_code(annotations, fig=None, width=None, height=None):
     height="{height}"
     viewBox="0 0 {width} {height}"
 >
-<rect width="100%" height="100%" fill="black" />
+<rect width="100%" height="100%" fill="white" />
 {''.join([shape_to_svg_code(a) for a in annotations])}
 </svg>
 """
