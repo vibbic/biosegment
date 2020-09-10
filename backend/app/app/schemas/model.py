@@ -22,7 +22,7 @@ class ModelCreate(ModelBase):
 class ModelCreateFromAnnotation(ModelCreate):
     title: str
     location: str
-    dataset_id: int
+    project_id: int
     annotation_id: int
     from_model_id: Optional[int]
 

@@ -37,6 +37,7 @@ def train_unet2d(
     self,
     data_dir,
     log_dir,
+    labels_dir,
     retrain_model = None,
     seed=0,
     device=0,
@@ -100,6 +101,7 @@ def train_unet2d(
                         RandomDeformation_2D(input_shape[1:], grid_size=(64, 64), sigma=0.01, device=device,
                                             include_segmentation=True),
                         AddNoise(sigma_max=0.05, include_segmentation=True)])
+    # TODO use labels dir
     train = StronglyLabeledVolumeDataset(os.path.join(data_dir, 'train'),
                                         os.path.join(data_dir, 'train_labels'),
                                         input_shape=input_shape, len_epoch=len_epoch, type='pngseq',

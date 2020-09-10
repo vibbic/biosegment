@@ -26,10 +26,15 @@ def train_unet2d(
     Train UNet2D model.
     """
     # TODO check ownership
-    dataset = crud.dataset.get(db=db, id=args.dataset_id)
+    annotation = crud.annotation.get(db=db, id=args.annotation_id)
+    if not annotation:
+        raise HTTPException(status_code=404, detail="Annotation not found")
+    annotation_dir = annotation.location
+    dataset = crud.dataset.get(db=db, id=annotation.dataset_id)
     if not dataset:
         raise HTTPException(status_code=404, detail="Dataset not found")
     data_dir = dataset.location
+    # TODO write annotations out as pngs
     log_dir = args.location
     retrain_model_location = args.from_model_id
     # 0 is Falsy
@@ -40,7 +45,7 @@ def train_unet2d(
         retrain_model_location = model.location
     task = celery_app.send_task(
         "app.worker.train_unet2d",
-        args=[data_dir, log_dir, retrain_model_location],
+        args=[data_dir, log_dir, retrain_model_location, annotation_dir],
         # TODO no hardcoding
         kwargs={
             "obj_in": {"title": args.title, "location": args.location,},
@@ -67,10 +72,10 @@ def infer_unet2d(
         raise HTTPException(status_code=404, detail="Dataset not found")
     data_dir = dataset.location
 
-    model = crud.model.get(db=db, id=args.model_id)
-    if not model:
+    model_db = crud.model.get(db=db, id=args.model_id)
+    if not model_db:
         raise HTTPException(status_code=404, detail="Model not found")
-    model = model.location
+    model = model_db.location
     write_dir = args.location
     task = celery_app.send_task(
         "app.worker.infer_unet2d",
