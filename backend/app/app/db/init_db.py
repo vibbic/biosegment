@@ -131,10 +131,7 @@ def init_db(db: Session) -> None:
         location="annotations/EMBL Dataset/mitos 1",
     )
     crud.annotation.create_with_owner(
-        db,
-        obj_in=annotation_in,
-        owner_id=user.id,
-        dataset_id=embl_dataset.id
+        db, obj_in=annotation_in, owner_id=user.id, dataset_id=embl_dataset.id
     )
 
     # add EPFL dataset

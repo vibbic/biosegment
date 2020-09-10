@@ -44,7 +44,7 @@ def create_segmentation(
 
     # TODO check which part of Union
     try:
-        if segmentation_in.model:
+        if segmentation_in.model_id:
             from_model = True
     except:
         from_model = True

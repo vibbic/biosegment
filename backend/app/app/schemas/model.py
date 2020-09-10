@@ -16,6 +16,7 @@ class ModelCreate(ModelBase):
     # a new model should have at least a title
     title: str
 
+
 # TODO allow for training_task options
 # TODO remove annotation_id
 class ModelCreateFromAnnotation(ModelCreate):
@@ -24,6 +25,7 @@ class ModelCreateFromAnnotation(ModelCreate):
     dataset_id: int
     annotation_id: int
     from_model_id: Optional[int]
+
 
 # Properties to receive on model update
 class ModelUpdate(ModelBase):

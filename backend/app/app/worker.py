@@ -52,20 +52,15 @@ def create_segmentation_from_inference(
     )
     return segmentation.id
 
+
 @celery_app.task(base=DatabaseTask, bind=True, acks_late=True)
 def create_model_from_retraining(
-    self: Task,
-    obj_in: schemas.ModelCreate,
-    owner_id: int,
-    project_id: int,
+    self: Task, obj_in: schemas.ModelCreate, owner_id: int, project_id: int,
 ) -> int:
     from app import crud
 
     logger.info(f"obj_in is {obj_in}")
     model = crud.model.create_with_owner(
-        db=self.db,
-        obj_in=obj_in,
-        owner_id=owner_id,
-        project_id=project_id,
+        db=self.db, obj_in=obj_in, owner_id=owner_id, project_id=project_id,
     )
     return model.id

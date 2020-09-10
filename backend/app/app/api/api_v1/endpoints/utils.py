@@ -1,12 +1,12 @@
 import logging
-from typing import Any, Optional, Union
+from typing import Any, Optional
 
 from celery.result import AsyncResult
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from pydantic.networks import EmailStr
 from sqlalchemy.orm import Session
 
-from app import models, schemas, crud
+from app import crud, models, schemas
 from app.api import deps
 from app.core.celery_app import celery_app
 from app.utils import send_test_email
@@ -26,23 +26,27 @@ def train_unet2d(
     Train UNet2D model.
     """
     # TODO check ownership
-    data_dir = crud.dataset.get(db=db, id=args.dataset_id).location
+    dataset = crud.dataset.get(db=db, id=args.dataset_id)
+    if not dataset:
+        raise HTTPException(status_code=404, detail="Dataset not found")
+    data_dir = dataset.location
     log_dir = args.location
-    retrain_model = args.from_model_id
+    retrain_model_location = args.from_model_id
     # 0 is Falsy
-    if retrain_model is not None:
-        retrain_model = crud.model.get(db=db, id=retrain_model)
-    task = celery_app.send_task("app.worker.train_unet2d", 
-        args=[data_dir, log_dir, retrain_model], 
+    if retrain_model_location is not None:
+        model = crud.model.get(db=db, id=retrain_model_location)
+        if not model:
+            raise HTTPException(status_code=404, detail="Model not found")
+        retrain_model_location = model.location
+    task = celery_app.send_task(
+        "app.worker.train_unet2d",
+        args=[data_dir, log_dir, retrain_model_location],
         # TODO no hardcoding
         kwargs={
-        "obj_in": {
-                "title": args.title,
-                "location": args.location,
-            },
+            "obj_in": {"title": args.title, "location": args.location,},
             "owner_id": current_user.id,
             "project_id": args.project_id,
-        }
+        },
     )
     logging.debug(task)
     return {"task_id": f"{task}"}
@@ -58,21 +62,26 @@ def infer_unet2d(
     Segment using UNet2D model.
     """
     # TODO check ownership
-    data_dir = crud.dataset.get(db=db, id=args.dataset_id).location
+    dataset = crud.dataset.get(db=db, id=args.dataset_id)
+    if not dataset:
+        raise HTTPException(status_code=404, detail="Dataset not found")
+    data_dir = dataset.location
+
     model = crud.model.get(db=db, id=args.model_id).location
+    if not model:
+        raise HTTPException(status_code=404, detail="Model not found")
+    model = model.location
     write_dir = args.location
-    task = celery_app.send_task("app.worker.infer_unet2d", 
-        args=[data_dir, model, write_dir], 
+    task = celery_app.send_task(
+        "app.worker.infer_unet2d",
+        args=[data_dir, model, write_dir],
         # TODO no hardcoding
         kwargs={
-            "obj_in": {
-                "title": args.title,
-                "location": args.location,
-            },
+            "obj_in": {"title": args.title, "location": args.location,},
             "owner_id": current_user.id,
             "dataset_id": args.dataset_id,
             "model_id": args.model_id,
-        }
+        },
     )
     logging.debug(task)
     return {"task_id": f"{task}"}
