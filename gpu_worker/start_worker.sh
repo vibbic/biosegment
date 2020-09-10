@@ -6,4 +6,4 @@ set -xe
 # TODO detect if celery_neuralnets is installed
 # conda activate celery_neuralnets
 # TODO add alternative production mode
-watchmedo auto-restart --directory=./ --pattern=*.py --recursive -- celery worker -A app.worker -l info -Q gpu-queue -c 2 -n gpu_worker@%h
+watchmedo auto-restart --directory=./ --pattern=*.py --recursive -- celery worker -A app.worker -l info -Q gpu-queue -n gpu_worker@%h
