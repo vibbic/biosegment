@@ -2,7 +2,7 @@
 set -xe
 
 # get ROOT_DATA_FOLDER from .env
-export $(grep "ROOT_DATA_FOLDER" ../.env | xargs)
+export "$(grep "ROOT_DATA_FOLDER" ../.env | xargs)"
 
 # TODO remove hardcoded conda location
 # source ~/miniconda3/etc/profile.d/conda.sh
