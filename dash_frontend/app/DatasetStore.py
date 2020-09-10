@@ -7,6 +7,7 @@ import app.api as api
 class DatasetStore(object):
 
     __instance = None
+    datasets = {}
 
     def __init__(self):
         """ Virtually private constructor. """
@@ -31,4 +32,7 @@ class DatasetStore(object):
 
     @staticmethod
     def get_dataset(dataset_id):
-        return Dataset(dataset_id)
+        store = DatasetStore.getInstance()
+        if dataset_id not in store.datasets:
+            store.datasets[dataset_id] = Dataset(dataset_id)
+        return store.datasets[dataset_id]
