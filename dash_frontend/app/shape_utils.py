@@ -28,8 +28,10 @@ def shape_to_svg_code(shape):
         interest = color_to_class(shape["line"]["color"])
     except:
         interest = None
-    # TODO support more classes of interest
-    hexpart = f"0{interest}"
+    # background = 0, interest 1 = 1,...
+    # 1 == 0x01 and 255 == 0xFF
+    hexpart = hex(interest)[2:].zfill(2)
+    # all three channels of RGB are equal for greyscale
     stroke_color = f"#{hexpart}{hexpart}{hexpart}"
     logging.debug(f"stroke_color: {stroke_color}")
     path = shape["path"]
