@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 
 from app.celery_app import celery_app
 from celery.utils.log import get_task_logger
@@ -6,7 +7,7 @@ from celery.utils.log import get_task_logger
 logger = get_task_logger(__name__)
 
 try:  
-   ROOT_DATA_FOLDER = os.environ["ROOT_DATA_FOLDER"]
+   ROOT_DATA_FOLDER = Path(os.environ["ROOT_DATA_FOLDER"])
 except KeyError: 
    import sys
    print("Please set the environment variable ROOT_DATA_FOLDER in .env")
@@ -58,6 +59,7 @@ def train_unet2d(
     test_freq=1,
     train_batch_size=1,
     test_batch_size=1,
+    **kwargs,
 ) -> str:
     import os
 
@@ -134,6 +136,22 @@ def train_unet2d(
     print_frm('Starting training')
     net.train_net(train_loader, test_loader, loss_fn, optimizer, epochs, scheduler=scheduler,
                 augmenter=augmenter, print_stats=print_stats, log_dir=log_dir, device=device)
+    # TODO use on_success syntax
+    # if metadata for segmentation creation is present
+    if len(kwargs) > 0:
+        logger.info(f"Running subtask with kwargs {kwargs}")
+        task = celery_app.send_task(
+            "app.worker.create_model_from_retraining", 
+            # TODO better routing of tasks
+            queue="main-queue",
+            kwargs={
+            "obj_in": kwargs["obj_in"],
+            "owner_id": kwargs["owner_id"],
+            "project_id": kwargs["project_id"],
+        })
+        logger.info(f"Subtask {task}")
+    else:
+        logger.info(f"Not subtask with kwargs {kwargs}")
 
 
 
@@ -152,6 +170,7 @@ def infer_unet2d(
     **kwargs,
 ):
     import os
+    from pathlib import Path
     import torch
     import numpy as np
 
@@ -187,24 +206,21 @@ def infer_unet2d(
             image_array[is_maximum_for_interest] = i
         write_volume(image_array, write_dir, type=type, index_inc=1)
 
-    assert model != "string"
-    if model[0] != "/":
-        model = f"{ROOT_DATA_FOLDER}{model}"
-    if data_dir[0] != "/":
-        data_dir = f"{ROOT_DATA_FOLDER}{data_dir}"
-    if write_dir[0] != "/":
-        write_dir = f"{ROOT_DATA_FOLDER}{write_dir}"
+    model = ROOT_DATA_FOLDER / model
+    data_dir = ROOT_DATA_FOLDER / data_dir
+    write_dir = ROOT_DATA_FOLDER / write_dir
         
     logger.info(f"model {model}")
-    assert os.path.isfile(model)
+    assert model.is_file()
     logger.info(f"data_dir {data_dir}")
-    assert os.path.isdir(data_dir)
+    assert data_dir.is_dir()
     logger.info(f"write_dir {write_dir}")
     try:
-        os.mkdir(write_dir)
-    except OSError as error:
-        logger.error("Write dir already exists: {write_dir}")
-    assert os.path.isdir(write_dir)
+        write_dir.mkdir(parents=True)
+    except FileExistsError:
+         logger.error("Write dir already exists: {write_dir}")
+    except FileExistsError:
+         logger.error("Write dir already exists: {write_dir}")
 
     input_shape = (1, input_size[0], input_size[1])
 
@@ -228,7 +244,8 @@ def infer_unet2d(
 
     if write_dir:
         self.update_state(state="PROGRESS", meta=create_meta(9, 10))
-        write_out(write_dir, segmentation, classes_of_interest=classes_of_interest)
+        # TODO also use Paths in neuralnets
+        write_out(str(write_dir), segmentation, classes_of_interest=classes_of_interest)
     
     # TODO use on_success syntax
     # if metadata for segmentation creation is present
@@ -239,11 +256,8 @@ def infer_unet2d(
             # TODO better routing of tasks
             queue="main-queue",
             kwargs={
-            "obj_in": {
-                "title": kwargs["title"],
-                "location": kwargs["location"],
-            },
-            "owner_id": 1,
+            "obj_in": kwargs["obj_in"],
+            "owner_id": kwargs["owner_id"],
             "dataset_id": kwargs["dataset_id"],
             "model_id": kwargs["model_id"],
         })

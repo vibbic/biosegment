@@ -9,6 +9,7 @@ celery_app.conf.task_routes = {
     # for db operations, emails, basic testing...
     "app.worker.test_celery": "main-queue",
     "app.worker.create_segmentation_from_inference": "main-queue",
+    "app.worker.create_model_from_retraining": "main-queue",
     # gpu queue, processed by gpu_worker (have GPU's and are not in containers)
     # for training and inference
     "app.worker.test_pytorch": "gpu-queue",

@@ -2,7 +2,7 @@ from .annotation import Annotation, AnnotationCreate, AnnotationInDB, Annotation
 from .dataset import Dataset, DatasetCreate, DatasetInDB, DatasetUpdate
 from .infer_task import InferTask
 from .item import Item, ItemCreate, ItemInDB, ItemUpdate
-from .model import Model, ModelCreate, ModelInDB, ModelUpdate
+from .model import Model, ModelCreate, ModelCreateFromAnnotation, ModelInDB, ModelUpdate
 from .msg import Msg
 from .project import Project, ProjectCreate, ProjectInDB, ProjectUpdate
 from .segmentation import (

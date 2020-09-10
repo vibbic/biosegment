@@ -17,12 +17,12 @@ class SegmentationBase(BaseModel):
 class SegmentationCreate(SegmentationBase):
     title: str
 
-
-class SegmentationCreateFromModel(InferTask):
-    title: str
+# TODO allow for infer task options
+# TODO remove ids
+class SegmentationCreateFromModel(SegmentationCreate):
     model_id: int
     dataset_id: int
-
+    location : str
 
 # Properties to receive on segmentation update
 class SegmentationUpdate(SegmentationBase):
