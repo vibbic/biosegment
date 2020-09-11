@@ -1,27 +1,17 @@
-import dash_core_components as dcc
-import dash_html_components as html
-from dash.dependencies import Input, Output
-from dash.exceptions import PreventUpdate
-import dash_bootstrap_components as dbc
-
 import logging
 
+import dash_bootstrap_components as dbc
+import dash_core_components as dcc
+import dash_html_components as html
 from app.app import app
-from app.api import base
-
-from app.pages import (
-    Viewer2DPage,
-    Projects,
-    Project,
-    Datasets,
-    Dataset
-)
+from app.pages import Dataset, Datasets, Project, Projects, Viewer2DPage
+from dash.dependencies import Input, Output
 
 logging.basicConfig(
-    filename='all.log', 
-    filemode='w', 
+    filename="all.log",
+    filemode="w",
     level=logging.DEBUG,
-    format='%(asctime)s %(message)s',
+    format="%(asctime)s %(message)s",
 )
 
 # all pages for in navbar (no details)
@@ -39,7 +29,8 @@ details = [
 
 navbar = dbc.NavbarSimple(
     children=[
-        dbc.NavItem(dbc.NavLink(p.title, href=app.get_relative_path(p.path))) for p in navigation_pages
+        dbc.NavItem(dbc.NavLink(p.title, href=app.get_relative_path(p.path)))
+        for p in navigation_pages
     ],
     brand="BioSegment",
     brand_href="#",
@@ -47,22 +38,16 @@ navbar = dbc.NavbarSimple(
     dark=True,
 )
 
-app.layout = html.Div([
-    dcc.Location(id='url', refresh=False),
-    navbar,
-    dbc.Container(
-        html.Div(id='page-content'),
-        fluid=True
-    )
-])
-
-
-@app.callback(
-    Output('page-content', 'children'),
+app.layout = html.Div(
     [
-        Input('url', 'pathname'),
-]
+        dcc.Location(id="url", refresh=False),
+        navbar,
+        dbc.Container(html.Div(id="page-content"), fluid=True),
+    ]
 )
+
+
+@app.callback(Output("page-content", "children"), [Input("url", "pathname"),])
 def display_page(pathname):
     current_page = None
     for page in navigation_pages:
@@ -74,12 +59,13 @@ def display_page(pathname):
                 current_page = page
     if current_page is None:
         return "404"
-    return current_page.layout    
+    return current_page.layout
+
 
 # TODO turn off in production
 app.enable_dev_tools(debug=True)
 
 server = app.server
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     app.run_server(debug=True)

@@ -1,8 +1,8 @@
 import logging
 
-from app.Dataset import Dataset
-from app.env import ROOT_DATA_FOLDER
 import app.api as api
+from app.Dataset import Dataset
+
 
 class DatasetStore(object):
 
@@ -16,7 +16,7 @@ class DatasetStore(object):
         else:
             DatasetStore.__instance = self
 
-    @staticmethod 
+    @staticmethod
     def getInstance():
         """ Static access method. """
         if DatasetStore.__instance == None:

@@ -1,6 +1,9 @@
-import plotly.express as px
-import numpy as np
 import itertools
+
+import numpy as np
+
+import plotly.express as px
+
 
 def fromhex(n):
     return int(n, base=16)
