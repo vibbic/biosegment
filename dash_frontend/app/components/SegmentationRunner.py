@@ -51,6 +51,15 @@ segmentation_runner_layout = dbc.Card([
     ),    
 ], body=True)
 
+@app.callback(
+    Output(f"{PREFIX}-start-new-segmentation", "disabled"),
+    [
+        Input(f"{PREFIX}-progress", "animated"),
+    ]
+)
+def change_state_button(animated):
+    return animated
+
 @app.callback([
     Output(f'{PREFIX}-selected-model-name', 'options'),
 ], [

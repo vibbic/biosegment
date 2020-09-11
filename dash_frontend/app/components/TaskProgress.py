@@ -39,10 +39,10 @@ def create_callbacks(prefix):
             task_id = task_id_data["task_id"]["task_id"]
         except:
             logging.debug("Not task id")
-            return [0, 100, True, "0%", "primary", True]
+            return [0, 100, False, "0%", "primary", True]
         if not task_id:
             logging.debug("Not task id2")
-            return [0, 100, True, "0%", "primary", True]
+            return [0, 100, False, "0%", "primary", True]
         logging.debug(f"Task id {task_id}")
         try:
             response = api.utils.poll_task(json={"task_id": task_id})

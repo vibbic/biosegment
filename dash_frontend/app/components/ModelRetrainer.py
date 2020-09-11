@@ -58,6 +58,15 @@ model_retrainer_layout = dbc.Card([
     ),    
 ], body=True)
 
+@app.callback(
+    Output(f"{PREFIX}-start-retraining", "disabled"),
+    [
+        Input(f"{PREFIX}-progress", "animated"),
+    ]
+)
+def change_state_button(animated):
+    return animated
+
 @app.callback([
     Output(f"{PREFIX}-selected-annotation-name", 'options'),
 ], [
