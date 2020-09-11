@@ -23,9 +23,18 @@ model_retrainer_layout = dbc.Card([
     dbc.FormGroup(
         [
             dbc.Label("Selected model"),
-            dcc.Dropdown(
-                id=f"{PREFIX}-selected-model-name",
-            ),
+            dbc.Row([
+                dbc.Col(
+                    dcc.Dropdown(
+                        id=f"{PREFIX}-selected-model-name",
+                    ),
+                    width=8,
+                ),
+                dbc.Col(
+                    dbc.Button('Refresh', id=f"{PREFIX}-refresh-selected-model-name", size="sm"), 
+                    width=2,
+                )
+            ]),
         ]
     ),
     dbc.FormGroup(
@@ -59,7 +68,7 @@ model_retrainer_layout = dbc.Card([
 ], body=True)
 
 @app.callback(
-    Output(f"{PREFIX}-start-retraining", "disabled"),
+    Output(f"{PREFIX}-start-new-segmentation", "disabled"),
     [
         Input(f"{PREFIX}-progress", "animated"),
     ]

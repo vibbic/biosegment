@@ -12,7 +12,7 @@ from app.app import app
 from app.Dataset import Dataset
 from app.DatasetStore import DatasetStore
 
-from app.components.BasicComponent import BasicComponent
+from app.components.DatasetSelector import dataset_selector_layout
 from app.shape_utils import class_to_color
 
 
@@ -97,13 +97,22 @@ viewer_layout = dbc.Card(
     html.H3(
         "Viewer"
     ),
+    dataset_selector_layout,
     html.P(
         "Selected segmentation"
     ),
-    html.Button('Update segmentation options', id='update-button-segmentations-options'),
-    dcc.Dropdown(
-        id="selected-segmentation-name",
-    ),                
+    dbc.Row([
+        dbc.Col(
+            dcc.Dropdown(
+                id="selected-segmentation-name"
+            ), 
+            width=9,
+        ),
+        dbc.Col(
+            dbc.Button('Refresh', id='update-button-segmentations-options'), 
+            width=3,
+        )
+    ]),      
     html.Div(
         id=f'viewer-slice-info'
     ),

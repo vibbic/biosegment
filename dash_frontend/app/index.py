@@ -37,42 +37,23 @@ details = [
     Dataset,
 ]
 
-SIDEBAR_STYLE = {
-    "position": "fixed",
-    "top": 0,
-    "left": 0,
-    "bottom": 0,
-    "width": "16rem",
-    "padding": "2rem 1rem",
-    "backgroundColor": "#F8F9FA",
-}
-
-CONTENT_STYLE = {
-    "marginLeft": "18rem",
-    "marginRight": "2rem",
-    "padding": "2rem 1rem",
-}
-
-sidebar = html.Div(
-    [
-        html.H2("BioSegment", className="display-5"),
-        html.Hr(),
-        html.P(
-            "A segmentation viewer", className="lead"
-        ),
-        dbc.Nav(
-            [dbc.NavLink(p.title, href=app.get_relative_path(p.path), id=f"{p.title}-link") for p in navigation_pages],
-            vertical=True,
-            pills=True,
-        ),
+navbar = dbc.NavbarSimple(
+    children=[
+        dbc.NavItem(dbc.NavLink(p.title, href=app.get_relative_path(p.path))) for p in navigation_pages
     ],
-    style=SIDEBAR_STYLE,
+    brand="BioSegment",
+    brand_href="#",
+    color="primary",
+    dark=True,
 )
 
 app.layout = html.Div([
     dcc.Location(id='url', refresh=False),
-    sidebar,
-    html.Div(id='page-content', style=CONTENT_STYLE)
+    navbar,
+    dbc.Container(
+        html.Div(id='page-content'),
+        fluid=True
+    )
 ])
 
 

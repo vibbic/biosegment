@@ -10,16 +10,14 @@ from dash.exceptions import PreventUpdate
 from app.DatasetStore import DatasetStore
 
 
-dataset_selector_layout = dbc.Card([
-    dbc.FormGroup(
+dataset_selector_layout = dbc.FormGroup(
         [
             dbc.Label("Selected dataset"),
             dcc.Dropdown(
                 id="selected-dataset-name",
             ),
         ]
-    )
-], body=True)
+)
 
 @app.callback(
 [
