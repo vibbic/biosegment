@@ -3,6 +3,7 @@ import logging
 import dash
 import dash_html_components as html
 import dash_core_components as dcc
+import dash_bootstrap_components as dbc
 from dash.dependencies import Input, Output, State
 from dash.exceptions import PreventUpdate
 import plotly.graph_objects as go
@@ -91,7 +92,18 @@ def make_default_figure(
     return fig
 
 
-viewer_layout = html.Div([
+viewer_layout = dbc.Card(
+[
+    html.H3(
+        "Viewer"
+    ),
+    html.P(
+        "Selected segmentation"
+    ),
+    html.Button('Update segmentation options', id='update-button-segmentations-options'),
+    dcc.Dropdown(
+        id="selected-segmentation-name",
+    ),                
     html.Div(
         id=f'viewer-slice-info'
     ),
@@ -119,7 +131,8 @@ viewer_layout = html.Div([
     # shapes are dicts given by the Plotly graph
     # the line color is the interest class
     dcc.Store(id="annotations", data={}),
-])
+    ], body=True
+)
 
 @app.callback([
     Output(f'selected-segmentation-name', 'options'),

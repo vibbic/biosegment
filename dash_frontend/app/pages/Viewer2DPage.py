@@ -34,23 +34,6 @@ layout = dbc.Container(
                     ]
                 )
             ]),
-            dbc.Col(
-                dbc.Card(
-                [
-                    html.H3(
-                        "Viewer"
-                    ),
-                    html.P(
-                        "Selected segmentation"
-                    ),
-                    html.Button('Update segmentation options', id='update-button-segmentations-options'),
-                    dcc.Dropdown(
-                        id="selected-segmentation-name",
-                    ),
-                    viewer_layout,
-                ], body=True),
-                md=12,
-                lg=6,
-            )
+            dbc.Col(viewer_layout, md=12, lg=6)
         ]),
 ])
