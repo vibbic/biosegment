@@ -7,10 +7,14 @@ import dash_html_components as html
 from dash.dependencies import Input, Output, State
 from app.app import app
 from dash.exceptions import PreventUpdate
-from app.components.TaskProgress import task_progress
+from app.components.TaskProgress import create_layout, create_callbacks
 from app.DatasetStore import DatasetStore
 from app import api
 from app.shape_utils import annotations_to_png
+
+PREFIX = "segmentation"
+
+create_callbacks(PREFIX)
 
 segmentation_runner_layout = dbc.Card([
     html.H4(
@@ -21,7 +25,7 @@ segmentation_runner_layout = dbc.Card([
         [
             dbc.Label("Selected model"),
             dcc.Dropdown(
-                id="selected-model-name",
+                id=f"{PREFIX}-selected-model-name",
             ),
         ]
     ),
@@ -29,7 +33,7 @@ segmentation_runner_layout = dbc.Card([
         [
             dbc.Label("New segmentation name"),
             dcc.Input(
-                id="new-segmentation-name",
+                id=f"{PREFIX}-new-segmentation-name",
                 value="New segmentation 1",
                 type="text",
             ),
@@ -39,16 +43,16 @@ segmentation_runner_layout = dbc.Card([
         [
             dbc.Button(
                 "Start new segmentation",
-                id="start-new-segmentation",
+                id=f"{PREFIX}-start-new-segmentation",
                 color="primary", className="mr-1"
             ),
-            task_progress,
+            create_layout(PREFIX),
         ]
     ),    
 ], body=True)
 
 @app.callback([
-    Output(f'selected-model-name', 'options'),
+    Output(f'{PREFIX}-selected-model-name', 'options'),
 ], [
     Input('selected-dataset-name', 'value'),
 ])
@@ -60,14 +64,14 @@ def change_model_options(name):
 
 @app.callback(
     [
-        Output("task-id", "data"),
+        Output(f"{PREFIX}-task-id", "data"),
     ],
     [
-        Input("start-new-segmentation", "n_clicks"),
+        Input(f"{PREFIX}-start-new-segmentation", "n_clicks"),
     ],
     [
-        State("new-segmentation-name", "value"),
-        State("selected-model-name", "value"),
+        State(f"{PREFIX}-new-segmentation-name", "value"),
+        State(f"{PREFIX}-selected-model-name", "value"),
         State("selected-dataset-name", "value"),
     ]
 )

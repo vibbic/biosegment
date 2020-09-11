@@ -7,11 +7,13 @@ import dash_html_components as html
 from dash.dependencies import Input, Output, State
 from app.app import app
 from dash.exceptions import PreventUpdate
-from app.components.TaskProgress import task_progress
+from app.components.TaskProgress import create_layout, create_callbacks
 from app.DatasetStore import DatasetStore
 from app import api
 
 PREFIX = "retrainer"
+
+create_callbacks(PREFIX)
 
 model_retrainer_layout = dbc.Card([
     html.H4(
@@ -51,7 +53,7 @@ model_retrainer_layout = dbc.Card([
                 id=f"{PREFIX}-start-retraining",
                 color="primary", className="mr-1"
             ),
-            task_progress,
+            create_layout(PREFIX),
         ]
     ),    
 ], body=True)
@@ -87,8 +89,8 @@ def change_model_options(name):
     ],
     [
         State(f'{PREFIX}-new-model-name', "value"),
-        State(f'{PREFIX}-model-name', "value"),
-        State(f'{PREFIX}-annotation-name', "value"),
+        State(f'{PREFIX}-selected-model-name', "value"),
+        State(f'{PREFIX}-selected-annotation-name', "value"),
     ]
 )
 def start_model_retraining(n, new_model_name, selected_model, selected_annotation):
