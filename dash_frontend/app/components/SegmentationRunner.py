@@ -11,6 +11,7 @@ from app.components.TaskProgress import create_layout, create_callbacks
 from app.DatasetStore import DatasetStore
 from app import api
 from app.shape_utils import annotations_to_png
+from app.layout_utils import dropdown_with_button
 
 PREFIX = "segmentation"
 
@@ -24,9 +25,7 @@ segmentation_runner_layout = dbc.Card([
     dbc.FormGroup(
         [
             dbc.Label("Selected model"),
-            dcc.Dropdown(
-                id=f"{PREFIX}-selected-model-name",
-            ),
+            dropdown_with_button(dropdown_id=f"{PREFIX}-selected-model-name", button_id=f"{PREFIX}-refresh-selected-model-name"), 
         ]
     ),
     dbc.FormGroup(
@@ -64,8 +63,9 @@ def change_state_button(animated):
     Output(f'{PREFIX}-selected-model-name', 'options'),
 ], [
     Input('selected-dataset-name', 'value'),
+    Input(f"{PREFIX}-refresh-selected-model-name", 'n_clicks')
 ])
-def change_model_options(name):
+def change_model_options(name, n_clicks):
     if name:
         options = DatasetStore.get_dataset(name).get_models_available()
         return [options]

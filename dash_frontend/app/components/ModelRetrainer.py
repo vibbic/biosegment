@@ -10,6 +10,7 @@ from dash.exceptions import PreventUpdate
 from app.components.TaskProgress import create_layout, create_callbacks
 from app.DatasetStore import DatasetStore
 from app import api
+from app.layout_utils import dropdown_with_button
 
 PREFIX = "retrainer"
 
@@ -23,26 +24,13 @@ model_retrainer_layout = dbc.Card([
     dbc.FormGroup(
         [
             dbc.Label("Selected model"),
-            dbc.Row([
-                dbc.Col(
-                    dcc.Dropdown(
-                        id=f"{PREFIX}-selected-model-name",
-                    ),
-                    width=8,
-                ),
-                dbc.Col(
-                    dbc.Button('Refresh', id=f"{PREFIX}-refresh-selected-model-name", size="sm"), 
-                    width=2,
-                )
-            ]),
+            dropdown_with_button(dropdown_id=f"{PREFIX}-selected-model-name", button_id=f"{PREFIX}-refresh-selected-model-name"), 
         ]
     ),
     dbc.FormGroup(
         [
             dbc.Label("Selected annotation"),
-            dcc.Dropdown(
-                id=f"{PREFIX}-selected-annotation-name",
-            ),
+            dropdown_with_button(dropdown_id=f"{PREFIX}-selected-annotation-name", button_id=f"{PREFIX}-refresh-selected-annotation-name"), 
         ]
     ),
     dbc.FormGroup(
@@ -80,19 +68,22 @@ def change_state_button(animated):
     Output(f"{PREFIX}-selected-annotation-name", 'options'),
 ], [
     Input("selected-dataset-name", 'value'),
+    Input(f"{PREFIX}-refresh-selected-annotation-name", 'n_clicks')
 ])
-def change_annotation_options(name):
+def change_annotation_options(name, n_clicks):
     if name:
         options = DatasetStore.get_dataset(name).get_annotations_available()
         return [options]
     raise PreventUpdate
 
+
 @app.callback([
     Output(f'{PREFIX}-selected-model-name', 'options'),
 ], [
     Input('selected-dataset-name', 'value'),
+    Input(f"{PREFIX}-refresh-selected-model-name", 'n_clicks')
 ])
-def change_model_options(name):
+def change_model_options(name, n_clicks):
     if name:
         options = DatasetStore.get_dataset(name).get_models_available()
         return [options]
