@@ -158,7 +158,7 @@ def train_unet2d(
 
 
 @celery_app.task(bind=True, acks_late=True)
-def infer_unet2d(
+def infer_unet2d(  # TODO: rename to just "infer", also 2.5d and 3d nets are supported here
     self,
     data_dir,
     model,
