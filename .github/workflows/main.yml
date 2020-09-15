@@ -1,0 +1,11 @@
+name: BioSegment testing
+on: push
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build BioSegment
+        run: docker-compose up -d --build
+      - name: Test BioSegment
+        run: echo "BioSegment developer: Add test code here"
