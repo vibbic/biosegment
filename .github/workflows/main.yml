@@ -8,4 +8,4 @@ jobs:
       - name: Build BioSegment
         run: docker-compose up -d --build
       - name: Test BioSegment
-        run: echo "BioSegment developer: Add test code here"
+        run: echo "TODO Add test code here"
