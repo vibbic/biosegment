@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, List
 
 from pydantic import BaseModel
 
@@ -18,13 +18,17 @@ class ModelCreate(ModelBase):
 
 
 # TODO allow for training_task options
-# TODO remove annotation_id
 class ModelCreateFromAnnotation(ModelCreate):
     title: str
-    location: str
-    project_id: int
-    annotation_id: int
-    from_model_id: Optional[int]
+    # optional model to retrain
+    from_model_id: Optional[int] = None
+    # TODO use annotation_id from database
+    annotation: str
+    dataset_id: int
+    # TODO inherit from task schema
+    log_dir: str
+    input_size: List[int]
+    classes_of_interest: List[int]
 
 
 # Properties to receive on model update

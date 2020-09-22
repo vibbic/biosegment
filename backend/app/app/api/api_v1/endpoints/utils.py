@@ -25,21 +25,22 @@ def train_unet2d(
     """
     Train UNet2D model.
     """
+    logging.debug(args)
     # TODO check ownership
-    annotation = crud.annotation.get(db=db, id=args.annotation_id)
-    if not annotation:
-        raise HTTPException(status_code=404, detail="Annotation not found")
-    annotation_dir = annotation.location
-    dataset = crud.dataset.get(db=db, id=annotation.dataset_id)
+    # annotation = crud.annotation.get(db=db, id=args.annotation_id)
+    # if not annotation:
+    #     raise HTTPException(status_code=404, detail="Annotation not found")
+    annotation_dir =args.annotation
+    dataset = crud.dataset.get(db=db, id=args.dataset_id)
     if not dataset:
         raise HTTPException(status_code=404, detail="Dataset not found")
     data_dir = dataset.location
     # TODO write annotations out as pngs
     log_dir = args.location
-    retrain_model_location = args.from_model_id
+    retrain_model = args.from_model_id
     # 0 is Falsy
-    if retrain_model_location is not None:
-        model = crud.model.get(db=db, id=retrain_model_location)
+    if retrain_model is not None:
+        model = crud.model.get(db=db, id=retrain_model)
         if not model:
             raise HTTPException(status_code=404, detail="Model not found")
         retrain_model_location = model.location
@@ -50,7 +51,7 @@ def train_unet2d(
         kwargs={
             "obj_in": {"title": args.title, "location": args.location,},
             "owner_id": current_user.id,
-            "project_id": args.project_id,
+            "project_id": dataset.project_id,
         },
     )
     logging.debug(task)
