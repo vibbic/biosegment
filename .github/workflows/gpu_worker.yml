@@ -5,14 +5,15 @@ jobs:
         runs-on: ubuntu-latest
         steps:
         - uses: actions/checkout@v1
+        - name: Update Conda environment with neuralnets requirements
+          uses: actions/checkout@v2
+          uses: matthewrmshin/conda-action@v1
+          with:
+            args: conda env update -f gpu_worker/celery_neuralnets_environment.yaml
         - name: Update Conda environment with celery requirements
           uses: matthewrmshin/conda-action@v1
           with:
             args: conda env update -f gpu_worker/celery_celery_environment.yaml
-        - name: Update Conda environment with neuralnets requirements
-          uses: matthewrmshin/conda-action@v1
-          with:
-            args: conda env update -f gpu_worker/celery_neuralnets_environment.yaml
         - name: Update Conda environment with pytorch requirements
           uses: matthewrmshin/conda-action@v1
           with:
