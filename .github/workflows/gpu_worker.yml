@@ -5,8 +5,11 @@ jobs:
         runs-on: ubuntu-latest
         steps:
         - uses: actions/checkout@v1
+        - name: Who am I?
+          run: echo "I am: `whoami`"
+        - name: Git present?
+          run: echo "git is here: `which git`"
         - name: Update Conda environment with neuralnets requirements
-          uses: actions/checkout@v2
           uses: matthewrmshin/conda-action@v1
           with:
             args: conda env update -f gpu_worker/celery_neuralnets_environment.yaml
