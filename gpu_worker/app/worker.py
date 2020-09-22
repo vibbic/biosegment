@@ -37,8 +37,9 @@ def train_unet2d(
     self,
     data_dir,
     log_dir,
-    labels_dir,
+    annotation_dir,
     retrain_model = None,
+    # note: duplication with backend schema TrainingTaskBase
     seed=0,
     device=0,
     print_stats=50,
@@ -63,6 +64,7 @@ def train_unet2d(
     **kwargs,
 ) -> str:
     import os
+    from pathlib import Path
 
     import torch
     import torch.optim as optim
@@ -77,6 +79,8 @@ def train_unet2d(
     from neuralnets.util.tools import set_seed
     from neuralnets.util.validation import validate
 
+    self.update_state(state="PROGRESS", meta=create_meta(0, 10))
+
     loss_fn = get_loss_function(loss)
 
     """
@@ -87,9 +91,12 @@ def train_unet2d(
     """
         Setup logging directory
     """
+    log_dir = (ROOT_DATA_FOLDER / log_dir).parent
+    data_dir = ROOT_DATA_FOLDER / data_dir
+    annotation_dir = ROOT_DATA_FOLDER / annotation_dir
+
     print_frm('Setting up log directories')
-    if not os.path.exists(log_dir):
-        os.mkdir(log_dir)
+    log_dir.mkdir(exist_ok=True)
 
     """
         Load the data
@@ -101,14 +108,14 @@ def train_unet2d(
                         RandomDeformation_2D(input_shape[1:], grid_size=(64, 64), sigma=0.01, device=device,
                                             include_segmentation=True),
                         AddNoise(sigma_max=0.05, include_segmentation=True)])
-    # TODO use labels dir
-    train = StronglyLabeledVolumeDataset(os.path.join(data_dir, 'train'),
-                                        os.path.join(data_dir, 'train_labels'),
+    # TODO use labels dir and train_test_split from biosegment branch
+    train = StronglyLabeledVolumeDataset(data_dir / '../train',
+                                        data_dir / '../train_labels',
                                         input_shape=input_shape, len_epoch=len_epoch, type='pngseq',
                                         in_channels=in_channels, batch_size=train_batch_size,
                                         orientations=orientations)
-    test = StronglyLabeledVolumeDataset(os.path.join(data_dir, 'test'),
-                                        os.path.join(data_dir, 'test_labels'),
+    test = StronglyLabeledVolumeDataset(data_dir / '../test',
+                                        data_dir / '../test_labels',
                                         input_shape=input_shape, len_epoch=len_epoch, type='pngseq',
                                         in_channels=in_channels, batch_size=test_batch_size,
                                         orientations=orientations)
@@ -120,7 +127,7 @@ def train_unet2d(
     """
     print_frm('Building the network')
     if retrain_model:
-        net = torch.load(retrain_model)
+        net = torch.load(ROOT_DATA_FOLDER / retrain_model)
     else:
         net = UNet2D(in_channels=in_channels, feature_maps=fm, levels=levels, dropout_enc=dropout,
                 dropout_dec=dropout, norm=norm, activation=activation, coi=classes_of_interest)
@@ -135,9 +142,11 @@ def train_unet2d(
     """
         Train the network
     """
+    self.update_state(state="PROGRESS", meta=create_meta(1, 10))
     print_frm('Starting training')
     net.train_net(train_loader, test_loader, loss_fn, optimizer, epochs, scheduler=scheduler,
                 augmenter=augmenter, print_stats=print_stats, log_dir=log_dir, device=device)
+    self.update_state(state="PROGRESS", meta=create_meta(9, 10))
     # TODO use on_success syntax
     # if metadata for segmentation creation is present
     if len(kwargs) > 0:

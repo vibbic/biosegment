@@ -25,12 +25,12 @@ def train_unet2d(
     """
     Train UNet2D model.
     """
-    logging.debug(args)
+    logging.info(args)
     # TODO check ownership
     # annotation = crud.annotation.get(db=db, id=args.annotation_id)
     # if not annotation:
     #     raise HTTPException(status_code=404, detail="Annotation not found")
-    annotation_dir =args.annotation
+    annotation_dir = args.annotation
     dataset = crud.dataset.get(db=db, id=args.dataset_id)
     if not dataset:
         raise HTTPException(status_code=404, detail="Dataset not found")
@@ -44,15 +44,26 @@ def train_unet2d(
         if not model:
             raise HTTPException(status_code=404, detail="Model not found")
         retrain_model_location = model.location
-    task = celery_app.send_task(
-        "app.worker.train_unet2d",
-        args=[data_dir, log_dir, retrain_model_location, annotation_dir],
-        # TODO no hardcoding
-        kwargs={
-            "obj_in": {"title": args.title, "location": args.location,},
+    # remove unused entries like database ids
+    kwargs = args.dict(
+        exclude={"annotation", "dataset_id", "location", "from_model_id"}
+    )
+    # add task specific arguments and keep optional training parameters
+    kwargs.update(
+        {
+            "data_dir": data_dir,
+            "log_dir": log_dir,
+            "annotation_dir": annotation_dir,
+            "retrain_model": retrain_model_location if retrain_model else None,
+            "obj_in": {"title": args.title, "location": args.location},
             "owner_id": current_user.id,
             "project_id": dataset.project_id,
-        },
+        }
+    )
+    task = celery_app.send_task(
+        "app.worker.train_unet2d",
+        # TODO no hardcoding
+        kwargs=kwargs,
     )
     logging.debug(task)
     return {"task_id": f"{task}"}
@@ -83,7 +94,7 @@ def infer_unet2d(
         args=[data_dir, model, write_dir],
         # TODO no hardcoding
         kwargs={
-            "obj_in": {"title": args.title, "location": args.location,},
+            "obj_in": {"title": args.title, "location": args.location},
             "owner_id": current_user.id,
             "dataset_id": args.dataset_id,
             "model_id": args.model_id,
