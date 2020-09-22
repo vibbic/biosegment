@@ -80,7 +80,7 @@ def train_unet2d(
     from neuralnets.util.tools import set_seed, train_test_split
     from neuralnets.util.validation import validate
 
-    self.update_state(state="PROGRESS", meta=create_meta(0, 10))
+    self.update_state(state="PROGRESS", meta=create_meta(1, 10))
 
     loss_fn = get_loss_function(loss)
 
@@ -163,7 +163,7 @@ def train_unet2d(
     """
         Train the network
     """
-    self.update_state(state="PROGRESS", meta=create_meta(1, 10))
+    self.update_state(state="PROGRESS", meta=create_meta(2, 10))
     print_frm('Starting training')
     net.train_net(train_loader, test_loader, loss_fn, optimizer, epochs, scheduler=scheduler,
                 augmenter=augmenter, print_stats=print_stats, log_dir=log_dir, device=device)
