@@ -61,6 +61,7 @@ def train_unet2d(
     test_freq=1,
     train_batch_size=1,
     test_batch_size=1,
+    test_size=0.33,
     **kwargs,
 ) -> str:
     import os
@@ -74,9 +75,9 @@ def train_unet2d(
     from neuralnets.data.datasets import StronglyLabeledVolumeDataset
     from neuralnets.networks.unet import UNet2D
     from neuralnets.util.augmentation import ToFloatTensor, Rotate90, FlipX, FlipY, ContrastAdjust, RandomDeformation_2D, AddNoise
-    from neuralnets.util.io import print_frm
+    from neuralnets.util.io import print_frm, write_volume, read_volume
     from neuralnets.util.losses import get_loss_function
-    from neuralnets.util.tools import set_seed
+    from neuralnets.util.tools import set_seed, train_test_split
     from neuralnets.util.validation import validate
 
     self.update_state(state="PROGRESS", meta=create_meta(0, 10))
@@ -108,14 +109,34 @@ def train_unet2d(
                         RandomDeformation_2D(input_shape[1:], grid_size=(64, 64), sigma=0.01, device=device,
                                             include_segmentation=True),
                         AddNoise(sigma_max=0.05, include_segmentation=True)])
-    # TODO use labels dir and train_test_split from biosegment branch
-    train = StronglyLabeledVolumeDataset(data_dir / '../train',
-                                        data_dir / '../train_labels',
+    
+    # TODO remove unnecessary serialization steps
+    # read in datasets
+    # TODO read_volume is time consuming, optimize
+    input_data = read_volume(file=data_dir, type="pngseq")
+    label_data = read_volume(file=annotation_dir, type="pngseq")
+    print_frm('Creating testing and training subsets')
+    x_train, y_train, x_test, y_test = train_test_split(input_data, label_data, test_size=test_size)
+    
+    # Write out numpy arrays in log_dir
+    # TODO also use pathlib for neuralnets functions
+    train_path = log_dir / 'train'
+    train_labels_path = log_dir / 'train_labels'
+    test_path = log_dir / 'test'
+    test_labels_path = log_dir / 'test_labels'
+    write_volume(data=x_train, file=str(train_path), type="pngseq")
+    write_volume(data=y_train, file=str(train_labels_path), type="pngseq")
+    write_volume(data=x_test, file=str(test_path), type="pngseq")
+    write_volume(data=y_test, file=str(test_labels_path), type="pngseq")
+
+    # read in pngseqs to volume dataset
+    train = StronglyLabeledVolumeDataset(str(train_path),
+                                        str(train_labels_path),
                                         input_shape=input_shape, len_epoch=len_epoch, type='pngseq',
                                         in_channels=in_channels, batch_size=train_batch_size,
                                         orientations=orientations)
-    test = StronglyLabeledVolumeDataset(data_dir / '../test',
-                                        data_dir / '../test_labels',
+    test = StronglyLabeledVolumeDataset(str(test_path),
+                                        str(test_labels_path),
                                         input_shape=input_shape, len_epoch=len_epoch, type='pngseq',
                                         in_channels=in_channels, batch_size=test_batch_size,
                                         orientations=orientations)
