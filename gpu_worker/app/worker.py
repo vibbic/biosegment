@@ -38,20 +38,20 @@ def train_unet2d(
     data_dir,
     log_dir,
     annotation_dir,
+    input_size,
+    classes_of_interest,
     retrain_model = None,
     # note: duplication with backend schema TrainingTaskBase
     seed=0,
     device=0,
     print_stats=50,
-    input_size=(256,256),
     fm=1,
     levels=4,
     dropout=0.0,
     norm="instance",
     activation="relu",
     in_channels=1,
-    classes_of_interest=(0,1,2),
-    orientations=(0,),
+    orientations=[0],
     loss="ce",
     lr=1e-3,
     step_size=10,
@@ -104,21 +104,25 @@ def train_unet2d(
     """
     input_shape = (1, input_size[0], input_size[1])
     print_frm('Loading data')
-    augmenter = Compose([ToFloatTensor(device=device), Rotate90(), FlipX(prob=0.5), FlipY(prob=0.5),
-                        ContrastAdjust(adj=0.1, include_segmentation=True),
-                        RandomDeformation_2D(input_shape[1:], grid_size=(64, 64), sigma=0.01, device=device,
-                                            include_segmentation=True),
-                        AddNoise(sigma_max=0.05, include_segmentation=True)])
-    
-    # TODO remove unnecessary serialization steps
+    print_frm(f"""
+    Args: input_shape {input_shape}
+    len_epoch {len_epoch}
+    batch_size {train_batch_size}
+    in_channels {in_channels}
+    orientations {orientations}
+    """)
     # read in datasets
-    # TODO read_volume is time consuming, optimize
-    input_data = read_volume(file=data_dir, type="pngseq")
-    label_data = read_volume(file=annotation_dir, type="pngseq")
+    labeled_volume = StronglyLabeledVolumeDataset(str(data_dir),
+            str(annotation_dir),
+            input_shape=input_shape, len_epoch=len_epoch, type='pngseq',
+            in_channels=in_channels, batch_size=train_batch_size,
+            orientations=orientations)
+
     print_frm('Creating testing and training subsets')
-    x_train, y_train, x_test, y_test = train_test_split(input_data, label_data, test_size=test_size)
-    
+    x_train, y_train, x_test, y_test = train_test_split(labeled_volume.data, labeled_volume.labels, test_size=test_size)
+
     # Write out numpy arrays in log_dir
+    # TODO remove unnecessary serialization steps
     # TODO also use pathlib for neuralnets functions
     train_path = log_dir / 'train'
     train_labels_path = log_dir / 'train_labels'
@@ -160,6 +164,11 @@ def train_unet2d(
     optimizer = optim.Adam(net.parameters(), lr=lr)
     scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=step_size, gamma=gamma)
 
+    augmenter = Compose([ToFloatTensor(device=device), Rotate90(), FlipX(prob=0.5), FlipY(prob=0.5),
+                        ContrastAdjust(adj=0.1, include_segmentation=True),
+                        RandomDeformation_2D(input_shape[1:], grid_size=(64, 64), sigma=0.01, device=device,
+                                            include_segmentation=True),
+                        AddNoise(sigma_max=0.05, include_segmentation=True)])
     """
         Train the network
     """
