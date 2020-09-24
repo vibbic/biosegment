@@ -101,3 +101,17 @@ Kill them all
 ```
 ps auxww | grep 'celery worker' | awk '{print $2}' | xargs kill -9
 ```
+
+## Model training visualisation
+
+We can use [TensorBoard](https://www.tensorflow.org/tensorboard) to visualize model (re)training.
+
+Install Tensorboard with
+
+```pip install tensorboard```
+
+Then start tensorboard in the terminal with `logdir` pointing to the directory where biosegment stores the model training files, for example 
+
+```tensorboard --logdir "/home/johndoe/code/biosegment/data/models/EMBL/my retrained model 1"``` 
+
+The tensorboard can be viewed in the browser at http://localhost:6006.
