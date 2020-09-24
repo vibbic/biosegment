@@ -1,6 +1,7 @@
 from requests.adapters import HTTPAdapter
 
-DEFAULT_TIMEOUT = 5 # seconds
+DEFAULT_TIMEOUT = 5  # seconds
+
 
 class TimeoutHTTPAdapter(HTTPAdapter):
     def __init__(self, *args, **kwargs):

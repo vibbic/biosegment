@@ -1,12 +1,12 @@
-import logging 
-
-from cairosvg import svg2png
-import skimage
-import plotly.express as px
-import PIL.Image
 import io
-import numpy as np
 import logging
+
+import numpy as np
+
+import PIL.Image
+import plotly.express as px
+import skimage
+from cairosvg import svg2png
 
 DEFAULT_STROKE_WIDTH = 3  # gives line width of 2^3 = 8
 # the number of different classes for labels
@@ -16,11 +16,14 @@ class_labels = list(range(NUM_LABEL_CLASSES))
 # we can't have less colors than classes
 assert NUM_LABEL_CLASSES <= len(class_label_colormap)
 
+
 def class_to_color(n):
     return class_label_colormap[n]
 
+
 def color_to_class(c):
     return class_label_colormap.index(c)
+
 
 def shape_to_svg_code(shape):
     stroke_width = shape["line"]["width"]
@@ -41,6 +44,7 @@ def shape_to_svg_code(shape):
     fill-opacity="0"
 />
 """
+
 
 def annotations_to_svg_code(annotations, fig=None, width=None, height=None):
     """
@@ -68,15 +72,21 @@ def annotations_to_svg_code(annotations, fig=None, width=None, height=None):
 </svg>
 """
 
-def annotations_to_png(fig=None, annotations=None, width=None, height=None, write_to=None):
+
+def annotations_to_png(
+    fig=None, annotations=None, width=None, height=None, write_to=None
+):
     """
     Like svg2png, if write_to is None, returns a bytestring. If it is a path
     to a file it writes to this file and returns None.
     """
-    svg_code = annotations_to_svg_code(fig=fig, annotations=annotations, width=width, height=height)
+    svg_code = annotations_to_svg_code(
+        fig=fig, annotations=annotations, width=width, height=height
+    )
     r = svg2png(bytestring=svg_code, write_to=write_to)
     logging.debug(f"svg2png return {r}")
     return r
+
 
 # def shape_to_png(fig=None, shape=None, width=None, height=None, write_to=None):
 #     """

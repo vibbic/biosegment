@@ -1,15 +1,14 @@
 # from requests_oauthlib import OAuth2Session
-import json
-import requests
-import logging
 import http.client
+import json
+import logging
 
-from requests_toolbelt import sessions
 from requests.packages.urllib3.util.retry import Retry
 
+from app.api.TimeoutHTTPAdapter import TimeoutHTTPAdapter
 # from requests_oauthlib import OAuth2Session
 from app.env import API_DOMAIN
-from app.api.TimeoutHTTPAdapter import TimeoutHTTPAdapter
+from requests_toolbelt import sessions
 
 # TODO remove credentials and use client secret
 ROOT_USERNAME = "admin@biosegment.irc.ugent.be"
@@ -17,8 +16,8 @@ ROOT_PASSWORD = "m1cr0scopy"
 # CLIENT_ID = "<your client key>"
 # CLIENT_SECRET = "<your client secret>"
 
-API_ROOT = f'http://{API_DOMAIN}/api/v1/'
-TOKEN_URL = 'login/access-token'
+API_ROOT = f"http://{API_DOMAIN}/api/v1/"
+TOKEN_URL = "login/access-token"
 
 http_session = sessions.BaseUrlSession(base_url=API_ROOT)
 
@@ -37,13 +36,14 @@ requests_log = logging.getLogger("requests.packages.urllib3")
 requests_log.setLevel(logging.DEBUG)
 requests_log.propagate = True
 
+
 def get_tokens():
     global http_session
     # TODO refresh tokens
     data = {
-        'grant_type': 'password',
-        'username': ROOT_USERNAME, 
-        'password': ROOT_PASSWORD,
+        "grant_type": "password",
+        "username": ROOT_USERNAME,
+        "password": ROOT_PASSWORD,
         # 'scope': '',
         # 'cient_id': '',
         # 'client_secret': '',
@@ -61,8 +61,11 @@ def get_tokens():
     logging.debug(data)
     logging.debug(TOKEN_URL)
     try:
-        access_token_response = http_session.post(TOKEN_URL, data=data, timeout=5,
-        # auth=(client_id, client_secret)
+        access_token_response = http_session.post(
+            TOKEN_URL,
+            data=data,
+            timeout=5,
+            # auth=(client_id, client_secret)
         )
         logging.debug(access_token_response)
         # print(access_token_response.headers)
@@ -71,16 +74,18 @@ def get_tokens():
         # print("access token: " + tokens['access_token'])
         tokens = new_tokens
         # print(Base.tokens)
-        token = tokens['access_token']
+        token = tokens["access_token"]
         logging.debug(f"Token type: {type(token)}")
     except Exception as e:
         logging.warning(f"Exception {e}")
         return None
     return str(token)
 
+
 token = get_tokens()
 while token is None:
     token = get_tokens()
+
 
 def get(path, headers={}, **kwargs):
     global token
@@ -90,17 +95,18 @@ def get(path, headers={}, **kwargs):
     # logging.debug(f"GET using token {token}")
     # logging.debug(f"Path {path}")
     r = http_session.get(
-        path, 
+        path,
         headers={
-            'Authorization': 'Bearer ' + token,
-            'Accept': 'application/json',
+            "Authorization": "Bearer " + token,
+            "Accept": "application/json",
             # **headers
         },
-        timeout=1
+        timeout=1,
     )
     assert r.status_code == 200
     # logging.debug(f"f {r}")
     return r.json()
+
 
 def post(path, headers={}, **kwargs):
     global token
@@ -115,17 +121,16 @@ def post(path, headers={}, **kwargs):
         payload = None
     # logging.debug(f"JSON {payload}")
     r = http_session.post(
-        path, 
+        path,
         headers={
-            'Authorization': 'Bearer ' + token, 
+            "Authorization": "Bearer " + token,
             # **headers
-            'Content-type': 'application/json', 
-            'Accept': 'application/json',
+            "Content-type": "application/json",
+            "Accept": "application/json",
         },
         timeout=1,
-        json = payload
+        json=payload,
     )
     assert r.status_code == 200 or r.status_code == 201
     # logging.debug(f"f {r}")
     return r.json()
-

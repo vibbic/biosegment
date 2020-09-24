@@ -1,0 +1,33 @@
+name: GPU Worker testing
+on: push
+jobs:
+    build-and-run:
+        runs-on: ubuntu-latest
+        steps:
+        - uses: actions/checkout@v1
+        - name: Who am I?
+          run: whoami
+        - name: Git present?
+          run: which git
+        # The conda env update below fails with an error about git not being found
+        # when it tries to clone the neuralnets sources from github.
+        # - name: Update Conda environment with neuralnets requirements
+        #   uses: matthewrmshin/conda-action@v1
+        #   with:
+        #     args: conda env update -f gpu_worker/celery_neuralnets_environment.yaml
+        - name: Update Conda environment with neuralnets requirements
+          run: echo "FIXME This fails with an error about git"
+        - name: Update Conda environment with celery requirements
+          uses: matthewrmshin/conda-action@v1
+          with:
+            args: conda env update -f gpu_worker/celery_celery_environment.yaml
+        - name: Update Conda environment with pytorch requirements
+          uses: matthewrmshin/conda-action@v1
+          with:
+            args: conda env update -f gpu_worker/celery_pytorch_environment.yaml
+        - name: Activate environment
+          uses: matthewrmshin/conda-action@v1
+          with:
+            args: conda activate celery_neuralnets
+        - name: Test GPU worker
+          run: echo "TODO Add test code here"

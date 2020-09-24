@@ -18,4 +18,6 @@ dependencies:
   - opencv==4.2.0
   - pip
   - pip: 
-    - neuralnets
+    - git+https://github.com/JorisRoels/neuralnets.git@biosegment
+  
+
