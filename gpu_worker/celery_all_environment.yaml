@@ -10,7 +10,7 @@ dependencies:
   - torchvision
   - cudatoolkit=10.2
     # celery
-  - celery
+  - celery==4.4.6
   - watchdog
     # neuralnets
   - future
@@ -27,7 +27,7 @@ dependencies:
   - pip: 
     - git+https://github.com/JorisRoels/neuralnets.git@biosegment
     # celery
-    - celery[redis]
+    - celery[redis]==4.4.6
 
 
 
