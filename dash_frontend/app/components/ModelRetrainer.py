@@ -38,6 +38,16 @@ model_retrainer_layout = dbc.Card(
         ),
         dbc.FormGroup(
             [
+                dbc.Label("Epochs"),
+                dcc.Input(
+                    id=f"{PREFIX}-epochs",
+                    value=10,
+                    type="number",
+                ),
+            ]
+        ),
+        dbc.FormGroup(
+            [
                 dbc.Label("New model name"),
                 dcc.Input(
                     id=f"{PREFIX}-new-model-name", value="New model 1", type="text",
@@ -103,20 +113,24 @@ def change_model_options(name, n_clicks):
         State(f"{PREFIX}-new-model-name", "value"),
         State(f"{PREFIX}-selected-model-name", "value"),
         State(f"{PREFIX}-selected-annotation-name", "value"),
+        State(f"{PREFIX}-epochs", "value"),
+        State("selected-dataset-name", "value"),
     ],
 )
-def start_model_retraining(n, new_model_name, selected_model, selected_annotation):
+def start_model_retraining(n, new_model_name, selected_model_id, selected_annotation, epochs, selected_dataset_id):
     if n:
-        assert selected_model
+        assert selected_model_id
         body = {
             "title": new_model_name,
-            "retrain_model": selected_model,
-            "model_id": 1,
-            "dataset_id": 1,
-            "labels_dir": selected_annotation,
-            "log_dir": f"segmentations/EMBL/{new_model_name}",
+            # TODO create location on backend based on new name
+            "location": f"models/EMBL/{new_model_name}/best_checkpoint.pytorch",
+            "from_model_id": selected_model_id,
+            "dataset_id": selected_dataset_id,
+            # TODO use annotation_id from database
+            "annotation": selected_annotation,
             "input_size": [512, 512],
             "classes_of_interest": [0, 1, 2],
+            "epochs": epochs,
         }
         logging.debug(f"Start segmentation body: {body}")
         task_id = api.utils.train(json=body)

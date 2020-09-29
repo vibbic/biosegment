@@ -15,7 +15,7 @@ def add_dataset(
     model: models.Model,
     name: str,
 ) -> Tuple[models.Dataset, models.Segmentation]:
-    title = f"{name} Dataset"
+    title = name
     dataset_in = schemas.DatasetCreate(
         title=title, description=f"{title} description", location=f"EM/{name}/raw/"
     )
@@ -87,14 +87,14 @@ def init_db(db: Session) -> None:
     )
 
     # add unet2d model trained on ground truth
-    model_in = schemas.ModelCreate(
-        title="Trained UNet2D",
-        description="Trained UNet2D description",
-        location="models/EMBL/test_run2/best_checkpoint.pytorch",
-    )
-    trained_unet2d = crud.model.create_with_owner(
-        db, obj_in=model_in, owner_id=user.id, project_id=main_project.id
-    )
+    # model_in = schemas.ModelCreate(
+    #     title="Trained UNet2D",
+    #     description="Trained UNet2D description",
+    #     location="models/EMBL/test_run2/best_checkpoint.pytorch",
+    # )
+    # trained_unet2d = crud.model.create_with_owner(
+    #     db, obj_in=model_in, owner_id=user.id, project_id=main_project.id
+    # )
 
     # add untrained unet2d segmentation
     segmentation_in = schemas.SegmentationCreate(
@@ -111,24 +111,24 @@ def init_db(db: Session) -> None:
     )
 
     # add trained unet2d segmentation
-    segmentation_in = schemas.SegmentationCreate(
-        title="Trained UNet2D segmentation",
-        description="Trained UNet2D segmentation description",
-        location="segmentations/EMBL/trained",
-    )
-    crud.segmentation.create_with_owner(
-        db,
-        obj_in=segmentation_in,
-        owner_id=user.id,
-        dataset_id=embl_dataset.id,
-        model_id=trained_unet2d.id,
-    )
+    # segmentation_in = schemas.SegmentationCreate(
+    #     title="Trained UNet2D segmentation",
+    #     description="Trained UNet2D segmentation description",
+    #     location="segmentations/EMBL/trained",
+    # )
+    # crud.segmentation.create_with_owner(
+    #     db,
+    #     obj_in=segmentation_in,
+    #     owner_id=user.id,
+    #     dataset_id=embl_dataset.id,
+    #     model_id=trained_unet2d.id,
+    # )
 
     # add mitos 1 annotation
     annotation_in = schemas.AnnotationCreate(
-        title="mitos 1",
-        description="mitos 1 description",
-        location="annotations/EMBL Dataset/mitos 1",
+        title="mitos 2",
+        description="mitos 2 description",
+        location="annotations/EMBL/mitos 2",
     )
     crud.annotation.create_with_owner(
         db, obj_in=annotation_in, owner_id=user.id, dataset_id=embl_dataset.id

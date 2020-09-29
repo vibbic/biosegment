@@ -34,7 +34,6 @@ def shape_to_svg_code(shape):
     hexpart = hex(interest)[2:].zfill(2)
     # all three channels of RGB are equal for greyscale
     stroke_color = f"#{hexpart}{hexpart}{hexpart}"
-    logging.debug(f"stroke_color: {stroke_color}")
     path = shape["path"]
     return f"""
 <path
@@ -61,6 +60,7 @@ def annotations_to_svg_code(annotations, fig=None, width=None, height=None):
     else:
         if width is None or height is None:
             raise ValueError("If fig is None, you must specify width and height")
+    svgs_annotations = ''.join([shape_to_svg_code(a) for a in annotations]) if annotations else ""
     return f"""
 <svg
     width="{width}"
@@ -68,7 +68,7 @@ def annotations_to_svg_code(annotations, fig=None, width=None, height=None):
     viewBox="0 0 {width} {height}"
 >
 <rect width="100%" height="100%" fill="white" />
-{''.join([shape_to_svg_code(a) for a in annotations])}
+{svgs_annotations}
 </svg>
 """
 
@@ -84,7 +84,6 @@ def annotations_to_png(
         fig=fig, annotations=annotations, width=width, height=height
     )
     r = svg2png(bytestring=svg_code, write_to=write_to)
-    logging.debug(f"svg2png return {r}")
     return r
 
 

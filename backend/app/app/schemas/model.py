@@ -1,6 +1,8 @@
-from typing import Optional
+from typing import List, Optional
 
 from pydantic import BaseModel
+
+from .training_task import TrainingTaskBase
 
 
 # Shared properties
@@ -17,14 +19,19 @@ class ModelCreate(ModelBase):
     title: str
 
 
-# TODO allow for training_task options
-# TODO remove annotation_id
-class ModelCreateFromAnnotation(ModelCreate):
+# TODO Union with ModelCreate
+class ModelCreateFromAnnotation(TrainingTaskBase):
     title: str
     location: str
-    project_id: int
-    annotation_id: int
-    from_model_id: Optional[int]
+    description: Optional[str] = None
+    # optional model to retrain
+    from_model_id: Optional[int] = None
+    # TODO use annotation_id from database
+    annotation: str
+    dataset_id: int
+    # TODO inherit from task schema
+    input_size: List[int]
+    classes_of_interest: List[int]
 
 
 # Properties to receive on model update
