@@ -9,14 +9,16 @@ on:
 jobs:
   # all jobs run in parallel by default
   lint:
+    # run poetry to install dev dependencies for backend lint script
     strategy:
       fail-fast: false
       matrix:
+        # linting on one platform is sufficient
         python-version: [3.*]
         poetry-version: [1.0.10]
-        os: [ubuntu-18.04, macos-latest, windows-latest]
-    # runs-on: ${{ matrix.os }}
-    runs-on: ubuntu-latest
+        # os: [ubuntu-18.04, macos-latest, windows-latest]
+        os: [ubuntu-latest]
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v2
@@ -26,12 +28,13 @@ jobs:
         uses: abatilo/actions-poetry@v2.0.0
         with:
           poetry-version: ${{ matrix.poetry-version }}
-      - name: View poetry --help
-        run: poetry --help
-      - name: Run test
+      - name: Install dependencies
         run: |
           cd backend/app
           poetry install
+      - name: Run test
+        run: |
+          cd backend/app
           poetry run sh scripts/lint.sh
   test:
     needs: lint
