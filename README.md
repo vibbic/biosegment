@@ -82,9 +82,7 @@ Current workaround
 ```
 # in gpu_worker/
 # install environment for neuralnets celery worker
-conda env update -f celery_pytorch_environment.yaml
-conda env update -f celery_celery_environment.yaml
-conda env update -f celery_neuralnets_environment.yaml
+conda env update -f celery_all_environment.yaml
 conda activate celery_neuralnets
 bash start_worker.sh
 ```

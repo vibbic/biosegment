@@ -1,11 +1,49 @@
 name: BioSegment testing
-on: push
+on:
+  # Trigger the workflow on push or pull request,
+  # but only for the master branch
+  push:
+  pull_request:
+    branches:
+      - master
 jobs:
-  test:
-    runs-on: ubuntu-latest
+  # all jobs run in parallel by default
+  lint:
+    # run poetry to install dev dependencies for backend lint script
+    strategy:
+      fail-fast: false
+      matrix:
+        # linting on one platform is sufficient
+        python-version: [3.*]
+        poetry-version: [1.0.10]
+        # os: [ubuntu-18.04, macos-latest, windows-latest]
+        os: [ubuntu-latest]
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2
-      - name: Build BioSegment
-        run: docker-compose up -d --build
+      - uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Run image
+        uses: abatilo/actions-poetry@v2.0.0
+        with:
+          poetry-version: ${{ matrix.poetry-version }}
+      - name: Install dependencies
+        run: |
+          cd backend/app
+          poetry install
+      - name: Run test
+        run: |
+          cd backend/app
+          poetry run sh scripts/lint.sh
+  test:
+    needs: lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Git checkout
+        uses: actions/checkout@v2
+      - name: Branch name
+        run: echo running on branch ${GITHUB_REF##*/}
       - name: Test BioSegment
-        run: echo "TODO Add test code here"
+      # use sh to avoid permission errors
+        run: sh ./scripts/test.sh
