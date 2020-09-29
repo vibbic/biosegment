@@ -52,7 +52,7 @@ sh scripts/lint.sh
 ```
 
 ## Data folder
-In `.env` a ROOT_DATA_FOLDER is defined. The structure of the folder is the following
+In `.env` a ROOT_DATA_FOLDER is defined with the default value of `./data`, relative to this project folder. The structure of the folder is the following:
 - ROOT_DATA_FOLDER
     - EM
         - EMBL
@@ -68,6 +68,10 @@ In `.env` a ROOT_DATA_FOLDER is defined. The structure of the folder is the foll
     - annotations
 
 In the future the backend will handle this folder structure.
+Overwriting ROOT_DATA_FOLDER can be done using an environment variable:
+```
+ROOT_DATA_FOLDER=/personal/data/folder/location docker-compose up -d --build
+```
 
 ## Run celery worker with GPU
 
@@ -113,3 +117,10 @@ Then start tensorboard in the terminal with `logdir` pointing to the directory w
 ```tensorboard --logdir "/home/johndoe/code/biosegment/data/models/EMBL/my retrained model 1"``` 
 
 The tensorboard can be viewed in the browser at http://localhost:6006.
+
+## Production
+
+The `.env` file is version controlled, so it should not hold production secrets. Create from it a seperate `.env.prod` file with different secrets and credentials. This new file can be used instead of the default with an [`env-file` option parameter](https://docs.docker.com/compose/environment-variables/):
+```
+docker-compose --env-file .env.prod up 
+```
