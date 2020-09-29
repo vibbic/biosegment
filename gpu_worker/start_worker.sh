@@ -2,6 +2,7 @@
 set -xe
 
 # get ROOT_DATA_FOLDER from .env
+# TODO allow use of .env.prod
 export "$(grep "ROOT_DATA_FOLDER" ../.env | xargs)"
 
 # TODO remove hardcoded conda location
