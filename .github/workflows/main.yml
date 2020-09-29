@@ -32,8 +32,7 @@ jobs:
         run: |
           cd backend/app
           poetry install
-          poetry shell
-          sh scripts/lint.sh
+          poetry run sh scripts/lint.sh
   test:
     needs: lint
     runs-on: ubuntu-latest
