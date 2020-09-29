@@ -1,5 +1,18 @@
 name: GPU Worker testing
-on: push
+on:
+  # disable for now
+  # TODO add pytest test suite or a redis backend
+  push:
+    branches-ignore:
+      - '**' 
+#   # Trigger the workflow on push or pull request,
+#   # but only for the master branch
+#   push:
+#     branches:
+#       - master
+#   pull_request:
+#     branches:
+#       - master
 jobs:
     build-and-run:
         runs-on: ubuntu-latest
@@ -8,13 +21,15 @@ jobs:
           - name: Cache conda
             uses: actions/cache@v1
             env:
-              # Increase this value to reset cache if etc/example-environment.yml has not changed
+              # Increase this value to reset cache if gpu_worker/celery_all_environment.yaml has not changed
               CACHE_NUMBER: 0
             with:
               path: ~/conda_pkgs_dir
-              key: ${{ runner.os }}-conda-${{ env.CACHE_NUMBER }}-${{ hashFiles('etc/example-environment.yml') }}
+              key: ${{ runner.os }}-conda-${{ env.CACHE_NUMBER }}-${{ hashFiles('gpu_worker/celery_all_environment.yaml') }}
           - uses: conda-incubator/setup-miniconda@v1
             with:
+              # TODO use bundled Miniconda in act_base
+              installer-url: https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
               activate-environment: celery_neuralnets
               channel-priority: strict
               environment-file: gpu_worker/celery_all_environment.yaml

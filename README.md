@@ -113,3 +113,21 @@ Then start tensorboard in the terminal with `logdir` pointing to the directory w
 ```tensorboard --logdir "/home/johndoe/code/biosegment/data/models/EMBL/my retrained model 1"``` 
 
 The tensorboard can be viewed in the browser at http://localhost:6006.
+
+## CI
+
+Continuous integration using [GitHub Actions](https://docs.github.com/en/free-pro-team@latest/actions) can run linting or tests on code changes. The configuration files are located in `.github/`.
+
+For local development, [act](https://github.com/nektos/act) can be used.
+
+```bash
+# install act
+curl https://raw.githubusercontent.com/nektos/act/master/install.sh | sudo bash
+# use a public Docker image as base environment
+act -P ubuntu-latest=berombau/act_base -j lint
+```
+
+Caveats
+- There are differences between `berombau/act_base` and the GitHub images
+- different oses are not supported
+- public GitHub actions can depend on certain GitHub tooling, which would require incorporating that dependency in the `act_base` image.
