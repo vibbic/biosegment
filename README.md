@@ -127,14 +127,20 @@ For local development, [act](https://github.com/nektos/act) can be used.
 ```bash
 # install act
 curl https://raw.githubusercontent.com/nektos/act/master/install.sh | sudo bash
-# use a public Docker image as base environment
-act -P ubuntu-latest=berombau/act_base -j lint
+```
+
+Example commands:
+```
+act -P ubuntu-latest=berombau/act_base -j test
+# WARNING act-environments-ubuntu:18.04 is >18GB!
+act -P ubuntu-latest=nektos/act-environments-ubuntu:18.04 -j lint
 ```
 
 Caveats
 - There are differences between `berombau/act_base` and the GitHub images
 - different oses are not supported
 - public GitHub actions can depend on certain GitHub tooling, which would require incorporating that dependency in the `act_base` image.
+
 ## Production
 
 The `.env` file is version controlled, so it should not hold production secrets. Create from it a seperate `.env.prod` file with different secrets and credentials. This new file can be used instead of the default with an [`env-file` option parameter](https://docs.docker.com/compose/environment-variables/):
