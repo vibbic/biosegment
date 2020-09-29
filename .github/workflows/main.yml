@@ -1,11 +1,28 @@
 name: BioSegment testing
-on: push
+on:
+  # Trigger the workflow on push or pull request,
+  # but only for the master branch
+  push:
+  pull_request:
+    branches:
+      - master
 jobs:
-  test:
+  # all jobs run in parallel by default
+  lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - name: Build BioSegment
-        run: docker-compose up -d --build
+      - name: Git checkout
+        uses: actions/checkout@v2
+      - name: Run linter
+        run: echo "Linting TODO"
+  test:
+    needs: lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Git checkout
+        uses: actions/checkout@v2
+      - name: Branch name
+        run: echo running on branch ${GITHUB_REF##*/}
       - name: Test BioSegment
-        run: echo "TODO Add test code here"
+        run: ./scripts/test.sh
+        shell: bash
