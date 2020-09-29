@@ -5,8 +5,6 @@ from app.components.ModelRetrainer import model_retrainer_layout
 from app.components.SegmentationRunner import segmentation_runner_layout
 from app.components.Viewer2D import viewer_layout
 
-WORKER_ROOT_DATA_FOLDER = "/home/brombaut/workspace/biosegment/data/"
-
 title = "Viewer 2D"
 path = "/viewer"
 
