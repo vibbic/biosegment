@@ -1,5 +1,5 @@
 import logging
-import os
+from pathlib import Path
 
 import dash_bootstrap_components as dbc
 import dash_core_components as dcc
@@ -99,18 +99,23 @@ def show_annotations(annotations_data):
         State("annotations", "data"),
         State("selected-dataset-name", "value"),
         State("new-annotation-name", "value"),
+        State("viewer-slice-id", "max"),
     ],
 )
-def save_annotations(n_clicks, annotations_data, dataset_id, new_annotation_name):
+def save_annotations(n_clicks, annotations_data, dataset_id, new_annotation_name, max_slice):
     if not n_clicks:
         raise PreventUpdate
-    annotation_folder = f"/data/annotations/{DatasetStore.get_dataset(dataset_id).get_title()}/{new_annotation_name}"
+    annotation_folder = Path(f"/data/annotations/{DatasetStore.get_dataset(dataset_id).get_title()}/{new_annotation_name}")
     try:
-        for slice_id, annotations in annotations_data.items():
-            try:
-                os.makedirs(annotation_folder)
-            except OSError as error:
-                logging.debug(error)
+        # TODO define behaviour if folder exists
+        annotation_folder.mkdir(parents=True, exist_ok=True)
+        logging.debug(annotations_data)
+        for slice_id in range(max_slice):
+            slice_id = str(slice_id)
+            if slice_id in annotations_data:
+                annotations = annotations_data[slice_id]
+            else:
+                annotations = None
             annotations_to_png(
                 width=512,
                 height=512,

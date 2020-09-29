@@ -3,7 +3,33 @@ from typing import List, Optional
 from pydantic import BaseModel
 
 
-class TrainingTask(BaseModel):
+class TrainingTaskBase(BaseModel):
+    # optional extra parameters
+    # note: duplication with default parameters of task train_unet2d
+    orientations: Optional[List[int]] = [
+        0,
+    ]
+    seed: Optional[int] = 0
+    device: Optional[int] = 0
+    print_stats: Optional[int] = 50
+    fm: Optional[int] = 1
+    levels: Optional[int] = 4
+    dropout: Optional[float] = 0.0
+    norm: Optional[str] = "instance"
+    activation: Optional[str] = "relu"
+    in_channels: Optional[int] = 1
+    loss: Optional[str] = "ce"
+    lr: Optional[float] = 1e-3
+    step_size: Optional[int] = 10
+    gamma: Optional[float] = 0.9
+    epochs: Optional[int] = 50
+    len_epoch: Optional[int] = 100
+    test_freq: Optional[int] = 1
+    train_batch_size: Optional[int] = 1
+    test_batch_size: Optional[int] = 1
+
+
+class TrainingTask(TrainingTaskBase):
     data_dir: str
     log_dir: str
     input_size: List[int]
@@ -11,24 +37,3 @@ class TrainingTask(BaseModel):
 
     # training or retraining
     retrain_model: Optional[str]
-
-    # optional extra parameters
-    orientations: Optional[List[int]]
-    seed: Optional[int]
-    device: Optional[int]
-    print_stats: Optional[int]
-    fm: Optional[int]
-    levels: Optional[int]
-    dropout: Optional[float]
-    norm: Optional[str]
-    activation: Optional[str]
-    in_channels: Optional[int]
-    loss: Optional[str]
-    lr: Optional[float]
-    step_size: Optional[int]
-    gamma: Optional[float]
-    epochs: Optional[float]
-    len_epoch: Optional[int]
-    test_freq: Optional[int]
-    train_batch_size: Optional[int]
-    test_batch_size: Optional[int]
