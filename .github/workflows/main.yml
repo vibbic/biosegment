@@ -9,12 +9,31 @@ on:
 jobs:
   # all jobs run in parallel by default
   lint:
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: [3.*]
+        poetry-version: [1.0.10]
+        os: [ubuntu-18.04, macos-latest, windows-latest]
+    # runs-on: ${{ matrix.os }}
     runs-on: ubuntu-latest
     steps:
-      - name: Git checkout
-        uses: actions/checkout@v2
-      - name: Run linter
-        run: echo "Linting TODO"
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Run image
+        uses: abatilo/actions-poetry@v2.0.0
+        with:
+          poetry-version: ${{ matrix.poetry-version }}
+      - name: View poetry --help
+        run: poetry --help
+      - name: Run test
+        run: |
+          cd backend/app
+          poetry install
+          poetry shell
+          sh scripts/lint.sh
   test:
     needs: lint
     runs-on: ubuntu-latest
@@ -24,5 +43,5 @@ jobs:
       - name: Branch name
         run: echo running on branch ${GITHUB_REF##*/}
       - name: Test BioSegment
-        run: ./scripts/test.sh
-        shell: bash
+      # use sh to avoid permission errors
+        run: sh ./scripts/test.sh
