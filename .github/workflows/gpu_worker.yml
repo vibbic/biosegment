@@ -17,7 +17,7 @@ jobs:
             with:
               activate-environment: celery_neuralnets
               channel-priority: strict
-              environment-file: gpu_worker/celery_all_environment.yml
+              environment-file: gpu_worker/celery_all_environment.yaml
               use-only-tar-bz2: true # IMPORTANT: This needs to be set for caching to work properly!
           - name: Run GPU Worker
             shell: bash -l {0}
