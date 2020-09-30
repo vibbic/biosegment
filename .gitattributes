@@ -1,0 +1,6 @@
+
+# Force Windows batch scripts to use CR/LF line endings
+*.{bat,[bB][aA][tT]} text eol=crlf
+
+# Force Bash shell scripts to use LF line endings
+*.sh text eol=lf
