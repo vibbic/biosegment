@@ -2,6 +2,11 @@
 
 BioSegment is a software stack to enable segmentation of microscopy data using machine learning models.
 
+## Supported platforms
+
+- Ubuntu 18.04, 20.04
+- Windows 10
+
 ## Installation
 
 Install:
@@ -70,25 +75,37 @@ In `.env` a ROOT_DATA_FOLDER is defined with the default value of `./data`, rela
 In the future the backend will handle this folder structure.
 Overwriting ROOT_DATA_FOLDER can be done using an environment variable:
 ```
+# On Linux:
 ROOT_DATA_FOLDER=/personal/data/folder/location docker-compose up -d --build
+
+# On Windows:
+set ROOT_DATA_FOLDER=X:/biosegment/data
+docker-compose up -d --build
 ```
 
 ## Run celery worker with GPU
 
-- docker-compose GPU support is very experimental, not working currently
-    - see `docker-compose_gpu.yml`
-    - docker-compose override gives errors, that's why one .yml file is needed
-    - NVIDIA driver still isn't visible then, waiting for stable support
+GPU support in docker-compose is very experimental, not working currently
+- see `docker-compose_gpu.yml`
+- docker-compose override gives errors, that's why one .yml file is needed
+- NVIDIA driver still isn't visible then, waiting for stable support
 
 Current workaround
 - expose rabbitMQ queue in docker-compose to host
 - run celery worker on host without virtualization
 ```
-# in gpu_worker/
+cd gpu_worker
+
 # install environment for neuralnets celery worker
 conda env update -f celery_all_environment.yaml
 conda activate celery_neuralnets
+
+# On Linux
 bash start_worker.sh
+
+# On Windows
+set ROOT_DATA_FOLDER=X:/biosegment/data
+start_worker.bat   # On Windows
 ```
 
 If force stopping the auto-reloading watchdog for workers (x2 Ctrl-C), some workers may linger.
