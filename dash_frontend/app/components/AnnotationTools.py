@@ -111,7 +111,6 @@ def change_annotation_mode_btn(annotation_mode, selected_annotation):
 
 @app.callback(
     [
-        Output("viewer-graph",  "config"),
         Output("annotation-mode", "data"),
     ],
     [
@@ -122,16 +121,11 @@ def change_annotation_mode_btn(annotation_mode, selected_annotation):
     ]
 )
 def change_annotation_mode(n_clicks, old_mode):
-    edit_buttons = ["drawrect", "drawopenpath", "eraseshape",]
     if n_clicks:
         if old_mode == ANNOTATION_MODE.EDITING:
-            # stop editing
-            config = {"modeBarButtonsToRemove": edit_buttons}
-            return config, ANNOTATION_MODE.NOT_EDITING
+            return [ANNOTATION_MODE.NOT_EDITING]
         else:
-            # start editing
-            config = {"modeBarButtonsToAdd": edit_buttons}
-            return config, ANNOTATION_MODE.EDITING
+            return [ANNOTATION_MODE.EDITING]
     raise PreventUpdate
 
 

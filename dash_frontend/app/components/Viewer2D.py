@@ -60,7 +60,7 @@ def add_layout_images_to_fig(fig, segmentation, dataset, slice_id, update_ranges
 
 
 def make_default_figure(
-    stroke_color=None, stroke_width=None, shapes=[],
+    annotation_mode=ANNOTATION_MODE.NOT_EDITING, stroke_color=None, stroke_width=None, shapes=[]
 ):
     def dummy_fig():
         fig = go.Figure(go.Scatter(x=[], y=[]))
@@ -72,15 +72,23 @@ def make_default_figure(
         return fig
 
     fig = dummy_fig()
-    fig.update_layout(
-        {
-            "dragmode": "drawopenpath",
-            "shapes": shapes,
-            "newshape.line.color": stroke_color,
-            "newshape.line.width": stroke_width,
-            "margin": dict(l=0, r=0, b=0, t=0, pad=4),
-        }
-    )
+    if (annotation_mode == ANNOTATION_MODE.EDITING):
+        fig.update_layout(
+            {
+                "dragmode": "drawopenpath",
+                "shapes": shapes,
+                "newshape.line.color": stroke_color,
+                "newshape.line.width": stroke_width,
+                "margin": dict(l=0, r=0, b=0, t=0, pad=4),
+            }
+        )
+    else:
+        fig.update_layout(
+            {
+                "shapes": shapes,
+                "margin": dict(l=0, r=0, b=0, t=0, pad=4),
+            }
+        )
     return fig
 
 
@@ -188,6 +196,7 @@ def create_annotation(shape, slice_id):
 
 @app.callback(
     [
+        Output(f"viewer-graph", "config"),
         Output(f"viewer-graph", "figure"),
         Output("annotations", "data"),
         Output("stroke-width-display", "children"),
@@ -203,6 +212,7 @@ def create_annotation(shape, slice_id):
             "n_clicks_timestamp",
         ),
         Input("stroke-width", "value"),
+        Input("annotation-mode", "data")
     ],
     [
         State(f"viewer-slice-id", "value"),
@@ -218,21 +228,37 @@ def update_fig(
     graph_relayoutData,
     any_label_class_button_value,
     stroke_width_value,
+    annotation_mode,
     # states
     # fig,
     slice_id,
     annotations_data,
 ):
     cbcontext = [p["prop_id"] for p in dash.callback_context.triggered][0]
+    config = {}
     # if fig is None:
     #     fig = make_default_figure()
     if not current_dataset or not slice_id:
-        fig = make_default_figure()
-        return [fig, annotations_data, None]
+        fig = make_default_figure(annotation_mode=annotation_mode,)
+        return [config, fig, annotations_data, None]
 
     # TODO fix confusion
     # keys are strings, not ints
     slice_id = str(slice_id)
+    
+    if annotation_mode:
+        edit_buttons = ["drawrect", "drawopenpath", "eraseshape",]
+        if annotation_mode == ANNOTATION_MODE.EDITING:
+            # TODO unselect current selected shape
+            config =  {"modeBarButtonsToAdd": edit_buttons}
+            editable = True
+        else:
+            config = {"modeBarButtonsToRemove": edit_buttons}
+            editable = False
+        # set annotations to correct mode on change
+        for annotations in annotations_data.values():
+            for annotation in annotations:
+                annotation["editable"] = editable
 
     if cbcontext == "viewer-graph.relayoutData":
         if "shapes" in graph_relayoutData.keys():
@@ -271,6 +297,7 @@ def update_fig(
         stroke_color=class_to_color(label_class_value),
         stroke_width=stroke_width,
         shapes=current_annotations,
+        annotation_mode=annotation_mode,
     )
     # logging.debug(f"Fig: {fig}")
     add_layout_images_to_fig(
@@ -280,7 +307,7 @@ def update_fig(
         slice_id=int(slice_id),
     )
     fig.update_layout(uirevision="segmentation")
-    return (fig, annotations_data, "Stroke width: %d" % (stroke_width,))
+    return (config, fig, annotations_data, "Stroke width: %d" % (stroke_width,))
 
 
 if __name__ == "__main__":
