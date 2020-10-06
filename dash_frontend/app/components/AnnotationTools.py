@@ -6,6 +6,7 @@ import dash_core_components as dcc
 import dash_html_components as html
 from app.app import app
 from app.DatasetStore import DatasetStore
+from app.layout_utils import dropdown_with_button
 from app.shape_utils import (
     DEFAULT_STROKE_WIDTH,
     annotations_to_png,
@@ -14,6 +15,8 @@ from app.shape_utils import (
 )
 from dash.dependencies import Input, Output, State
 from dash.exceptions import PreventUpdate
+
+PREFIX = "annotation-tools"
 
 annotation_tools_layout = dbc.Card(
     dbc.CardBody(
@@ -51,11 +54,25 @@ annotation_tools_layout = dbc.Card(
             ),
             dbc.FormGroup(
                 [
-                    dbc.Label("New annotations name"),
+                    dbc.Label("Selected annotation"),
+                    dropdown_with_button(
+                        dropdown_id=f"{PREFIX}-selected-annotation-name",
+                        button_id=f"{PREFIX}-refresh-selected-annotation-name",
+                    ),
+                ]
+            ),
+            dbc.FormGroup(
+                [
+                    dbc.Label("Create new annotation from selected"),
                     dcc.Input(
                         id="new-annotation-name", type="text", value="New annotation 1",
                     ),
-                    dbc.Button("Save new annotation", id="save-new-annotation",),
+                    dbc.Button("Create new annotation", id="create-new-annotation",),
+                ]
+            ),
+            dbc.FormGroup(
+                [
+                    dbc.Button("Start editing current annotation", id="annotation-mode", color="success", active=False),
                 ]
             ),
             dbc.Label("Annotations"),
@@ -64,6 +81,45 @@ annotation_tools_layout = dbc.Card(
     ),
     id="right-column",
 )
+
+@app.callback(
+    [
+        Output("annotation-mode", "children"),
+        Output("annotation-mode", "color"),
+        Output("annotation-mode", "active"),
+        Output(f"{PREFIX}-selected-annotation-name", "disabled")
+    ],
+    [
+        # Input("selected-dataset-name", "value"),
+        Input(f"annotation-mode", "n_clicks"),
+    ],
+    [
+        State("annotation-mode", "active"),
+    ]
+)
+def change_annotation_mode(n_clicks, old_mode):
+    if n_clicks:
+        if old_mode:
+            # stop editing
+            return "Start editing current annotation", "success", False, False
+        else:
+            # start editing
+            return "Stop editing current annotation", "danger", True, True
+    raise PreventUpdate
+
+
+@app.callback(
+    [Output(f"{PREFIX}-selected-annotation-name", "options"),],
+    [
+        Input("selected-dataset-name", "value"),
+        Input(f"{PREFIX}-refresh-selected-annotation-name", "n_clicks"),
+    ],
+)
+def change_annotation_options(name, n_clicks):
+    if name:
+        options = DatasetStore.get_dataset(name).get_annotations_available()
+        return [options]
+    raise PreventUpdate
 
 
 @app.callback(Output("masks-display", "children"), [Input("annotations", "data"),])
