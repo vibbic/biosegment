@@ -7,7 +7,7 @@ import dash_core_components as dcc
 import dash_html_components as html
 from app.app import app
 from app.DatasetStore import DatasetStore
-from app.layout_utils import dropdown_with_button
+from app.layout_utils import dropdown_with_button, ANNOTATION_MODE
 from app.shape_utils import (
     DEFAULT_STROKE_WIDTH,
     annotations_to_png,
@@ -16,14 +16,9 @@ from app.shape_utils import (
 )
 from dash.dependencies import Input, Output, State
 from dash.exceptions import PreventUpdate
-from enum import IntEnum, auto
+
 
 PREFIX = "annotation-tools"
-
-# Use IntEnum so ANNOTATION_MODE can be saved in Dash Store as int and still be compared
-class ANNOTATION_MODE(IntEnum):
-     NOT_EDITING = auto()
-     EDITING = auto()
 
 annotation_tools_layout = dbc.Card(
     dbc.CardBody(

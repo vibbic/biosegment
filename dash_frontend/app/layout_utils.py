@@ -1,6 +1,10 @@
 import dash_bootstrap_components as dbc
 import dash_core_components as dcc
-
+from enum import IntEnum, auto
+# Use IntEnum so ANNOTATION_MODE can be saved in Dash Store as int and still be compared
+class ANNOTATION_MODE(IntEnum):
+     NOT_EDITING = auto()
+     EDITING = auto()
 
 def dropdown_with_button(
     dropdown_id,

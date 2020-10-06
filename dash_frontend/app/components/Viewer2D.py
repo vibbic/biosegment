@@ -7,9 +7,8 @@ import dash_html_components as html
 import plotly.graph_objects as go
 from app.app import app
 from app.components.DatasetSelector import dataset_selector_layout
-from app.components.AnnotationTools import ANNOTATION_MODE
 from app.DatasetStore import DatasetStore
-from app.layout_utils import dropdown_with_button
+from app.layout_utils import dropdown_with_button, ANNOTATION_MODE
 from app.shape_utils import class_to_color
 from dash.dependencies import Input, Output, State
 from dash.exceptions import PreventUpdate
@@ -117,6 +116,7 @@ viewer_layout = dbc.Card(
         # shapes are dicts given by the Plotly graph
         # the line color is the interest class
         dcc.Store(id="annotations", data={}),
+        html.Div(id="test"),
     ],
     body=True,
 )
