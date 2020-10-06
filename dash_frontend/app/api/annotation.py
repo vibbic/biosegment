@@ -17,3 +17,6 @@ def get_multi_for_dataset(dataset_id, **kwargs):
 
 def create(**kwargs):
     return base.post(f"{ENTRYPOINT_BASE}", **kwargs)
+
+def create_for_dataset(dataset_id, **kwargs):
+    return base.post(f"datasets/{dataset_id}/{ENTRYPOINT_BASE}", **kwargs)

@@ -181,8 +181,7 @@ def change_dataset_dimensions(name):
         return [dataset.get_dimensions()]
     raise PreventUpdate
 
-
-def create_annotation(shape, slice_id):
+def create_annotations(shape, slice_id):
     try:
         interest = color_to_class(shape["line"]["color"])
     except:
@@ -193,12 +192,10 @@ def create_annotation(shape, slice_id):
         "interest": interest,
     }
 
-
 @app.callback(
     [
         Output(f"viewer-graph", "config"),
         Output(f"viewer-graph", "figure"),
-        Output("annotations", "data"),
         Output("stroke-width-display", "children"),
     ],
     [
@@ -206,18 +203,19 @@ def create_annotation(shape, slice_id):
         # TODO
         Input("selected-dataset-name", "value"),
         Input(f"viewer-slice-id", "value"),
-        Input("viewer-graph", "relayoutData"),
+        # Input("viewer-graph", "relayoutData"),
         Input(
             {"type": "label-class-button", "index": dash.dependencies.ALL},
             "n_clicks_timestamp",
         ),
         Input("stroke-width", "value"),
-        Input("annotation-mode", "data")
+        Input("annotations", "data"),
+        Input("annotation-mode", "data"),
     ],
     [
         State(f"viewer-slice-id", "value"),
         # State(f'viewer-graph', 'figure'),
-        State("annotations", "data"),
+        # State("annotations", "data"),
     ],
 )
 def update_fig(
@@ -225,14 +223,13 @@ def update_fig(
     current_segmentation,
     current_dataset,
     slice_id_update,
-    graph_relayoutData,
     any_label_class_button_value,
     stroke_width_value,
+    annotations_data,
     annotation_mode,
     # states
     # fig,
     slice_id,
-    annotations_data,
 ):
     cbcontext = [p["prop_id"] for p in dash.callback_context.triggered][0]
     config = {}
@@ -240,7 +237,7 @@ def update_fig(
     #     fig = make_default_figure()
     if not current_dataset or not slice_id:
         fig = make_default_figure(annotation_mode=annotation_mode,)
-        return [config, fig, annotations_data, None]
+        return [config, fig, None]
 
     # TODO fix confusion
     # keys are strings, not ints
@@ -251,29 +248,23 @@ def update_fig(
         if annotation_mode == ANNOTATION_MODE.EDITING:
             # TODO unselect current selected shape
             config =  {"modeBarButtonsToAdd": edit_buttons}
-            editable = True
         else:
             config = {"modeBarButtonsToRemove": edit_buttons}
-            editable = False
-        # set annotations to correct mode on change
-        for annotations in annotations_data.values():
-            for annotation in annotations:
-                annotation["editable"] = editable
 
-    if cbcontext == "viewer-graph.relayoutData":
-        if "shapes" in graph_relayoutData.keys():
-            # TODO support for editing annotations
-            # TODO use set
-            new_shapes = graph_relayoutData["shapes"]
-            try:
-                old_shapes = annotations_data[slice_id]
-            except:
-                logging.debug(
-                    f"No annotation entry for slice {slice_id} and keys {annotations_data.keys()}, creating one"
-                )
-                annotations_data[slice_id] = []
-                old_shapes = []
-            annotations_data[slice_id] += [s for s in new_shapes if s not in old_shapes]
+    # if cbcontext == "viewer-graph.relayoutData":
+    #     if "shapes" in graph_relayoutData.keys():
+    #         # TODO support for editing annotations
+    #         # TODO use set
+    #         new_shapes = graph_relayoutData["shapes"]
+    #         try:
+    #             old_shapes = annotations_data[slice_id]
+    #         except:
+    #             logging.debug(
+    #                 f"No annotation entry for slice {slice_id} and keys {annotations_data.keys()}, creating one"
+    #             )
+    #             annotations_data[slice_id] = []
+    #             old_shapes = []
+    #         annotations_data[slice_id] += [s for s in new_shapes if s not in old_shapes]
         # else:
         #     return dash.no_update
 
@@ -307,7 +298,7 @@ def update_fig(
         slice_id=int(slice_id),
     )
     fig.update_layout(uirevision="segmentation")
-    return (config, fig, annotations_data, "Stroke width: %d" % (stroke_width,))
+    return (config, fig, "Stroke width: %d" % (stroke_width,))
 
 
 if __name__ == "__main__":
