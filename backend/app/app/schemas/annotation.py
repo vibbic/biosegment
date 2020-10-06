@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Dict, List, Optional
 
 from pydantic import BaseModel
 
@@ -18,7 +18,7 @@ class AnnotationCreate(AnnotationBase):
 
 # Properties to receive on annotation update
 class AnnotationUpdate(AnnotationBase):
-    pass
+    shapes: Optional[Dict[str, List[Dict]]] = None
 
 
 # Properties shared by models stored in DB

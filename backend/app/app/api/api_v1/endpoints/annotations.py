@@ -1,3 +1,6 @@
+import logging
+from json import dump
+from pathlib import Path
 from typing import Any, List
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -62,6 +65,24 @@ def update_annotation(
         annotation.owner_id != current_user.id
     ):
         raise HTTPException(status_code=400, detail="Not enough permissions")
+
+    if annotation_in.shapes:
+        try:
+            logging.info(f"location: {annotation.location}")
+            assert annotation.location
+            annotations_location = Path(f"/data/{annotation.location}")
+            # TODO define behaviour if folder exists
+            annotations_location.parent.mkdir(parents=True, exist_ok=True)
+            annotations_location.touch()
+            logging.info(f"location: {annotations_location}")
+            with annotations_location.open(mode="w") as fp:
+                dump(annotation_in.shapes, fp)
+        except Exception as e:
+            logging.info(f"Error saving annotations: {e}")
+            raise HTTPException(
+                status_code=500,
+                detail="Something went wrong during saving the annotations",
+            )
     annotation = crud.annotation.update(db=db, db_obj=annotation, obj_in=annotation_in)
     return annotation
 

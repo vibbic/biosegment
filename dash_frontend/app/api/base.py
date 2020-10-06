@@ -107,7 +107,6 @@ def get(path, headers={}, **kwargs):
     # logging.debug(f"f {r}")
     return r.json()
 
-
 def post(path, headers={}, **kwargs):
     global token
     global http_session
@@ -121,6 +120,33 @@ def post(path, headers={}, **kwargs):
         payload = None
     # logging.debug(f"JSON {payload}")
     r = http_session.post(
+        path,
+        headers={
+            "Authorization": "Bearer " + token,
+            # **headers
+            "Content-type": "application/json",
+            "Accept": "application/json",
+        },
+        timeout=1,
+        json=payload,
+    )
+    assert r.status_code == 200 or r.status_code == 201
+    # logging.debug(f"f {r}")
+    return r.json()
+
+def put(path, headers={}, **kwargs):
+    global token
+    global http_session
+    if not token:
+        token = get_tokens()
+    # logging.debug(f"POST using token {token}")
+    # logging.debug(f"Path {path}")
+    try:
+        payload = kwargs["json"]
+    except:
+        payload = None
+    # logging.debug(f"JSON {payload}")
+    r = http_session.put(
         path,
         headers={
             "Authorization": "Bearer " + token,

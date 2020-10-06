@@ -14,6 +14,8 @@ def get_multi(**kwargs):
 def get_multi_for_dataset(dataset_id, **kwargs):
     return base.get(f"datasets/{dataset_id}/annotations", **kwargs)
 
+def update(id, **kwargs):
+    return base.put(f"{ENTRYPOINT_BASE}/{id}", **kwargs)
 
 def create(**kwargs):
     return base.post(f"{ENTRYPOINT_BASE}", **kwargs)

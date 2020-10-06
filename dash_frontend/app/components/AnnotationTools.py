@@ -173,14 +173,17 @@ def change_annotation_mode_btn(annotation_mode, selected_annotation):
         State("annotation-mode", "data"),
         State("annotations", "data"),
         State(f"{PREFIX}-selected-annotation-name", "value"),
+        State("selected-dataset-name", "value"),
     ]
 )
-def change_annotation_mode(n_clicks, old_mode, annotations_data, selected_annotation_id):
+def change_annotation_mode(n_clicks, old_mode, annotations_data, selected_annotation_id, dataset_id):
     if n_clicks:
         if old_mode == ANNOTATION_MODE.EDITING:
             # logging.debug(f"Annotations data: {annotations_data}")
-            annotation_folder = api.annotation.get(id=selected_annotation_id)["location"]
-            write_annotations_to_json(annotation_folder, annotations_data)
+            # TODO difference between POST and UPDATE
+            api.annotation.update(id=selected_annotation_id, json={
+                "shapes": annotations_data 
+            })
             return [ANNOTATION_MODE.NOT_EDITING]
         else:
             # annotation data should already be loaded by annotation selector
@@ -232,25 +235,12 @@ def create_annotation(n_clicks, dataset_id, new_annotation_name, selected_annota
             dataset_id=dataset_id,
             json={
                 "title": new_annotation_name,
-                "location": f"annotations/{DatasetStore.get_dataset(dataset_id).get_title()}/{new_annotation_name}"
+                "location": f"annotations/{DatasetStore.get_dataset(dataset_id).get_title()}/{new_annotation_name}/annotations.json"
             }
         )
         return dash.no_update
     logging.debug(f"Not creating annotation")
     raise PreventUpdate
-
-
-def write_annotations_to_json(annotation_folder, annotations_data):
-    try:
-        # TODO define behaviour if folder exists
-        annotation_folder = Path(f"/data/{annotation_folder}")
-        annotation_folder.mkdir(parents=True, exist_ok=True)
-        logging.debug(annotations_data)
-        with open(f"{annotation_folder}/annotations.json", 'w') as fp:
-            json.dump(annotations_data, fp)
-    except Exception as e:
-        logging.debug(f"Error saving annotations: {e}")
-        raise PreventUpdate
 
 # @app.callback(
 #     # not needed
