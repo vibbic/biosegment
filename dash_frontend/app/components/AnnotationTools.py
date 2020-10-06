@@ -1,6 +1,7 @@
 import logging
 from pathlib import Path
 
+import dash
 import dash_bootstrap_components as dbc
 import dash_core_components as dcc
 import dash_html_components as html
@@ -15,8 +16,14 @@ from app.shape_utils import (
 )
 from dash.dependencies import Input, Output, State
 from dash.exceptions import PreventUpdate
+from enum import IntEnum, auto
 
 PREFIX = "annotation-tools"
+
+# Use IntEnum so ANNOTATION_MODE can be saved in Dash Store as int and still be compared
+class ANNOTATION_MODE(IntEnum):
+     NOT_EDITING = auto()
+     EDITING = auto()
 
 annotation_tools_layout = dbc.Card(
     dbc.CardBody(
@@ -72,11 +79,13 @@ annotation_tools_layout = dbc.Card(
             ),
             dbc.FormGroup(
                 [
-                    dbc.Button("Start editing current annotation", id="annotation-mode", color="success", active=False),
+                    # disabled by default because no annotation is selected by default
+                    dbc.Button("Start editing current annotation", id="annotation-mode-btn", color="success", active=False, disabled=True),
                 ]
             ),
             dbc.Label("Annotations"),
             html.P(id="masks-display"),
+            dcc.Store(id="annotation-mode", data=ANNOTATION_MODE.NOT_EDITING)
         ]
     ),
     id="right-column",
@@ -84,41 +93,63 @@ annotation_tools_layout = dbc.Card(
 
 @app.callback(
     [
-        Output("annotation-mode", "children"),
-        Output("annotation-mode", "color"),
-        Output("annotation-mode", "active"),
-        Output(f"{PREFIX}-selected-annotation-name", "disabled")
+        Output("annotation-mode-btn", "children"),
+        Output("annotation-mode-btn", "color"),
+        Output("annotation-mode-btn", "active"),
+        Output("annotation-mode-btn", "disabled"),
     ],
     [
-        # Input("selected-dataset-name", "value"),
-        Input(f"annotation-mode", "n_clicks"),
+        Input("annotation-mode", "data"),
+        Input(f"{PREFIX}-selected-annotation-name", "value")
+    ],
+)
+def change_annotation_mode_btn(annotation_mode, selected_annotation):
+    if annotation_mode == ANNOTATION_MODE.NOT_EDITING:
+        return "Start editing current annotation", "success", False, selected_annotation is None
+    else:
+        return "Stop editing current annotation", "danger", True, False
+
+@app.callback(
+    [
+        Output("viewer-graph",  "config"),
+        Output("annotation-mode", "data"),
     ],
     [
-        State("annotation-mode", "active"),
+        Input("annotation-mode-btn", "n_clicks"),
+    ],
+    [
+        State("annotation-mode", "data"),
     ]
 )
 def change_annotation_mode(n_clicks, old_mode):
+    edit_buttons = ["drawrect", "drawopenpath", "eraseshape",]
     if n_clicks:
-        if old_mode:
+        if old_mode == ANNOTATION_MODE.EDITING:
             # stop editing
-            return "Start editing current annotation", "success", False, False
+            config = {"modeBarButtonsToRemove": edit_buttons}
+            return config, ANNOTATION_MODE.NOT_EDITING
         else:
             # start editing
-            return "Stop editing current annotation", "danger", True, True
+            config = {"modeBarButtonsToAdd": edit_buttons}
+            return config, ANNOTATION_MODE.EDITING
     raise PreventUpdate
 
 
 @app.callback(
-    [Output(f"{PREFIX}-selected-annotation-name", "options"),],
+    [
+        Output(f"{PREFIX}-selected-annotation-name", "options"),
+        Output(f"{PREFIX}-selected-annotation-name", "disabled"),
+    ],
     [
         Input("selected-dataset-name", "value"),
         Input(f"{PREFIX}-refresh-selected-annotation-name", "n_clicks"),
+        Input("annotation-mode", "data")
     ],
 )
-def change_annotation_options(name, n_clicks):
+def change_annotation_dropdown(name, n_clicks, annotation_mode):
     if name:
         options = DatasetStore.get_dataset(name).get_annotations_available()
-        return [options]
+        return [options, annotation_mode == ANNOTATION_MODE.EDITING]
     raise PreventUpdate
 
 

@@ -7,6 +7,7 @@ import dash_html_components as html
 import plotly.graph_objects as go
 from app.app import app
 from app.components.DatasetSelector import dataset_selector_layout
+from app.components.AnnotationTools import ANNOTATION_MODE
 from app.DatasetStore import DatasetStore
 from app.layout_utils import dropdown_with_button
 from app.shape_utils import class_to_color
@@ -98,7 +99,6 @@ viewer_layout = dbc.Card(
         dcc.Graph(
             id=f"viewer-graph",
             figure=make_default_figure(),
-            config={"modeBarButtonsToAdd": ["drawrect", "drawopenpath", "eraseshape",]},
         ),
         dcc.Store(id=f"viewer-dataset-dimensions", data={"min": 0, "max": 63}),
         dcc.Store(id=f"viewer-slice-number-top", data=0),
@@ -118,15 +118,17 @@ viewer_layout = dbc.Card(
     [
         Output(f"selected-segmentation-name", "options"),
         Output(f"selected-segmentation-name", "value"),
+        Output(f"selected-segmentation-name", "disabled"),
     ],
     [
         Input("selected-dataset-name", "value"),
         Input("update-button-segmentations-options", "n_clicks"),
+        Input("annotation-mode", "data"),
     ],
     [State(f"selected-segmentation-name", "value")],
 )
-def change_segmentation_options(name, n_clicks, current_segmentation):
-    if name:
+def change_segmentation_options(name, n_clicks, annotation_mode, current_segmentation):
+    if name or annotation_mode:
         cbcontext = [p["prop_id"] for p in dash.callback_context.triggered][0]
         options = DatasetStore.get_dataset(name).get_segmentations_available()
         # open first segmentation 1. as default or 2. on dataset change
@@ -134,7 +136,7 @@ def change_segmentation_options(name, n_clicks, current_segmentation):
             current_segmentation is None and options
         ) or cbcontext == "selected-dataset-name.value":
             current_segmentation = options[0]["value"]
-        return [options, current_segmentation]
+        return [options, current_segmentation, annotation_mode == ANNOTATION_MODE.EDITING]
     raise PreventUpdate
 
 
