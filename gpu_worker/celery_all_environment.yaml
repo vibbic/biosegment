@@ -4,7 +4,7 @@ channels:
   - conda-forge
   - defaults
 dependencies:
-  - python>=3.7
+  - python>=3.8
     # pytorch
   - pytorch
   - torchvision
@@ -23,6 +23,11 @@ dependencies:
   - six
   - scikit-learn
   - opencv==4.2.0
+  # for shape_utils
+  - plotly
+  - pandas
+  - cairosvg
+  # 
   - pip
   - pip: 
     - git+https://github.com/JorisRoels/neuralnets.git@biosegment

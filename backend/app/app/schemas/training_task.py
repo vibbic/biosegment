@@ -33,7 +33,6 @@ class TrainingTaskBase(BaseModel):
 class TrainingTask(TrainingTaskBase):
     data_dir: str
     log_dir: str
-    resolution: Resolution
     classes_of_interest: List[int]
 
     # training or retraining

@@ -241,38 +241,3 @@ def create_annotation(n_clicks, dataset_id, new_annotation_name, selected_annota
         return dash.no_update
     logging.debug(f"Not creating annotation")
     raise PreventUpdate
-
-# @app.callback(
-#     # not needed
-#     Output("save-new-annotation", "value"),
-#     [Input("save-new-annotation", "n_clicks"),],
-#     [
-#         State("annotations", "data"),
-#         State("selected-dataset-name", "value"),
-#         State("new-annotation-name", "value"),
-#         State("viewer-slice-id", "max"),
-#     ],
-# )
-# def annotations_to_png(n_clicks, annotations_data, dataset_id, new_annotation_name, max_slice):
-#     if not n_clicks:
-#         raise PreventUpdate
-#     annotation_folder = Path(f"/data/annotations/{DatasetStore.get_dataset(dataset_id).get_title()}/{new_annotation_name}")
-#     try:
-#         # TODO define behaviour if folder exists
-#         annotation_folder.mkdir(parents=True, exist_ok=True)
-#         logging.debug(annotations_data)
-#         for slice_id in range(max_slice):
-#             slice_id = str(slice_id)
-#             if slice_id in annotations_data:
-#                 annotations = annotations_data[slice_id]
-#             else:
-#                 annotations = None
-#             annotations_to_png(
-#                 width=512,
-#                 height=512,
-#                 annotations=annotations,
-#                 write_to=f"{annotation_folder}/{int(slice_id):04d}.png",
-#             )
-#     except Exception as e:
-#         logging.debug(f"Error saving annotations: {e}")
-#         raise PreventUpdate

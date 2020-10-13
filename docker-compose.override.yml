@@ -100,8 +100,6 @@ services:
       - API_DOMAIN=backend
     volumes:
       - ./dash_frontend:/app
-      # TODO make read-only dataset folder (create annotations via backend)
-      - ${ROOT_DATA_FOLDER?Variable not set}:/data
     labels:
       - traefik.enable=true
       - traefik.constraint-label-stack=${TRAEFIK_TAG?Variable not set}

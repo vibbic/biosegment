@@ -26,11 +26,8 @@ class ModelCreateFromAnnotation(TrainingTaskBase):
     description: Optional[str] = None
     # optional model to retrain
     from_model_id: Optional[int] = None
-    # TODO use annotation_id from database
-    annotation: str
-    dataset_id: int
+    annotation_id: int
     # TODO inherit from task schema
-    input_size: List[int]
     classes_of_interest: List[int]
 
 

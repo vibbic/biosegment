@@ -30,10 +30,20 @@ def train_unet2d(
     # annotation = crud.annotation.get(db=db, id=args.annotation_id)
     # if not annotation:
     #     raise HTTPException(status_code=404, detail="Annotation not found")
-    annotation_dir = args.annotation
-    dataset = crud.dataset.get(db=db, id=args.dataset_id)
-    if not dataset:
+    annotation = crud.annotation.get(db=db, id=args.annotation_id)
+    if not annotation:
+        raise HTTPException(status_code=404, detail="Annotation not found")
+    if not annotation.location:
+        raise HTTPException(status_code=404, detail="Annotation has no location")
+    try:
+        dataset = crud.dataset.get(db=db, id=annotation.dataset_id)
+        assert dataset
+    except:
         raise HTTPException(status_code=404, detail="Dataset not found")
+    if not dataset.location:
+        raise HTTPException(status_code=404, detail="Dataset has no location")
+    if not dataset.resolution:
+        raise HTTPException(status_code=404, detail="Dataset has no resolution")
     data_dir = dataset.location
     # TODO write annotations out as pngs
     log_dir = args.location
@@ -53,11 +63,13 @@ def train_unet2d(
         {
             "data_dir": data_dir,
             "log_dir": log_dir,
-            "annotation_dir": annotation_dir,
+            "annotation_dir": annotation.location,
             "retrain_model": retrain_model_location if retrain_model else None,
             "obj_in": {"title": args.title, "location": args.location},
             "owner_id": current_user.id,
             "project_id": dataset.project_id,
+            # TODO use dict for dataset resolution
+            "resolution": dataset.resolution
         }
     )
     task = celery_app.send_task(
