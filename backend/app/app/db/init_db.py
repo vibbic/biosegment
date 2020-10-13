@@ -141,16 +141,15 @@ def init_db(db: Session) -> None:
     #     db, obj_in=annotation_in, owner_id=user.id, dataset_id=embl_dataset.id
     # )
 
-    # TODO lookup dataset resolutions
     # add EPFL dataset
     embl_dataset, embl_ground_truth = add_dataset(
-        db, user, main_project, untrained_unet2d, "EPFL", None
+        db, user, main_project, untrained_unet2d, "EPFL", create_resolution(1024, 768, 330)
     )
     # add Kasthuri dataset
     embl_dataset, embl_ground_truth = add_dataset(
-        db, user, main_project, untrained_unet2d, "Kasthuri", None
+        db, user, main_project, untrained_unet2d, "Kasthuri", create_resolution(1463, 1613, 160)
     )
     # add VNC dataset
     embl_dataset, embl_ground_truth = add_dataset(
-        db, user, main_project, untrained_unet2d, "VNC", None
+        db, user, main_project, untrained_unet2d, "VNC", create_resolution(1024, 1024, 20)
     )
