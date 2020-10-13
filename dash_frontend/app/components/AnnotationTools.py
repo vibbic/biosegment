@@ -110,13 +110,15 @@ def change_annotation_dropdown(selected_dataset, n_clicks, annotation_mode, data
     [
         Input("viewer-graph", "relayoutData"),
         Input("annotation-mode", "data"),
+        Input(f"{PREFIX}-selected-annotation-name", "value"),
     ],
     [
         State("annotations", "data"),
         State(f"viewer-slice-id", "value"),
     ]
 )
-def change_annotations(graph_relayoutData, annotation_mode, annotations_data, slice_id):
+def change_annotations(graph_relayoutData, annotation_mode, selected_annotation_id, annotations_data, slice_id):
+    ctx = dash.callback_context
     if graph_relayoutData:
         if "shapes" in graph_relayoutData.keys():
             # TODO support for editing annotations
@@ -128,8 +130,8 @@ def change_annotations(graph_relayoutData, annotation_mode, annotations_data, sl
                 logging.debug(
                     f"No annotation entry for slice {slice_id} and keys {annotations_data.keys()}, creating one"
                 )
-                annotations_data[slice_id] = []
                 old_shapes = []
+                annotations_data[slice_id] = []
             annotations_data[slice_id] += [s for s in new_shapes if s not in old_shapes]
     if annotation_mode:
         if annotation_mode == ANNOTATION_MODE.EDITING:
@@ -139,8 +141,16 @@ def change_annotations(graph_relayoutData, annotation_mode, annotations_data, sl
             editable = False
         # set annotations to correct mode on change
         for annotations in annotations_data.values():
+            logging.info(f"annotations: {annotations_data}")
             for annotation in annotations:
                 annotation["editable"] = editable
+    if f"{PREFIX}-selected-annotation-name.value" == ctx.triggered[0]['prop_id']:
+        if selected_annotation_id:
+            response = api.annotation.get_shapes(id=selected_annotation_id)
+            annotations_data = response["shapes"]
+        else:
+            annotations_data = {}
+        logging.debug(f"annotations_data {annotations_data}")
     return [annotations_data]
 
 @app.callback(
@@ -198,7 +208,7 @@ def show_annotations(annotations_data):
             [
                 html.Div(
                     [
-                        html.P(f"Slice {slice_id}"),
+                        html.P(f"Slice {str(slice_id)}"),
                         html.Ul(
                             [
                                 html.Li(f"Color {annotation['line']['color']}")
