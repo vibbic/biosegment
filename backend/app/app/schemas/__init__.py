@@ -1,5 +1,5 @@
 from .annotation import Annotation, AnnotationCreate, AnnotationInDB, AnnotationUpdate
-from .dataset import Dataset, DatasetCreate, DatasetInDB, DatasetUpdate
+from .dataset import Dataset, DatasetCreate, DatasetInDB, DatasetUpdate, Resolution
 from .infer_task import InferTask
 from .item import Item, ItemCreate, ItemInDB, ItemUpdate
 from .model import Model, ModelCreate, ModelCreateFromAnnotation, ModelInDB, ModelUpdate
