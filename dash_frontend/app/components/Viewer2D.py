@@ -107,7 +107,7 @@ viewer_layout = dbc.Card(
             id=f"viewer-graph",
             figure=make_default_figure(),
         ),
-        dcc.Store(id=f"viewer-dataset-dimensions", data={"min": 0, "max": 63}),
+        dcc.Store(id=f"viewer-dataset-dimensions", data={}),
         dcc.Store(id=f"viewer-slice-number-top", data=0),
         dcc.Store(id=f"viewer-slice-number-side", data=0),
         dcc.Store(id=f"viewer-annotations", data=None),
@@ -162,22 +162,33 @@ def update_slice_info(value):
         Output(f"viewer-slice-id", "marks"),
         Output(f"viewer-slice-id", "value"),
     ],
-    [Input(f"viewer-dataset-dimensions", "data")],
+    [
+        Input(f"viewer-dataset-dimensions", "data")
+    ],
 )
 def update_slider(dimensions):
-    min_slice = dimensions["min"]
-    max_slice = dimensions["max"]
-    marks = {i: str(i) for i in range(0, max_slice, 10)}
-    return min_slice, max_slice, marks, 10
+    if dimensions:
+        logging.info("Update slider")
+        min_slice = dimensions["min"]
+        max_slice = dimensions["max"]
+        marks = {i: str(i) for i in range(0, max_slice, 10)}
+        return min_slice, max_slice, marks, 10
+    raise PreventUpdate
 
 
 @app.callback(
     [Output(f"viewer-dataset-dimensions", "data"),],
     [Input("selected-dataset-name", "value")],
+    [
+        State(f"viewer-dataset-dimensions", "data")
+    ],
 )
-def change_dataset_dimensions(name):
+def change_dataset_dimensions(name, old_dimensions):
     if name:
         dataset = DatasetStore.get_dataset(name)
+        dimensions = dataset.get_dimensions()
+        if dimensions == old_dimensions:
+            raise PreventUpdate
         return [dataset.get_dimensions()]
     raise PreventUpdate
 

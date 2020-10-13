@@ -12,10 +12,10 @@ from skimage import io as skio
 class Dataset:
     def __init__(self, dataset_id):
         self.dataset_id = dataset_id
-        dataset = api.dataset.get(dataset_id)
-        self.title = dataset["title"]
-        slices_folder = f"{ROOT_DATA_FOLDER}{dataset['location']}"
-        self.project_id = dataset["owner_id"]
+        self.dataset = api.dataset.get(dataset_id)
+        self.title = self.dataset["title"]
+        slices_folder = f"{ROOT_DATA_FOLDER}{self.dataset['location']}"
+        self.project_id = self.dataset["owner_id"]
         logging.debug(f"Slices folder: {slices_folder}")
         assert os.path.exists(slices_folder)
         self.slice_locations = sorted(get_folder_list(slices_folder))
@@ -76,4 +76,4 @@ class Dataset:
         return self.title
 
     def get_dimensions(self):
-        return {"min": 0, "max": len(self.slice_locations)}
+        return {"min": 0, "max": self.dataset["resolution"]["z"]}
