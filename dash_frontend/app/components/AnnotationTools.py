@@ -12,7 +12,6 @@ from app.DatasetStore import DatasetStore
 from app.layout_utils import dropdown_with_button, ANNOTATION_MODE
 from app.shape_utils import (
     DEFAULT_STROKE_WIDTH,
-    annotations_to_png,
     class_labels,
     class_to_color,
 )
