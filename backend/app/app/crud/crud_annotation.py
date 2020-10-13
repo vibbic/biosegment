@@ -1,8 +1,10 @@
 from typing import List, Optional
+import json
 
 from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session
 
+from app import ROOT_DATA_FOLDER
 from app.crud.base import CRUDBase
 from app.models.annotation import Annotation
 from app.schemas.annotation import AnnotationCreate, AnnotationUpdate
@@ -29,7 +31,7 @@ class CRUDAnnotation(CRUDBase[Annotation, AnnotationCreate, AnnotationUpdate]):
         db.commit()
         db.refresh(db_obj)
         return db_obj
-
+    
     def get_multi_by_owner(
         self, db: Session, *, owner_id: int, skip: int = 0, limit: int = 100
     ) -> List[Annotation]:

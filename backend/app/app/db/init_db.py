@@ -132,14 +132,14 @@ def init_db(db: Session) -> None:
     # )
 
     # add mitos 1 annotation
-    annotation_in = schemas.AnnotationCreate(
-        title="mitos 2",
-        description="mitos 2 description",
-        location="annotations/EMBL/mitos 2",
-    )
-    crud.annotation.create_with_owner(
-        db, obj_in=annotation_in, owner_id=user.id, dataset_id=embl_dataset.id
-    )
+    # annotation_in = schemas.AnnotationCreate(
+    #     title="mitos 2",
+    #     description="mitos 2 description",
+    #     location="annotations/EMBL/mitos 2",
+    # )
+    # crud.annotation.create_with_owner(
+    #     db, obj_in=annotation_in, owner_id=user.id, dataset_id=embl_dataset.id
+    # )
 
     # TODO lookup dataset resolutions
     # add EPFL dataset

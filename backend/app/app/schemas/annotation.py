@@ -2,6 +2,10 @@ from typing import Dict, List, Optional
 
 from pydantic import BaseModel
 
+SHAPES = Dict[str, List[Dict]]
+
+class Shapes(BaseModel):
+    shapes: Optional[SHAPES] = None
 
 # Shared properties
 class AnnotationBase(BaseModel):
@@ -18,7 +22,7 @@ class AnnotationCreate(AnnotationBase):
 
 # Properties to receive on annotation update
 class AnnotationUpdate(AnnotationBase):
-    shapes: Optional[Dict[str, List[Dict]]] = None
+    shapes: SHAPES = None
 
 
 # Properties shared by models stored in DB
@@ -34,7 +38,6 @@ class AnnotationInDBBase(AnnotationBase):
 # Properties to return to client
 class Annotation(AnnotationInDBBase):
     pass
-
 
 # Properties properties stored in DB
 class AnnotationInDB(AnnotationInDBBase):
