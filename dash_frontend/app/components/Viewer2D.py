@@ -8,7 +8,7 @@ import plotly.graph_objects as go
 from app.app import app
 from app.components.DatasetSelector import dataset_selector_layout
 from app.DatasetStore import DatasetStore
-from app.layout_utils import dropdown_with_button
+from app.layout_utils import dropdown_with_button, ANNOTATION_MODE
 from app.shape_utils import class_to_color
 from dash.dependencies import Input, Output, State
 from dash.exceptions import PreventUpdate
@@ -59,7 +59,7 @@ def add_layout_images_to_fig(fig, segmentation, dataset, slice_id, update_ranges
 
 
 def make_default_figure(
-    stroke_color=None, stroke_width=None, shapes=[],
+    annotation_mode=ANNOTATION_MODE.NOT_EDITING, stroke_color=None, stroke_width=None, shapes=[]
 ):
     def dummy_fig():
         fig = go.Figure(go.Scatter(x=[], y=[]))
@@ -71,15 +71,23 @@ def make_default_figure(
         return fig
 
     fig = dummy_fig()
-    fig.update_layout(
-        {
-            "dragmode": "drawopenpath",
-            "shapes": shapes,
-            "newshape.line.color": stroke_color,
-            "newshape.line.width": stroke_width,
-            "margin": dict(l=0, r=0, b=0, t=0, pad=4),
-        }
-    )
+    if (annotation_mode == ANNOTATION_MODE.EDITING):
+        fig.update_layout(
+            {
+                "dragmode": "drawopenpath",
+                "shapes": shapes,
+                "newshape.line.color": stroke_color,
+                "newshape.line.width": stroke_width,
+                "margin": dict(l=0, r=0, b=0, t=0, pad=4),
+            }
+        )
+    else:
+        fig.update_layout(
+            {
+                "shapes": shapes,
+                "margin": dict(l=0, r=0, b=0, t=0, pad=4),
+            }
+        )
     return fig
 
 
@@ -98,7 +106,6 @@ viewer_layout = dbc.Card(
         dcc.Graph(
             id=f"viewer-graph",
             figure=make_default_figure(),
-            config={"modeBarButtonsToAdd": ["drawrect", "drawopenpath", "eraseshape",]},
         ),
         dcc.Store(id=f"viewer-dataset-dimensions", data={"min": 0, "max": 63}),
         dcc.Store(id=f"viewer-slice-number-top", data=0),
@@ -109,6 +116,7 @@ viewer_layout = dbc.Card(
         # shapes are dicts given by the Plotly graph
         # the line color is the interest class
         dcc.Store(id="annotations", data={}),
+        html.Div(id="test"),
     ],
     body=True,
 )
@@ -118,15 +126,17 @@ viewer_layout = dbc.Card(
     [
         Output(f"selected-segmentation-name", "options"),
         Output(f"selected-segmentation-name", "value"),
+        Output(f"selected-segmentation-name", "disabled"),
     ],
     [
         Input("selected-dataset-name", "value"),
         Input("update-button-segmentations-options", "n_clicks"),
+        Input("annotation-mode", "data"),
     ],
     [State(f"selected-segmentation-name", "value")],
 )
-def change_segmentation_options(name, n_clicks, current_segmentation):
-    if name:
+def change_segmentation_options(name, n_clicks, annotation_mode, current_segmentation):
+    if name or annotation_mode:
         cbcontext = [p["prop_id"] for p in dash.callback_context.triggered][0]
         options = DatasetStore.get_dataset(name).get_segmentations_available()
         # open first segmentation 1. as default or 2. on dataset change
@@ -134,7 +144,7 @@ def change_segmentation_options(name, n_clicks, current_segmentation):
             current_segmentation is None and options
         ) or cbcontext == "selected-dataset-name.value":
             current_segmentation = options[0]["value"]
-        return [options, current_segmentation]
+        return [options, current_segmentation, annotation_mode == ANNOTATION_MODE.EDITING]
     raise PreventUpdate
 
 
@@ -171,8 +181,7 @@ def change_dataset_dimensions(name):
         return [dataset.get_dimensions()]
     raise PreventUpdate
 
-
-def create_annotation(shape, slice_id):
+def create_annotations(shape, slice_id):
     try:
         interest = color_to_class(shape["line"]["color"])
     except:
@@ -183,11 +192,10 @@ def create_annotation(shape, slice_id):
         "interest": interest,
     }
 
-
 @app.callback(
     [
+        Output(f"viewer-graph", "config"),
         Output(f"viewer-graph", "figure"),
-        Output("annotations", "data"),
         Output("stroke-width-display", "children"),
     ],
     [
@@ -195,17 +203,19 @@ def create_annotation(shape, slice_id):
         # TODO
         Input("selected-dataset-name", "value"),
         Input(f"viewer-slice-id", "value"),
-        Input("viewer-graph", "relayoutData"),
+        # Input("viewer-graph", "relayoutData"),
         Input(
             {"type": "label-class-button", "index": dash.dependencies.ALL},
             "n_clicks_timestamp",
         ),
         Input("stroke-width", "value"),
+        Input("annotations", "data"),
+        Input("annotation-mode", "data"),
     ],
     [
         State(f"viewer-slice-id", "value"),
         # State(f'viewer-graph', 'figure'),
-        State("annotations", "data"),
+        # State("annotations", "data"),
     ],
 )
 def update_fig(
@@ -213,39 +223,48 @@ def update_fig(
     current_segmentation,
     current_dataset,
     slice_id_update,
-    graph_relayoutData,
     any_label_class_button_value,
     stroke_width_value,
+    annotations_data,
+    annotation_mode,
     # states
     # fig,
     slice_id,
-    annotations_data,
 ):
     cbcontext = [p["prop_id"] for p in dash.callback_context.triggered][0]
+    config = {}
     # if fig is None:
     #     fig = make_default_figure()
     if not current_dataset or not slice_id:
-        fig = make_default_figure()
-        return [fig, annotations_data, None]
+        fig = make_default_figure(annotation_mode=annotation_mode,)
+        return [config, fig, None]
 
     # TODO fix confusion
     # keys are strings, not ints
     slice_id = str(slice_id)
+    
+    if annotation_mode:
+        edit_buttons = ["drawrect", "drawopenpath", "eraseshape",]
+        if annotation_mode == ANNOTATION_MODE.EDITING:
+            # TODO unselect current selected shape
+            config =  {"modeBarButtonsToAdd": edit_buttons}
+        else:
+            config = {"modeBarButtonsToRemove": edit_buttons}
 
-    if cbcontext == "viewer-graph.relayoutData":
-        if "shapes" in graph_relayoutData.keys():
-            # TODO support for editing annotations
-            # TODO use set
-            new_shapes = graph_relayoutData["shapes"]
-            try:
-                old_shapes = annotations_data[slice_id]
-            except:
-                logging.debug(
-                    f"No annotation entry for slice {slice_id} and keys {annotations_data.keys()}, creating one"
-                )
-                annotations_data[slice_id] = []
-                old_shapes = []
-            annotations_data[slice_id] += [s for s in new_shapes if s not in old_shapes]
+    # if cbcontext == "viewer-graph.relayoutData":
+    #     if "shapes" in graph_relayoutData.keys():
+    #         # TODO support for editing annotations
+    #         # TODO use set
+    #         new_shapes = graph_relayoutData["shapes"]
+    #         try:
+    #             old_shapes = annotations_data[slice_id]
+    #         except:
+    #             logging.debug(
+    #                 f"No annotation entry for slice {slice_id} and keys {annotations_data.keys()}, creating one"
+    #             )
+    #             annotations_data[slice_id] = []
+    #             old_shapes = []
+    #         annotations_data[slice_id] += [s for s in new_shapes if s not in old_shapes]
         # else:
         #     return dash.no_update
 
@@ -269,6 +288,7 @@ def update_fig(
         stroke_color=class_to_color(label_class_value),
         stroke_width=stroke_width,
         shapes=current_annotations,
+        annotation_mode=annotation_mode,
     )
     # logging.debug(f"Fig: {fig}")
     add_layout_images_to_fig(
@@ -278,7 +298,7 @@ def update_fig(
         slice_id=int(slice_id),
     )
     fig.update_layout(uirevision="segmentation")
-    return (fig, annotations_data, "Stroke width: %d" % (stroke_width,))
+    return (config, fig, "Stroke width: %d" % (stroke_width,))
 
 
 if __name__ == "__main__":

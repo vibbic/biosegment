@@ -2,6 +2,10 @@ from typing import Optional
 
 from pydantic import BaseModel
 
+class Resolution(BaseModel):
+    x: int
+    y: int
+    z: int
 
 # Shared properties
 class DatasetBase(BaseModel):
@@ -10,9 +14,7 @@ class DatasetBase(BaseModel):
     description: Optional[str] = None
     file_type: Optional[str] = None
     location: Optional[str] = None
-    resolution_x: Optional[int] = None
-    resolution_y: Optional[int] = None
-    resolution_z: Optional[int] = None
+    resolution: Optional[Resolution] = None
     modality: Optional[str] = None
 
 

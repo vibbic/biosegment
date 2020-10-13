@@ -125,10 +125,8 @@ def start_model_retraining(n, new_model_name, selected_model_id, selected_annota
             # TODO create location on backend based on new name
             "location": f"models/EMBL/{new_model_name}/best_checkpoint.pytorch",
             "from_model_id": selected_model_id,
-            "dataset_id": selected_dataset_id,
             # TODO use annotation_id from database
-            "annotation": selected_annotation,
-            "input_size": [512, 512],
+            "annotation_id": selected_annotation,
             "classes_of_interest": [0, 1, 2],
             "epochs": epochs,
         }

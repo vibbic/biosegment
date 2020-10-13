@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 
 from app import crud, models, schemas
 from app.api import deps
+from app.api.api_v1.endpoints.annotations import check_annotation_location
 
 router = APIRouter()
 
@@ -143,6 +144,7 @@ def create_annotation(
     """
     Create new annotation.
     """
+    check_annotation_location(annotation_in)
     annotation = crud.annotation.create_with_owner(
         db=db, obj_in=annotation_in, owner_id=current_user.id, dataset_id=id
     )

@@ -6,8 +6,12 @@ from celery.utils.log import get_task_logger
 
 logger = get_task_logger(__name__)
 
-try:  
-   ROOT_DATA_FOLDER = Path(os.environ["ROOT_DATA_FOLDER"])
+try:
+   # expect to be in gpu_worker/ and data/ is located at ..
+   os.chdir(Path(".."))
+   # but allow for absolute ROOT_DATA_FOLDER
+   ROOT_DATA_FOLDER = Path(os.environ["ROOT_DATA_FOLDER"]).resolve()
+   print(f"Root data folder {ROOT_DATA_FOLDER}")
 except KeyError: 
    import sys
    print("Please set the environment variable ROOT_DATA_FOLDER in .env")
@@ -38,7 +42,7 @@ def train_unet2d(
     data_dir,
     log_dir,
     annotation_dir,
-    input_size,
+    resolution,
     classes_of_interest,
     retrain_model = None,
     # note: duplication with backend schema TrainingTaskBase
@@ -66,6 +70,7 @@ def train_unet2d(
 ) -> str:
     import os
     from pathlib import Path
+    import json
 
     import torch
     import torch.optim as optim
@@ -79,6 +84,8 @@ def train_unet2d(
     from neuralnets.util.losses import get_loss_function
     from neuralnets.util.tools import set_seed, train_test_split
     from neuralnets.util.validation import validate
+
+    from app.shape_utils import annotations_to_png
 
     self.update_state(state="PROGRESS", meta=create_meta(1, 10))
 
@@ -94,15 +101,46 @@ def train_unet2d(
     """
     log_dir = (ROOT_DATA_FOLDER / log_dir).parent
     data_dir = ROOT_DATA_FOLDER / data_dir
-    annotation_dir = ROOT_DATA_FOLDER / annotation_dir
+    annotations_dir_json = ROOT_DATA_FOLDER / annotation_dir
 
     print_frm('Setting up log directories')
-    log_dir.mkdir(exist_ok=True)
+    log_dir.mkdir(parents=True, exist_ok=True)
+
+    """
+        Convert JSON annotations to .pngs
+    """
+    with open(annotations_dir_json, 'r') as fp:
+        annotations_data = json.load(fp)
+    annotations_dir_png = log_dir / "annotations"
+
+    try:
+        # TODO define behaviour if folder exists
+        annotations_dir_png.mkdir(parents=True, exist_ok=True)
+        logger.info(annotations_data)
+        # TODO get max slice from dataset dimensions, support for 3D
+        logger.info(resolution)
+        for slice_id in range(resolution["z"]):
+            slice_id = str(slice_id)
+            if slice_id in annotations_data:
+                annotations = annotations_data[slice_id]
+            else:
+                annotations = None
+            annotations_to_png(
+                # TODO use dataset dimensions
+                width=resolution["x"],
+                height=resolution["y"],
+                annotations=annotations,
+                write_to=str(annotations_dir_png / f"{int(slice_id):04d}.png"),
+            )
+    except Exception as e:
+        logger.error(f"Error converting annotations: {e}")
+        return None
+    logger.info(f"pngs folder: {annotations_dir_png}")
 
     """
         Load the data
     """
-    input_shape = (1, input_size[0], input_size[1])
+    input_shape = (1, resolution["x"], resolution["y"])
     print_frm('Loading data')
     print_frm(f"""
     Args: input_shape {input_shape}
@@ -113,7 +151,7 @@ def train_unet2d(
     """)
     # read in datasets
     labeled_volume = StronglyLabeledVolumeDataset(str(data_dir),
-            str(annotation_dir),
+            str(annotations_dir_png),
             input_shape=input_shape, len_epoch=len_epoch, type='pngseq',
             in_channels=in_channels, batch_size=train_batch_size,
             orientations=orientations)

@@ -1,6 +1,6 @@
 from typing import TYPE_CHECKING
 
-from sqlalchemy import Column, ForeignKey, Integer, String
+from sqlalchemy import Column, ForeignKey, Integer, String, PickleType
 from sqlalchemy.orm import relationship
 
 from app.db.base_class import Base
@@ -18,9 +18,7 @@ class Dataset(Base):
     description = Column(String, index=True)
     file_type = Column(String, index=True)
     location = Column(String, index=True)
-    resolution_x = Column(Integer, index=True)
-    resolution_y = Column(Integer, index=True)
-    resolution_z = Column(Integer, index=True)
+    resolution = Column(PickleType)
     modality = Column(String, index=True)
 
     owner_id = Column(Integer, ForeignKey("user.id"))

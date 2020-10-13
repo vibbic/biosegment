@@ -41,7 +41,7 @@ services:
       - "8888:8888"
     volumes:
       - ./backend/app:/app
-      - ${ROOT_DATA_FOLDER?Variable not set}:/data:ro
+      - ${ROOT_DATA_FOLDER?Variable not set}:/data
     environment:
       - JUPYTER=jupyter lab --ip=0.0.0.0 --allow-root --NotebookApp.custom_display_url=http://127.0.0.1:8888
       - SERVER_HOST=http://${DOMAIN?Variable not set}
@@ -100,8 +100,7 @@ services:
       - API_DOMAIN=backend
     volumes:
       - ./dash_frontend:/app
-      # TODO make read-only dataset folder (create annotations via backend)
-      - ${ROOT_DATA_FOLDER?Variable not set}:/data
+      - ${ROOT_DATA_FOLDER?Variable not set}:/data:ro
     labels:
       - traefik.enable=true
       - traefik.constraint-label-stack=${TRAEFIK_TAG?Variable not set}

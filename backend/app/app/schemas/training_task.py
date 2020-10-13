@@ -2,6 +2,7 @@ from typing import List, Optional
 
 from pydantic import BaseModel
 
+from app.schemas.dataset import Resolution
 
 class TrainingTaskBase(BaseModel):
     # optional extra parameters
@@ -32,7 +33,6 @@ class TrainingTaskBase(BaseModel):
 class TrainingTask(TrainingTaskBase):
     data_dir: str
     log_dir: str
-    input_size: List[int]
     classes_of_interest: List[int]
 
     # training or retraining

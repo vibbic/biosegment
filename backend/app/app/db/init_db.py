@@ -7,6 +7,12 @@ from app import crud, schemas
 from app.core.config import settings
 from app.db.base import Base  # noqa: F401
 
+def create_resolution(x, y, z):
+    return {
+        "x": x,
+        "y": y,
+        "z": z,
+    }
 
 def add_dataset(
     db: Session,
@@ -14,10 +20,11 @@ def add_dataset(
     project: models.Project,
     model: models.Model,
     name: str,
+    resolution: schemas.Resolution,
 ) -> Tuple[models.Dataset, models.Segmentation]:
     title = name
     dataset_in = schemas.DatasetCreate(
-        title=title, description=f"{title} description", location=f"EM/{name}/raw/"
+        title=title, description=f"{title} description", location=f"EM/{name}/raw/", resolution=resolution
     )
     dataset = crud.dataset.create_with_owner(
         db, obj_in=dataset_in, owner_id=user.id, project_id=project.id
@@ -83,7 +90,7 @@ def init_db(db: Session) -> None:
 
     # add EMBL dataset
     embl_dataset, embl_ground_truth = add_dataset(
-        db, user, main_project, untrained_unet2d, "EMBL"
+        db, user, main_project, untrained_unet2d, "EMBL", create_resolution(512, 512, 64)
     )
 
     # add unet2d model trained on ground truth
@@ -125,24 +132,25 @@ def init_db(db: Session) -> None:
     # )
 
     # add mitos 1 annotation
-    annotation_in = schemas.AnnotationCreate(
-        title="mitos 2",
-        description="mitos 2 description",
-        location="annotations/EMBL/mitos 2",
-    )
-    crud.annotation.create_with_owner(
-        db, obj_in=annotation_in, owner_id=user.id, dataset_id=embl_dataset.id
-    )
+    # annotation_in = schemas.AnnotationCreate(
+    #     title="mitos 2",
+    #     description="mitos 2 description",
+    #     location="annotations/EMBL/mitos 2",
+    # )
+    # crud.annotation.create_with_owner(
+    #     db, obj_in=annotation_in, owner_id=user.id, dataset_id=embl_dataset.id
+    # )
 
+    # TODO lookup dataset resolutions
     # add EPFL dataset
     embl_dataset, embl_ground_truth = add_dataset(
-        db, user, main_project, untrained_unet2d, "EPFL"
+        db, user, main_project, untrained_unet2d, "EPFL", None
     )
     # add Kasthuri dataset
     embl_dataset, embl_ground_truth = add_dataset(
-        db, user, main_project, untrained_unet2d, "Kasthuri"
+        db, user, main_project, untrained_unet2d, "Kasthuri", None
     )
     # add VNC dataset
     embl_dataset, embl_ground_truth = add_dataset(
-        db, user, main_project, untrained_unet2d, "VNC"
+        db, user, main_project, untrained_unet2d, "VNC", None
     )
