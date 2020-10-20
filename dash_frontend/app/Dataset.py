@@ -8,20 +8,37 @@ from app.utils import get_folder_list
 from PIL import Image
 from skimage import io as skio
 
+def get_png_image(path):
+    assert os.path.exists(path)
+    png = Image.open(path)
+    return png
 
 class Dataset:
     def __init__(self, dataset_id):
         self.dataset_id = dataset_id
         self.dataset = api.dataset.get(dataset_id)
+        self.type = self.dataset["file_type"]
         self.title = self.dataset["title"]
-        slices_folder = f"{ROOT_DATA_FOLDER}{self.dataset['location']}"
         self.project_id = self.dataset["owner_id"]
-        logging.debug(f"Slices folder: {slices_folder}")
-        assert os.path.exists(slices_folder)
-        self.slice_locations = sorted(get_folder_list(slices_folder))
         self.segmentations = {}
         self.annotations = {}
         self.models = {}
+        self.location = ROOT_DATA_FOLDER / self.dataset['location']
+        self.slices = self.get_slices()
+
+    def get_slices(self):
+        logging.debug(f"Slices folder: {self.location}")
+        assert self.location.is_dir()
+        contents = list(self.location.iterdir())
+        if self.type == "tiff":
+            # presume single TIFF
+            path = contents[0]
+            return Image.open(str(path))
+        elif self.type == "pngseq":
+            return [get_png_image(str(p)) for p in contents]
+        else:
+            logging.error(f"Unkown filetype for dataset: {self.dataset}")
+            return None
 
     def get_models_available(self):
         models = api.model.get_multi_for_project(self.project_id)
@@ -42,35 +59,57 @@ class Dataset:
         return [{"label": m["title"], "value": m["id"],} for m in segmentations]
 
     def get_slice(self, slice_id):
-        path = self.slice_locations[slice_id]
-        assert os.path.exists(path)
-        png = Image.open(path)
-        return png
+        if self.type == "tiff":
+            self.slices.seek(slice_id)
+            return self.slices
+        elif self.type == "pngseq":
+            return self.slices[slice_id]
+        else:
+            logging.error(f"Unkown filetype for dataset: {self.dataset}")
+            return None
 
     def get_label(self, segment_id, slice_id):
         try:
             if len(self.segmentations) == 0:
                 self.get_segmentations_available()
-            labels_folder = (
-                f"{ROOT_DATA_FOLDER}{self.segmentations[segment_id]['location']}"
-            )
+            labels_folder = ROOT_DATA_FOLDER / self.segmentations[segment_id]['location']
         except:
             logging.debug(
                 f"No segment_id key {segment_id} in {self.segmentations.keys()}"
             )
             labels_folder = None
         logging.debug(f"labels_folder: {labels_folder}")
-        assert os.path.exists(labels_folder)
-        labels = sorted(get_folder_list(labels_folder))
-        path = labels[slice_id]
-        assert os.path.exists(path)
-        image_array = skio.imread(path)
-        recolored_image_array = label_to_colors(
-            image_array,
-            **{"alpha": [128, 128], "color_class_offset": 0, "no_map_zero": True},
-        )
-        png = Image.fromarray(recolored_image_array)
-        return png
+        assert labels_folder.is_dir()
+        contents = list(labels_folder.iterdir())
+        if self.type == "tiff":
+            # presume single TIFF
+            path = contents[0]
+            logging.debug(f"TiFF path: {path}")
+            tiff = skio.MultiImage(str(path))
+            image_array = tiff[slice_id]
+            recolored_image_array = label_to_colors(
+                image_array,
+                alpha=[128],
+                color_class_offset=1,
+                no_map_zero=True,
+            )
+            png = Image.fromarray(recolored_image_array)
+            return png
+        elif self.type == "pngseq":
+            path = contents[slice_id]
+            assert path.exists()
+            image_array = skio.imread(str(path))
+            recolored_image_array = label_to_colors(
+                image_array,
+                alpha=[128],
+                labels_contiguous=True,
+                no_map_zero=True,
+            )
+            png = Image.fromarray(recolored_image_array)
+            return png
+        else:
+            logging.error(f"Unkown filetype for dataset: {self.dataset}")
+            return None
 
     def get_title(self):
         return self.title
