@@ -119,17 +119,18 @@ def change_model_options(name, n_clicks):
 )
 def start_model_retraining(n, new_model_name, selected_model_id, selected_annotation, epochs, selected_dataset_id):
     if n:
-        assert selected_model_id
         body = {
             "title": new_model_name,
             # TODO create location on backend based on new name
             "location": f"models/EMBL/{new_model_name}/best_checkpoint.pytorch",
-            "from_model_id": selected_model_id,
             # TODO use annotation_id from database
             "annotation_id": selected_annotation,
             "classes_of_interest": [0, 1, 2],
             "epochs": epochs,
         }
+        # allow for training from scratch
+        if selected_model_id:
+            body["from_model_id"] = selected_model_id
         logging.debug(f"Start segmentation body: {body}")
         task_id = api.utils.train(json=body)
         return [{"task_id": task_id}]
