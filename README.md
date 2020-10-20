@@ -14,28 +14,35 @@ Install:
 - [Conda](https://docs.conda.io/en/latest/miniconda.html)
 - [docker-compose](https://docs.docker.com/compose/install/)
   - at least `version 1.26.2, build eefe0d31`
+
+Note that the Docker images take up ~8GB of disk space.
+Create a data folder according to the specification or use the provided script to create one at `data/`
+```
+bash scripts/create-data-folder.sh
+```
+
+Create and run the BioSegment stack using `docker-compose`. The first time could take ~10 minutes.
 ```bash
 docker-compose up -d --build
 ```
 
 - BioSegment is now running in dev mode at localhost
+- Go to `http://localhost/dash/viewer` to see the Dash viewer on the default dataset.
 
 ## Overview
-Dash-frontend, using Python Dash: <http://localhost/dash>
 
-Frontend, built with Docker, with routes handled based on the path: <http://localhost>
-
-Backend, JSON based web API based on OpenAPI: <http://localhost/api/>
-
-Automatic interactive documentation with Swagger UI (from the OpenAPI backend): <http://localhost/docs>
-
-Alternative automatic documentation with ReDoc (from the OpenAPI backend): <http://localhost/redoc>
-
-PGAdmin, PostgreSQL web administration: <http://localhost:5050>
-
-Flower, administration of Celery tasks: <http://localhost:5555>
-
-Traefik UI, to see how the routes are being handled by the proxy: <http://localhost:8090>
+- `dash_frontend/` for dashboard and segmentation viewer, using Python Dash: <http://localhost/dash>
+- `frontend/` for account managment, built with Javascript Vue, with routes handled based on the path: <http://localhost>
+- `backend/`, JSON based web API using Python FastAPI based on OpenAPI: <http://localhost/api/>
+  - Automatic interactive documentation with Swagger UI (from the OpenAPI backend): <http://localhost/docs>
+  - Alternative automatic documentation with ReDoc (from the OpenAPI backend): <http://localhost/redoc>
+- `gpu_worker/` Python Celery task runner to run PyTorch models (e.g. [neuralnets](https://pypi.org/project/neuralnets/)) directly on the host GPU
+- `diagrams/` with system diagrams using [mermaid](https://mermaid-js.github.io/mermaid/)
+- extra
+  - PGAdmin, PostgreSQL web administration: <http://localhost:5050>
+  - Flower, administration of Celery tasks: <http://localhost:5555>
+  - Traefik UI, to see how the routes are being handled by the proxy: <http://localhost:8090>
+- `.env` contains all login credentials and configurations
 
 ## Development
 - Dash frontend and backend hot-reload on file changes
@@ -59,18 +66,26 @@ sh scripts/lint.sh
 ## Data folder
 In `.env` a ROOT_DATA_FOLDER is defined with the default value of `./data`, relative to this project folder. The structure of the folder is the following:
 - ROOT_DATA_FOLDER
-  - EM
-    - EMBL
-      - raw
-        - .pngs
-      - labels
-  - models
-    - unet_2d (output folder of neuralnets training)
-      - best_checkpoint.pytorch
-  - segmentations
-    - EMBL (output folder of neuralnets inference)
-      - .pngs
+  - EM/
+    - {dataset_name} e.g. EMBL
+      - raw/
+        - {pngs}
+  - models/
+    - {model_name} e.g. unet_2d
+      - = output folder of neuralnets training
+      - saved model e.g. best_checkpoint.pytorch
+  - segmentations/
+    - {dataset_name}
+      - labels/
+        - = ground truth labels of the dataset
+        - {pngs}
+      - {segmentation_name}
+        - = output folder of neuralnets inference
+        - {pngs}
   - annotations
+    - {dataset_name}
+      - {annotation_name}
+        - saved annotations e.g. annotations.json
 
 In the future the backend will handle this folder structure.
 Overwriting ROOT_DATA_FOLDER can be done using an environment variable:
