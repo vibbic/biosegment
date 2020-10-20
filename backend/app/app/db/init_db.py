@@ -21,10 +21,11 @@ def add_dataset(
     model: models.Model,
     name: str,
     resolution: schemas.Resolution,
+    file_type: str 
 ) -> Tuple[models.Dataset, models.Segmentation]:
     title = name
     dataset_in = schemas.DatasetCreate(
-        title=title, description=f"{title} description", location=f"EM/{name}/raw/", resolution=resolution
+        title=title, description=f"{title} description", location=f"EM/{name}/raw/", resolution=resolution, file_type=file_type
     )
     dataset = crud.dataset.create_with_owner(
         db, obj_in=dataset_in, owner_id=user.id, project_id=project.id
@@ -90,7 +91,7 @@ def init_db(db: Session) -> None:
 
     # add EMBL dataset
     embl_dataset, embl_ground_truth = add_dataset(
-        db, user, main_project, untrained_unet2d, "EMBL", create_resolution(512, 512, 64)
+        db, user, main_project, untrained_unet2d, "EMBL", create_resolution(512, 512, 64), "pngseq"
     )
 
     # add unet2d model trained on ground truth
@@ -143,13 +144,14 @@ def init_db(db: Session) -> None:
 
     # add EPFL dataset
     embl_dataset, embl_ground_truth = add_dataset(
-        db, user, main_project, untrained_unet2d, "EPFL", create_resolution(1024, 768, 330)
+        db, user, main_project, untrained_unet2d, "EPFL", create_resolution(1024, 768, 165), "tiff"
     )
+
     # add Kasthuri dataset
     embl_dataset, embl_ground_truth = add_dataset(
-        db, user, main_project, untrained_unet2d, "Kasthuri", create_resolution(1463, 1613, 160)
+        db, user, main_project, untrained_unet2d, "Kasthuri", create_resolution(1463, 1613, 160), "pngseq"
     )
     # add VNC dataset
     embl_dataset, embl_ground_truth = add_dataset(
-        db, user, main_project, untrained_unet2d, "VNC", create_resolution(1024, 1024, 20)
+        db, user, main_project, untrained_unet2d, "VNC", create_resolution(1024, 1024, 20), "pngseq"
     )
