@@ -25,6 +25,7 @@ class Dataset:
         self.models = {}
         self.location = ROOT_DATA_FOLDER / self.dataset['location']
         self.slices = self.get_slices()
+        self.labels = {}
 
     def get_slices(self):
         logging.debug(f"Slices folder: {self.location}")
@@ -39,6 +40,56 @@ class Dataset:
         else:
             logging.error(f"Unkown filetype for dataset: {self.dataset}")
             return None
+
+    def get_labels(self, segment_id):
+        if segment_id in self.labels:
+            return
+        try:
+            if len(self.segmentations) == 0:
+                self.get_segmentations_available()
+            labels_folder = ROOT_DATA_FOLDER / self.segmentations[segment_id]['location']
+        except:
+            logging.debug(
+                f"No segment_id key {segment_id} in {self.segmentations.keys()}"
+            )
+            labels_folder = None
+        logging.debug(f"labels_folder: {labels_folder}")
+        assert labels_folder.is_dir()
+        contents = list(labels_folder.iterdir())
+        if self.type == "tiff":
+            # presume single TIFF
+            path = contents[0]
+            logging.debug(f"TiFF path: {path}")
+            labels = skio.MultiImage(str(path))
+            recolored_labels = []
+            for l in labels:
+                image_array = l
+                recolored_image_array = label_to_colors(
+                    image_array,
+                    alpha=[128],
+                    color_class_offset=1,
+                    no_map_zero=True,
+                )
+                png = Image.fromarray(recolored_image_array)
+                recolored_labels.append(png)
+        elif self.type == "pngseq":
+            recolored_labels = []
+            for path in contents:
+                assert path.exists()
+                image_array = skio.imread(str(path))
+                recolored_image_array = label_to_colors(
+                    image_array,
+                    alpha=[128],
+                    labels_contiguous=True,
+                    no_map_zero=True,
+                )
+                png = Image.fromarray(recolored_image_array)
+                recolored_labels.append(png)
+        else:
+            logging.error(f"Unkown filetype for dataset: {self.dataset}")
+            return None
+        self.labels[segment_id] = recolored_labels
+
 
     def get_models_available(self):
         models = api.model.get_multi_for_project(self.project_id)
@@ -69,47 +120,51 @@ class Dataset:
             return None
 
     def get_label(self, segment_id, slice_id):
-        try:
-            if len(self.segmentations) == 0:
-                self.get_segmentations_available()
-            labels_folder = ROOT_DATA_FOLDER / self.segmentations[segment_id]['location']
-        except:
-            logging.debug(
-                f"No segment_id key {segment_id} in {self.segmentations.keys()}"
-            )
-            labels_folder = None
-        logging.debug(f"labels_folder: {labels_folder}")
-        assert labels_folder.is_dir()
-        contents = list(labels_folder.iterdir())
-        if self.type == "tiff":
-            # presume single TIFF
-            path = contents[0]
-            logging.debug(f"TiFF path: {path}")
-            tiff = skio.MultiImage(str(path))
-            image_array = tiff[slice_id]
-            recolored_image_array = label_to_colors(
-                image_array,
-                alpha=[128],
-                color_class_offset=1,
-                no_map_zero=True,
-            )
-            png = Image.fromarray(recolored_image_array)
-            return png
-        elif self.type == "pngseq":
-            path = contents[slice_id]
-            assert path.exists()
-            image_array = skio.imread(str(path))
-            recolored_image_array = label_to_colors(
-                image_array,
-                alpha=[128],
-                labels_contiguous=True,
-                no_map_zero=True,
-            )
-            png = Image.fromarray(recolored_image_array)
-            return png
-        else:
-            logging.error(f"Unkown filetype for dataset: {self.dataset}")
-            return None
+        if segment_id not in self.labels:
+            self.get_labels(segment_id)
+        label = self.labels[segment_id][slice_id]
+        return label
+        # try:
+        #     if len(self.segmentations) == 0:
+        #         self.get_segmentations_available()
+        #     labels_folder = ROOT_DATA_FOLDER / self.segmentations[segment_id]['location']
+        # except:
+        #     logging.debug(
+        #         f"No segment_id key {segment_id} in {self.segmentations.keys()}"
+        #     )
+        #     labels_folder = None
+        # logging.debug(f"labels_folder: {labels_folder}")
+        # assert labels_folder.is_dir()
+        # contents = list(labels_folder.iterdir())
+        # if self.type == "tiff":
+        #     # presume single TIFF
+        #     path = contents[0]
+        #     logging.debug(f"TiFF path: {path}")
+        #     tiff = skio.MultiImage(str(path))
+        #     image_array = tiff[slice_id]
+        #     recolored_image_array = label_to_colors(
+        #         image_array,
+        #         alpha=[128],
+        #         color_class_offset=1,
+        #         no_map_zero=True,
+        #     )
+        #     png = Image.fromarray(recolored_image_array)
+        #     return png
+        # elif self.type == "pngseq":
+        #     path = contents[slice_id]
+        #     assert path.exists()
+        #     image_array = skio.imread(str(path))
+        #     recolored_image_array = label_to_colors(
+        #         image_array,
+        #         alpha=[128],
+        #         labels_contiguous=True,
+        #         no_map_zero=True,
+        #     )
+        #     png = Image.fromarray(recolored_image_array)
+        #     return png
+        # else:
+        #     logging.error(f"Unkown filetype for dataset: {self.dataset}")
+        #     return None
 
     def get_title(self):
         return self.title
