@@ -48,7 +48,8 @@ docker-compose up -d --build
 
 ### Frontend development
 
-* Enter the `frontend` directory, install the NPM packages and start the live server using the `npm` scripts:
+- Install locally [Node](https://nodejs.org/en/download/) and npm
+- Enter the `frontend` directory, install the NPM packages and start the live server using the `npm` scripts:
 
 ```bash
 cd frontend
