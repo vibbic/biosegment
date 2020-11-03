@@ -1,23 +1,23 @@
-import { shallowMount, createLocalVue } from '@vue/test-utils'
+import { shallowMount, createLocalVue } from '@vue/test-utils';
 import UploadButton from '@/components/UploadButton.vue';
 import Vuetify from 'vuetify';
 
-const localVue = createLocalVue()
+const localVue = createLocalVue();
 
 describe('UploadButton.vue', () => {
-  let vuetify
+  let vuetify;
 
   beforeEach(() => {
-    vuetify = new Vuetify()
-  })
+    vuetify = new Vuetify();
+  });
 
-  const mountFunction = options => {
+  const mountFunction = (options) => {
     return shallowMount(UploadButton, {
       localVue,
       vuetify,
       ...options,
-    })
-  }
+    });
+  };
 
   it('renders props.title when passed', () => {
     const title = 'upload a file';
