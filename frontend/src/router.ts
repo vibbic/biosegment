@@ -59,6 +59,11 @@ export default new Router({
               ],
             },
             {
+              path: 'projects/all',
+              component: () => import(
+                /* webpackChunkName: "main-admin-users" */ './views/main/project/Projects.vue'),
+            },
+            {
               path: 'admin',
               component: () => import(/* webpackChunkName: "main-admin" */ './views/main/admin/Admin.vue'),
               redirect: 'admin/users/all',

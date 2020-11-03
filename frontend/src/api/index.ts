@@ -1,8 +1,9 @@
 import axios from 'axios';
 import { apiUrl } from '@/env';
-import { IUserProfile, IUserProfileUpdate, IUserProfileCreate } from './interfaces';
+import { IUserProfile, IUserProfileUpdate, IUserProfileCreate } from '@/interfaces';
+import * as projectAPIFunctions from './project';
 
-function authHeaders(token: string) {
+export function authHeaders(token: string) {
   return {
     headers: {
       Authorization: `Bearer ${token}`,
@@ -42,4 +43,5 @@ export const api = {
       token,
     });
   },
+  ...projectAPIFunctions,
 };
