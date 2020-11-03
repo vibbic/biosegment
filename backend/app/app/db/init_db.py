@@ -1,4 +1,7 @@
 from typing import Tuple
+from pathlib import Path
+import json
+import logging
 
 from sqlalchemy.orm import Session
 
@@ -6,6 +9,8 @@ from app import models  # noqa: F401
 from app import crud, schemas
 from app.core.config import settings
 from app.db.base import Base  # noqa: F401
+
+DATA_FOLDER = Path("/data")
 
 def create_resolution(x, y, z):
     return {
@@ -47,6 +52,80 @@ def add_dataset(
     return dataset, ground_truth
 
 
+def init_using_setup_config(db, user, setup):
+    projects = {}
+    models = {}
+    datasets = {}
+
+    for p in setup["projects"]:
+        title = p["title"]
+        project_in = schemas.ProjectCreate(
+            title=title, description=f"{title} description",
+        )
+        db_project = crud.project.create_with_owner(
+            db, obj_in=project_in, owner_id=user.id
+        )
+        projects[title] = db_project
+    for m in setup["models"]:
+        title = m["title"]
+        location = m["location"]
+        project = projects[m["project"]]
+        model_in = schemas.ModelCreate(
+            title=title,
+            description=f"{title} description",
+            location=location,
+        )
+        db_model = crud.model.create_with_owner(
+            db, obj_in=model_in, owner_id=user.id, project_id=project.id
+        )
+        models[title] = db_model
+    for d in setup["datasets"]:
+        title = d["title"]
+        location = "datasets/{title}/raw"
+        file_type = d["file_type"] 
+        resolution = d["resolution"]
+        project = projects[d["project"]]
+        # TODO make optional
+        model = list(models.values())[0]
+        db_dataset = add_dataset(
+            db, user, project, model, title, create_resolution(*resolution), file_type
+        )
+        datasets[title] = db_dataset
+    for s in setup["segmentations"]:
+        title = s["title"]
+        location = s["location"]
+        dataset = datasets[s["dataset"]]
+        model = models[s["model"]]
+
+        segmentation_in = schemas.SegmentationCreate(
+            title=title,
+            description=f"{title} description",
+            location=location,
+        )
+        crud.segmentation.create_with_owner(
+            db,
+            obj_in=segmentation_in,
+            owner_id=user.id,
+            dataset_id=dataset.id,
+            model_id=model.id,
+        )
+    for a in setup["annotations"]:
+        title = a["title"]
+        location = a["location"]
+        dataset = datasets[a["dataset"]]
+
+        annotation_in = schemas.AnnotationCreate(
+            title=title,
+            description=f"{title} description",
+            location=location,
+        )
+        crud.annotation.create_with_owner(
+            db,
+            obj_in=annotation_in,
+            owner_id=user.id,
+            dataset_id=dataset.id,
+        )
+
 # make sure all SQL Alchemy models are imported (app.db.base) before initializing DB
 # otherwise, SQL Alchemy might fail to initialize relationships properly
 # for more details: https://github.com/tiangolo/full-stack-fastapi-postgresql/issues/28
@@ -71,87 +150,14 @@ def init_db(db: Session) -> None:
         )
         user = crud.user.create(db, obj_in=user_in)  # noqa: F841
 
-    # add main project
-    project_in = schemas.ProjectCreate(
-        title="Main project", description="Main project description",
-    )
-    main_project = crud.project.create_with_owner(
-        db, obj_in=project_in, owner_id=user.id
-    )
+    setup_file = DATA_FOLDER / "setup.json"
 
-    # add untrained unet2d model
-    model_in = schemas.ModelCreate(
-        title="Untrained UNet2D",
-        description="Untrained UNet2D description",
-        location="models/2d/2d.pytorch",
-    )
-    untrained_unet2d = crud.model.create_with_owner(
-        db, obj_in=model_in, owner_id=user.id, project_id=main_project.id
-    )
-
-    # add EMBL dataset
-    embl_dataset, embl_ground_truth = add_dataset(
-        db, user, main_project, untrained_unet2d, "EMBL", create_resolution(512, 512, 64), "pngseq"
-    )
-
-    # add unet2d model trained on ground truth
-    # model_in = schemas.ModelCreate(
-    #     title="Trained UNet2D",
-    #     description="Trained UNet2D description",
-    #     location="models/EMBL/test_run2/best_checkpoint.pytorch",
-    # )
-    # trained_unet2d = crud.model.create_with_owner(
-    #     db, obj_in=model_in, owner_id=user.id, project_id=main_project.id
-    # )
-
-    # add untrained unet2d segmentation
-    segmentation_in = schemas.SegmentationCreate(
-        title="Untrained UNet2D segmentation",
-        description="Untrained UNet2D segmentation description",
-        location="segmentations/EMBL/untrained",
-    )
-    crud.segmentation.create_with_owner(
-        db,
-        obj_in=segmentation_in,
-        owner_id=user.id,
-        dataset_id=embl_dataset.id,
-        model_id=untrained_unet2d.id,
-    )
-
-    # add trained unet2d segmentation
-    # segmentation_in = schemas.SegmentationCreate(
-    #     title="Trained UNet2D segmentation",
-    #     description="Trained UNet2D segmentation description",
-    #     location="segmentations/EMBL/trained",
-    # )
-    # crud.segmentation.create_with_owner(
-    #     db,
-    #     obj_in=segmentation_in,
-    #     owner_id=user.id,
-    #     dataset_id=embl_dataset.id,
-    #     model_id=trained_unet2d.id,
-    # )
-
-    # add mitos 1 annotation
-    # annotation_in = schemas.AnnotationCreate(
-    #     title="mitos 2",
-    #     description="mitos 2 description",
-    #     location="annotations/EMBL/mitos 2",
-    # )
-    # crud.annotation.create_with_owner(
-    #     db, obj_in=annotation_in, owner_id=user.id, dataset_id=embl_dataset.id
-    # )
-
-    # add EPFL dataset
-    embl_dataset, embl_ground_truth = add_dataset(
-        db, user, main_project, untrained_unet2d, "EPFL", create_resolution(1024, 768, 165), "tiff"
-    )
-
-    # add Kasthuri dataset
-    embl_dataset, embl_ground_truth = add_dataset(
-        db, user, main_project, untrained_unet2d, "Kasthuri", create_resolution(1463, 1613, 160), "pngseq"
-    )
-    # add VNC dataset
-    embl_dataset, embl_ground_truth = add_dataset(
-        db, user, main_project, untrained_unet2d, "VNC", create_resolution(1024, 1024, 20), "pngseq"
-    )
+    if setup_file.exists():
+        try:
+            with setup_file.open() as fh:
+                setup = json.load(fh)
+            init_using_setup_config(db, user, setup)
+        except Exception as e:
+            logging.error(f"Init db from setup file {setup_file} failed: {e}")
+    else:
+        logging.info(f"No setup file detection at {setup_file}")
