@@ -253,6 +253,7 @@ def infer_unet2d(  # TODO: rename to just "infer", also 2.5d and 3d nets are sup
     import torch
     import numpy as np
 
+    from neuralnets.util.tools import load_net
     from neuralnets.util.io import print_frm, read_png, write_volume
     from neuralnets.util.validation import segment
     from neuralnets.data.datasets import StronglyLabeledVolumeDataset, UnlabeledVolumeDataset
@@ -314,7 +315,7 @@ def infer_unet2d(  # TODO: rename to just "infer", also 2.5d and 3d nets are sup
                                     orientations=orientations)
 
     print_frm('Loading model')
-    net = torch.load(model)
+    net = load_net(model)
     print_frm('Segmenting')
     self.update_state(state="PROGRESS", meta=create_meta(1, 10))
     segmentation = infer(net, test.data, orientations=orientations, input_size=input_size, in_channels=in_channels)
