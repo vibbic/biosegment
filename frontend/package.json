@@ -9,9 +9,8 @@
     "test:unit": "vue-cli-service test:unit"
   },
   "dependencies": {
-    "@babel/polyfill": "^7.12.1",
     "axios": "^0.21.0",
-    "core-js": "^3.4.3",
+    "core-js": "^3.6.5",
     "register-service-worker": "^1.0.0",
     "typesafe-vuex": "^3.1.1",
     "vee-validate": "^2.1.7",
