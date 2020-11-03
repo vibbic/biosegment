@@ -51,6 +51,9 @@
     "not ie <= 10"
   ],
   "jest": {
+    "setupFilesAfterEnv": [
+      "<rootDir>/tests/unit/setup.ts"
+    ],
     "moduleFileExtensions": [
       "js",
       "jsx",
