@@ -1,14 +1,9 @@
 ./EM
-./EM/EMBL
-./EM/EMBL/raw
 ./EM/EPFL
 ./EM/EPFL/raw
 ./models
 ./segmentations
-./segmentations/EMBL/
-./segmentations/EMBL/labels
 ./segmentations/EPFL/
 ./segmentations/EPFL/labels
 ./annotations
-./annotations/EMBL/
 ./annotations/EPFL/

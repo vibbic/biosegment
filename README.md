@@ -16,7 +16,7 @@ Install:
   - at least `version 1.26.2, build eefe0d31`
 
 Note that the Docker images take up ~8GB of disk space.
-Create a data folder according to the specification or use the provided script to create one at `data/`
+Create a data folder according to the specification or use the provided script to create one at `data/`. Edit `data/setup.json` to add more datasets.
 ```
 bash scripts/create-data-folder.sh
 ```
@@ -98,6 +98,8 @@ sh scripts/lint.sh
 ## Data folder
 In `.env` a ROOT_DATA_FOLDER is defined with the default value of `./data`, relative to this project folder. The structure of the folder is the following:
 - ROOT_DATA_FOLDER
+  - setup.json
+    - JSON file containing configurations the backend reads during initialization of the database. Used in development.
   - EM/
     - {dataset_name} e.g. EMBL
       - raw/

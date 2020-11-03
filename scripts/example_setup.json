@@ -1,0 +1,30 @@
+{
+  "projects": [{ "title": "Main project" }],
+  "models": [
+    {
+      "title": "mito 2D",
+      "project": "Main project",
+      "location": "models/mito_2d.pytorch"
+    },
+    {
+      "title": "mito_er 2D",
+      "project": "Main project",
+      "location": "models/mito_er_2d.pytorch"
+    },
+    {
+      "title": "er 2D",
+      "project": "Main project",
+      "location": "models/er_2d.pytorch"
+    }
+  ],
+  "datasets": [
+    {
+      "title": "EPFL",
+      "project": "Main project",
+      "resolution": [1024, 768, 165],
+      "file_type": "tiff"
+    }
+  ],
+  "segmentations": null,
+  "annotations": null
+}
