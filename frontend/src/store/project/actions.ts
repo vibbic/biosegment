@@ -1,4 +1,3 @@
-import { api } from '@/api';
 import { ActionContext } from 'vuex';
 import { ProjectCreate, ProjectUpdate } from '@/interfaces';
 import { State } from '../state';
@@ -13,7 +12,7 @@ type MainContext = ActionContext<ProjectState, State>;
 export const actions = {
     async actionGetProjects(context: MainContext) {
         try {
-            const response = await api.project.get(context.rootState.main.token);
+            const response = await context.rootState.main.api.project.readProjectsApiV1ProjectsGet();
             if (response) {
                 commitSetProjects(context, response.data);
             }
@@ -26,7 +25,7 @@ export const actions = {
             const loadingNotification = { content: 'saving', showProgress: true };
             commitAddNotification(context, loadingNotification);
             const response = (await Promise.all([
-                api.project.update(context.rootState.main.token, payload.id, payload.project),
+                context.rootState.main.api.project.updateProjectApiV1ProjectsIdPut(payload.id, payload.project),
                 await new Promise((resolve, reject) => setTimeout(() => resolve(), 500)),
             ]))[0];
             commitSetProject(context, response.data);
@@ -41,7 +40,7 @@ export const actions = {
             const loadingNotification = { content: 'saving', showProgress: true };
             commitAddNotification(context, loadingNotification);
             const response = (await Promise.all([
-                api.project.create(context.rootState.main.token, payload),
+                context.rootState.main.api.project.createProjectApiV1ProjectsPost(payload),
                 await new Promise((resolve, reject) => setTimeout(() => resolve(), 500)),
             ]))[0];
             commitSetProject(context, response.data);

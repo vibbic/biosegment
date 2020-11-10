@@ -2,10 +2,13 @@ import { mutations } from './mutations';
 import { getters } from './getters';
 import { actions } from './actions';
 import { MainState } from './state';
+import { Configuration } from '@/api/generator';
+import { createAPI } from '@/api';
 
 const defaultState: MainState = {
   isLoggedIn: null,
   token: '',
+  api: createAPI(new Configuration()),
   logInError: false,
   userProfile: null,
   dashboardMiniDrawer: false,

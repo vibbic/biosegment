@@ -2,11 +2,15 @@ import { User } from '@/interfaces';
 import { MainState, AppNotification } from './state';
 import { getStoreAccessors } from 'typesafe-vuex';
 import { State } from '../state';
+import { Configuration } from '@/api/generator';
+import { createAPI } from '@/api';
 
 
 export const mutations = {
     setToken(state: MainState, payload: string) {
         state.token = payload;
+        const config = new Configuration({accessToken: payload})
+        state.api = createAPI(config)
     },
     setLoggedIn(state: MainState, payload: boolean) {
         state.isLoggedIn = payload;

@@ -1,8 +1,25 @@
 import axios from 'axios';
 import { apiUrl } from '@/env';
-import { User, UserUpdate, UserCreate } from '@/interfaces';
-import * as projectAPIFunctions from './project';
+import { User, UserUpdate, UserCreate, AnnotationsApi, DatasetsApi, ModelsApi, ProjectsApi, SegmentationsApi } from '@/interfaces';
+import { Configuration } from './generator';
 
+export interface API {
+  project: ProjectsApi,
+  dataset: DatasetsApi,
+  model: ModelsApi,
+  annotation: AnnotationsApi,
+  segmentation: SegmentationsApi,
+}
+
+export function createAPI(config: Configuration) {
+  return {
+      project: new ProjectsApi(config),
+      dataset: new DatasetsApi(config),
+      model: new ModelsApi(config),
+      annotation: new AnnotationsApi(config),
+      segmentation: new SegmentationsApi(config),
+  }
+}
 
 export function authHeaders(token: string) {
   return {
@@ -44,5 +61,4 @@ export const api = {
       token,
     });
   },
-  ...projectAPIFunctions,
 };
