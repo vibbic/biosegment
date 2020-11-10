@@ -1,6 +1,14 @@
+from enum import Enum
 from typing import Optional
 
 from pydantic import BaseModel
+
+class DatasetFileType(Enum):
+    tif2d = 'tif2d'
+    tif3d = 'tif3d'
+    tifseq = 'tifseq'
+    pngseq = 'pngseq'
+
 
 class Resolution(BaseModel):
     x: int
@@ -12,7 +20,7 @@ class DatasetBase(BaseModel):
     # be optional for e.g. updates
     title: Optional[str] = None
     description: Optional[str] = None
-    file_type: Optional[str] = None
+    file_type: Optional[DatasetFileType] = None
     location: Optional[str] = None
     resolution: Optional[Resolution] = None
     modality: Optional[str] = None

@@ -22,7 +22,7 @@
       "title": "EPFL",
       "project": "Main project",
       "resolution": [1024, 768, 165],
-      "file_type": "tiff"
+      "file_type": "tif3d"
     }
   ],
   "segmentations": null,

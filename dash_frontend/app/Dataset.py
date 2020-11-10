@@ -1,5 +1,6 @@
 import logging
 import os
+from enum import Enum
 
 import app.api as api
 from app.env import ROOT_DATA_FOLDER
@@ -7,6 +8,17 @@ from app.image_utils import label_to_colors
 from app.utils import get_folder_list
 from PIL import Image
 from skimage import io as skio
+
+class FileType(Enum):
+    tif2d = 'tif2d'
+    tif3d = 'tif3d'
+    tifseq = 'tifseq'
+    pngseq = 'pngseq'
+
+    def is_dir(self):
+        if "seq" in self.value:
+            return True
+        return False
 
 def get_png_image(path):
     assert os.path.exists(path)
@@ -17,7 +29,7 @@ class Dataset:
     def __init__(self, dataset_id):
         self.dataset_id = dataset_id
         self.dataset = api.dataset.get(dataset_id)
-        self.type = self.dataset["file_type"]
+        self.type = FileType(self.dataset["file_type"])
         self.title = self.dataset["title"]
         self.project_id = self.dataset["owner_id"]
         self.segmentations = {}
@@ -31,11 +43,11 @@ class Dataset:
         logging.debug(f"Slices folder: {self.location}")
         assert self.location.is_dir()
         contents = list(self.location.iterdir())
-        if self.type == "tiff":
+        if self.type == FileType.tif3d:
             # presume single TIFF
             path = contents[0]
             return Image.open(str(path))
-        elif self.type == "pngseq":
+        elif self.type == FileType.pngseq:
             return [get_png_image(str(p)) for p in contents]
         else:
             logging.error(f"Unkown filetype for dataset: {self.dataset}")
@@ -56,10 +68,10 @@ class Dataset:
         logging.debug(f"labels_folder: {labels_folder}")
         assert labels_folder.is_dir()
         contents = list(labels_folder.iterdir())
-        if self.type == "tiff":
+        if self.type == FileType.tif3d:
             # presume single TIFF
             path = contents[0]
-            logging.debug(f"TiFF path: {path}")
+            logging.debug(f"tif3d path: {path}")
             labels = skio.MultiImage(str(path))
             recolored_labels = []
             for l in labels:
@@ -72,7 +84,7 @@ class Dataset:
                 )
                 png = Image.fromarray(recolored_image_array)
                 recolored_labels.append(png)
-        elif self.type == "pngseq":
+        elif self.type == FileType.pngseq:
             recolored_labels = []
             for path in contents:
                 assert path.exists()
@@ -110,10 +122,10 @@ class Dataset:
         return [{"label": m["title"], "value": m["id"],} for m in segmentations]
 
     def get_slice(self, slice_id):
-        if self.type == "tiff":
+        if self.type == FileType.tif3d:
             self.slices.seek(slice_id)
             return self.slices
-        elif self.type == "pngseq":
+        elif self.type == FileType.pngseq:
             return self.slices[slice_id]
         else:
             logging.error(f"Unkown filetype for dataset: {self.dataset}")

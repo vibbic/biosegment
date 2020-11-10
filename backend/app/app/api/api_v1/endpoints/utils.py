@@ -101,12 +101,13 @@ def infer_unet2d(
         raise HTTPException(status_code=404, detail="Model not found")
     model = model_db.location
     write_dir = args.location
+    file_type = dataset.file_type
     task = celery_app.send_task(
         "app.worker.infer_unet2d",
-        args=[data_dir, model, write_dir],
+        args=[data_dir, model, write_dir, file_type],
         # TODO no hardcoding
         kwargs={
-            "obj_in": {"title": args.title, "location": args.location},
+            "obj_in": {"title": args.title, "location": args.location, "file_type": file_type},
             "owner_id": current_user.id,
             "dataset_id": args.dataset_id,
             "model_id": args.model_id,

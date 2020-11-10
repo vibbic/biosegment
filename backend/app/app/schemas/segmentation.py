@@ -1,13 +1,22 @@
+from enum import Enum
+
 from typing import Optional
 
 from pydantic import BaseModel
+
+
+class SegmentationFileType(Enum):
+    tif2d = 'tif2d'
+    tif3d = 'tif3d'
+    tifseq = 'tifseq'
+    pngseq = 'pngseq'
 
 
 # Shared properties
 class SegmentationBase(BaseModel):
     title: Optional[str] = None
     description: Optional[str] = None
-    file_type: Optional[str] = None
+    file_type: Optional[SegmentationFileType] = None
     location: Optional[str] = None
 
 

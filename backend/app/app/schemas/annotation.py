@@ -1,8 +1,13 @@
+from enum import Enum
 from typing import Dict, List, Optional
 
 from pydantic import BaseModel
 
 SHAPES = Dict[str, List[Dict]]
+
+class AnnotationFileType(Enum):
+    json = 'json'
+
 
 class Shapes(BaseModel):
     shapes: Optional[SHAPES] = None
@@ -12,7 +17,7 @@ class AnnotationBase(BaseModel):
     title: Optional[str] = None
     description: Optional[str] = None
     location: Optional[str] = None
-    file_type: Optional[str] = None
+    file_type: Optional[AnnotationFileType] = None
 
 
 # Properties to receive on annotation creation

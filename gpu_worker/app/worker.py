@@ -240,6 +240,7 @@ def infer_unet2d(  # TODO: rename to just "infer", also 2.5d and 3d nets are sup
     data_dir,
     model,
     write_dir,
+    file_type,
     input_size=(256,256), 
     in_channels=1,
     test_batch_size=1,
@@ -252,6 +253,7 @@ def infer_unet2d(  # TODO: rename to just "infer", also 2.5d and 3d nets are sup
     from pathlib import Path
     import torch
     import numpy as np
+    from app.file_types import FileType
 
     from neuralnets.util.tools import load_net
     from neuralnets.util.io import print_frm, read_png, write_volume
@@ -271,7 +273,7 @@ def infer_unet2d(  # TODO: rename to just "infer", also 2.5d and 3d nets are sup
         segmentation = segmentation / len(orientations)
         return segmentation
 
-    def write_out(write_dir, segmentation, threshold=0.2, classes_of_interest=(0, 1, 2), type='pngseq'):
+    def write_out(write_dir, segmentation, classes_of_interest, file_type, threshold=0.2):
         # (3, 64, 512, 512)
         # print(segmentation.shape)
         image_array = np.zeros(segmentation.shape[1:])
@@ -284,7 +286,7 @@ def infer_unet2d(  # TODO: rename to just "infer", also 2.5d and 3d nets are sup
         for i in range(1, len(classes_of_interest)):
             is_maximum_for_interest = maximums == i
             image_array[is_maximum_for_interest] = i
-        write_volume(image_array, write_dir, type=type, index_inc=1)
+        write_volume(image_array, write_dir, type=file_type, index_inc=1)
 
     model = ROOT_DATA_FOLDER / model
     data_dir = ROOT_DATA_FOLDER / data_dir
@@ -299,18 +301,24 @@ def infer_unet2d(  # TODO: rename to just "infer", also 2.5d and 3d nets are sup
         write_dir.mkdir(parents=True)
     except FileExistsError:
          logger.error("Write dir already exists: {write_dir}")
+         return
 
     input_shape = (1, input_size[0], input_size[1])
 
+    file_type = FileType(file_type)
+    if not file_type.is_dir():
+        try:
+            data_dir = list(data_dir.iterdir())[0]
+            # give segmentation same name
+            write_dir = write_dir / "segmentation_" + data_dir.name
+        except Exception as e:
+            logger.error(f"Could not find data for data_dir={data_dir} and file_type={file_type}")
+            return
+
     print_frm('Reading dataset')
-    # TODO support multiple dataset classes (labeled, unlabeled)
-    # test = UnlabeledVolumeDataset(data_dir,
-    #                                 input_shape=input_shape, len_epoch=len_epoch, type='pngseq',
-    #                                 in_channels=in_channels, batch_size=test_batch_size,
-    #                                 orientations=orientations)
 
     test = UnlabeledVolumeDataset(data_dir,
-                                    input_shape=input_shape, len_epoch=len_epoch, type='pngseq',
+                                    input_shape=input_shape, len_epoch=len_epoch, type=file_type.value,
                                     in_channels=in_channels, batch_size=test_batch_size,
                                     orientations=orientations)
 
@@ -323,7 +331,7 @@ def infer_unet2d(  # TODO: rename to just "infer", also 2.5d and 3d nets are sup
     if write_dir:
         self.update_state(state="PROGRESS", meta=create_meta(9, 10))
         # TODO also use Paths in neuralnets
-        write_out(str(write_dir), segmentation, classes_of_interest=classes_of_interest)
+        write_out(str(write_dir), segmentation, file_type=file_type.value, classes_of_interest=classes_of_interest)
     
     # TODO use on_success syntax
     # if metadata for segmentation creation is present
