@@ -12,6 +12,10 @@ export const mutations = {
         projects.push(payload);
         state.projects = projects;
     },
+    deleteProject(state: ProjectState, payload: Project) {
+        const projects = state.projects.filter((project: Project) => project.id !== payload.id);
+        state.projects = projects;
+    },
 };
 
 const { commit } = getStoreAccessors<ProjectState, State>('');

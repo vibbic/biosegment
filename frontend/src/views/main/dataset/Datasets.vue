@@ -15,6 +15,9 @@
             <v-btn text :to="{name: 'main-datasets-edit', params: {id: item.id}}">
               <v-icon>edit</v-icon>
             </v-btn>
+            <v-btn text @click="deleteDataset(item.id)">
+              <v-icon>delete</v-icon>
+            </v-btn>
           </td>
         </tr>
       </template>
@@ -27,7 +30,7 @@ import { Component, Vue } from 'vue-property-decorator';
 import { Store } from 'vuex';
 import { Dataset } from '@/interfaces';
 import { readDatasets } from '@/store/dataset/getters';
-import { dispatchGetDatasets } from '@/store/dataset/actions';
+import { dispatchGetDatasets, dispatchDeleteDataset } from '@/store/dataset/actions';
 
 @Component
 export default class DatasetDatasets extends Vue {
@@ -49,6 +52,10 @@ export default class DatasetDatasets extends Vue {
 
   public async mounted() {
     await dispatchGetDatasets(this.$store);
+  }
+
+  public async deleteDataset(id: number) {
+    await dispatchDeleteDataset(this.$store, {id: id});
   }
 }
 </script>

@@ -20,6 +20,16 @@ export const actions = {
             await dispatchCheckApiError(context, error);
         }
     },
+    async actionDeleteDataset(context: MainContext, payload: { id: number }) {
+        try {
+            const response = await context.rootState.main.api.dataset.deleteDatasetApiV1DatasetsIdDelete(payload.id);
+            if (response) {
+                commitDeleteDataset(context, response.data);
+            }
+        } catch (error) {
+            await dispatchCheckApiError(context, error);
+        }
+    },
     async actionUpdateDataset(context: MainContext, payload: { id: number, dataset: DatasetUpdate }) {
         try {
             const loadingNotification = { content: 'saving', showProgress: true };
@@ -57,3 +67,4 @@ const { dispatch } = getStoreAccessors<DatasetState, State>('');
 export const dispatchCreateDataset = dispatch(actions.actionCreateDataset);
 export const dispatchGetDatasets = dispatch(actions.actionGetDatasets);
 export const dispatchUpdateDataset = dispatch(actions.actionUpdateDataset);
+export const dispatchDeleteDataset = dispatch(actions.actionDeleteDataset);

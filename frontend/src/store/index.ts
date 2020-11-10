@@ -6,6 +6,8 @@ import { State } from './state';
 import { adminModule } from './admin';
 import { projectModule } from './project';
 import { datasetModule } from './dataset';
+import { annotationModule } from './annotation';
+import { segmentationModule } from './segmentation';
 
 Vue.use(Vuex);
 
@@ -15,6 +17,8 @@ const storeOptions: StoreOptions<State> = {
     admin: adminModule,
     project: projectModule,
     dataset: datasetModule,
+    annotation: annotationModule,
+    segmentation: segmentationModule,
   },
 };
 

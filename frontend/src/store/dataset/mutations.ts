@@ -12,9 +12,14 @@ export const mutations = {
         datasets.push(payload);
         state.datasets = datasets;
     },
+    deleteDataset(state: DatasetState, payload: Dataset) {
+        const datasets = state.datasets.filter((dataset: Dataset) => dataset.id !== payload.id);
+        state.datasets = datasets;
+    },
 };
 
 const { commit } = getStoreAccessors<DatasetState, State>('');
 
 export const commitSetDataset = commit(mutations.setDataset);
 export const commitSetDatasets = commit(mutations.setDatasets);
+export const commitDeleteDataset = commit(mutations.deleteDataset);

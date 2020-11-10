@@ -3,7 +3,7 @@ import { ProjectCreate, ProjectUpdate } from '@/interfaces';
 import { State } from '../state';
 import { ProjectState } from './state';
 import { getStoreAccessors } from 'typesafe-vuex';
-import { commitSetProjects, commitSetProject } from './mutations';
+import { commitSetProjects, commitSetProject, commitDeleteProject } from './mutations';
 import { dispatchCheckApiError } from '../main/actions';
 import { commitAddNotification, commitRemoveNotification } from '../main/mutations';
 
@@ -15,6 +15,16 @@ export const actions = {
             const response = await context.rootState.main.api.project.readProjectsApiV1ProjectsGet();
             if (response) {
                 commitSetProjects(context, response.data);
+            }
+        } catch (error) {
+            await dispatchCheckApiError(context, error);
+        }
+    },
+    async actionDeleteProject(context: MainContext, payload: { id: number }) {
+        try {
+            const response = await context.rootState.main.api.project.deleteProjectApiV1ProjectsIdDelete(payload.id);
+            if (response) {
+                commitDeleteProject(context, response.data);
             }
         } catch (error) {
             await dispatchCheckApiError(context, error);
@@ -57,3 +67,4 @@ const { dispatch } = getStoreAccessors<ProjectState, State>('');
 export const dispatchCreateProject = dispatch(actions.actionCreateProject);
 export const dispatchGetProjects = dispatch(actions.actionGetProjects);
 export const dispatchUpdateProject = dispatch(actions.actionUpdateProject);
+export const dispatchDeleteProject = dispatch(actions.actionDeleteProject);

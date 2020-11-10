@@ -15,6 +15,9 @@
             <v-btn text :to="{name: 'main-projects-edit', params: {id: item.id}}">
               <v-icon>edit</v-icon>
             </v-btn>
+            <v-btn text @click="deleteProject(item.id)">
+              <v-icon>delete</v-icon>
+            </v-btn>
           </td>
         </tr>
       </template>
@@ -27,7 +30,7 @@ import { Component, Vue } from 'vue-property-decorator';
 import { Store } from 'vuex';
 import { Project } from '@/interfaces';
 import { readProjects } from '@/store/project/getters';
-import { dispatchGetProjects } from '@/store/project/actions';
+import { dispatchGetProjects, dispatchDeleteProject } from '@/store/project/actions';
 
 @Component
 export default class ProjectProjects extends Vue {
@@ -49,6 +52,10 @@ export default class ProjectProjects extends Vue {
 
   public async mounted() {
     await dispatchGetProjects(this.$store);
+  }
+
+  public async deleteProject(id: number) {
+    await dispatchDeleteProject(this.$store, {id: id});
   }
 }
 </script>

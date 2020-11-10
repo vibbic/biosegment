@@ -4,6 +4,8 @@ import Router from 'vue-router';
 import RouterComponent from '@/components/RouterComponent.vue';
 import { projectRoutes } from './project';
 import { datasetRoutes } from './dataset';
+import { annotationRoutes } from './annotatation';
+import { segmentationRoutes } from './segmentation';
 
 Vue.use(Router);
 
@@ -62,6 +64,8 @@ export default new Router({
             },
             projectRoutes,
             datasetRoutes,
+            annotationRoutes,
+            segmentationRoutes,
             {
               path: 'admin',
               component: () => import(/* webpackChunkName: "main-admin" */ '@/views/main/admin/Admin.vue'),
