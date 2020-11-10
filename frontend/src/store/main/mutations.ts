@@ -9,8 +9,8 @@ import { createAPI } from '@/api';
 export const mutations = {
     setToken(state: MainState, payload: string) {
         state.token = payload;
-        const config = new Configuration({accessToken: payload})
-        state.api = createAPI(config)
+        const config = new Configuration({accessToken: payload});
+        state.api = createAPI(config);
     },
     setLoggedIn(state: MainState, payload: boolean) {
         state.isLoggedIn = payload;

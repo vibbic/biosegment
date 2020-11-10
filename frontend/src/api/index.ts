@@ -4,11 +4,11 @@ import { User, UserUpdate, UserCreate, AnnotationsApi, DatasetsApi, ModelsApi, P
 import { Configuration } from './generator';
 
 export interface API {
-  project: ProjectsApi,
-  dataset: DatasetsApi,
-  model: ModelsApi,
-  annotation: AnnotationsApi,
-  segmentation: SegmentationsApi,
+  project: ProjectsApi;
+  dataset: DatasetsApi;
+  model: ModelsApi;
+  annotation: AnnotationsApi;
+  segmentation: SegmentationsApi;
 }
 
 export function createAPI(config: Configuration) {
@@ -18,7 +18,7 @@ export function createAPI(config: Configuration) {
       model: new ModelsApi(config),
       annotation: new AnnotationsApi(config),
       segmentation: new SegmentationsApi(config),
-  }
+  };
 }
 
 export function authHeaders(token: string) {
