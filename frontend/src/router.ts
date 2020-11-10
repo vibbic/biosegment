@@ -61,7 +61,12 @@ export default new Router({
             {
               path: 'projects/all',
               component: () => import(
-                /* webpackChunkName: "main-admin-users" */ './views/main/project/Projects.vue'),
+                /* webpackChunkName: "main-projects" */ './views/main/project/Projects.vue'),
+            },
+            {
+              path: 'datasets/all',
+              component: () => import(
+                /* webpackChunkName: "main-datasets" */ './views/main/dataset/Datasets.vue'),
             },
             {
               path: 'admin',
