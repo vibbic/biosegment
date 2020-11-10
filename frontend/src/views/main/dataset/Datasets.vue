@@ -55,7 +55,7 @@ export default class DatasetDatasets extends Vue {
   }
 
   public async deleteDataset(id: number) {
-    await dispatchDeleteDataset(this.$store, {id: id});
+    await dispatchDeleteDataset(this.$store, {id});
   }
 }
 </script>

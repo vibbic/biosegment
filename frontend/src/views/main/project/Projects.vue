@@ -55,7 +55,7 @@ export default class ProjectProjects extends Vue {
   }
 
   public async deleteProject(id: number) {
-    await dispatchDeleteProject(this.$store, {id: id});
+    await dispatchDeleteProject(this.$store, {id});
   }
 }
 </script>

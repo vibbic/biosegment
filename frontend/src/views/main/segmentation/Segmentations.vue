@@ -55,7 +55,7 @@ export default class SegmentationSegmentations extends Vue {
   }
 
   public async deleteSegmentation(id: number) {
-    await dispatchDeleteSegmentation(this.$store, {id: id});
+    await dispatchDeleteSegmentation(this.$store, {id});
   }
 }
 </script>

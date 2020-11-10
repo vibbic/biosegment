@@ -55,7 +55,7 @@ export default class AnnotationAnnotations extends Vue {
   }
 
   public async deleteAnnotation(id: number) {
-    await dispatchDeleteAnnotation(this.$store, {id: id});
+    await dispatchDeleteAnnotation(this.$store, {id});
   }
 }
 </script>
