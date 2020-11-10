@@ -22,3 +22,4 @@ const { commit } = getStoreAccessors<ProjectState, State>('');
 
 export const commitSetProject = commit(mutations.setProject);
 export const commitSetProjects = commit(mutations.setProjects);
+export const commitDeleteProject = commit(mutations.deleteProject);

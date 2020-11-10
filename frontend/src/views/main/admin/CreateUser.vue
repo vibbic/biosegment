@@ -79,6 +79,9 @@ export default class CreateUser extends Vue {
     if (await this.$validator.validateAll()) {
       const updatedProfile: UserCreate = {
         email: this.email,
+        password: this.password1,
+        is_active: this.isActive,
+        is_superuser: this.isSuperuser,
       };
       if (this.fullName) {
         updatedProfile.full_name = this.fullName;
@@ -86,9 +89,6 @@ export default class CreateUser extends Vue {
       if (this.email) {
         updatedProfile.email = this.email;
       }
-      updatedProfile.is_active = this.isActive;
-      updatedProfile.is_superuser = this.isSuperuser;
-      updatedProfile.password = this.password1;
       await dispatchCreateUser(this.$store, updatedProfile);
       this.$router.push('/main/admin/users');
     }

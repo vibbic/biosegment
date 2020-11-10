@@ -3,7 +3,7 @@ import { DatasetCreate, DatasetUpdate } from '@/interfaces';
 import { State } from '../state';
 import { DatasetState } from './state';
 import { getStoreAccessors } from 'typesafe-vuex';
-import { commitSetDatasets, commitSetDataset } from './mutations';
+import { commitSetDatasets, commitSetDataset, commitDeleteDataset } from './mutations';
 import { dispatchCheckApiError } from '../main/actions';
 import { commitAddNotification, commitRemoveNotification } from '../main/mutations';
 
