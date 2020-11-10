@@ -1,6 +1,6 @@
 import { api } from '@/api';
 import { ActionContext } from 'vuex';
-import { IUserProfileCreate, IUserProfileUpdate } from '@/interfaces';
+import { UserCreate, UserUpdate } from '@/interfaces';
 import { State } from '../state';
 import { AdminState } from './state';
 import { getStoreAccessors } from 'typesafe-vuex';
@@ -21,7 +21,7 @@ export const actions = {
             await dispatchCheckApiError(context, error);
         }
     },
-    async actionUpdateUser(context: MainContext, payload: { id: number, user: IUserProfileUpdate }) {
+    async actionUpdateUser(context: MainContext, payload: { id: number, user: UserUpdate }) {
         try {
             const loadingNotification = { content: 'saving', showProgress: true };
             commitAddNotification(context, loadingNotification);
@@ -36,7 +36,7 @@ export const actions = {
             await dispatchCheckApiError(context, error);
         }
     },
-    async actionCreateUser(context: MainContext, payload: IUserProfileCreate) {
+    async actionCreateUser(context: MainContext, payload: UserCreate) {
         try {
             const loadingNotification = { content: 'saving', showProgress: true };
             commitAddNotification(context, loadingNotification);

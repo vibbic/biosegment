@@ -1,5 +1,5 @@
-import { IProject } from '@/interfaces';
+import { Project } from '@/interfaces';
 
 export interface ProjectState {
-    projects: IProject[];
+    projects: Project[];
 }

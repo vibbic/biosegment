@@ -75,6 +75,16 @@ If you have Vue CLI installed, you can also run `vue ui` to control, configure, 
 ### Dash frontend development
 
 - Dash frontend hot-reloads on file changes
+- The backend API can be used to generate code with `openapi-generator`
+  - download the latest API from `http://localhost/api/v1/openapi.json` and put it at `frontend/openapi.json`
+  - Run the following script to update the code at `/frontend/api/generator/`.
+
+```bash
+cd frontend
+docker run --rm -v $PWD:/local openapitools/openapi-generator-cli generate -i /local/openapi.json -g typescript-axios -o /local/src/api/generator/
+```
+
+- All the interfaces are code-generated, the axios function not yet.
 
 ### Backend development
 

@@ -1,7 +1,8 @@
 import axios from 'axios';
 import { apiUrl } from '@/env';
-import { IUserProfile, IUserProfileUpdate, IUserProfileCreate } from '@/interfaces';
+import { User, UserUpdate, UserCreate } from '@/interfaces';
 import * as projectAPIFunctions from './project';
+
 
 export function authHeaders(token: string) {
   return {
@@ -20,18 +21,18 @@ export const api = {
     return axios.post(`${apiUrl}/api/v1/login/access-token`, params);
   },
   async getMe(token: string) {
-    return axios.get<IUserProfile>(`${apiUrl}/api/v1/users/me`, authHeaders(token));
+    return axios.get<User>(`${apiUrl}/api/v1/users/me`, authHeaders(token));
   },
-  async updateMe(token: string, data: IUserProfileUpdate) {
-    return axios.put<IUserProfile>(`${apiUrl}/api/v1/users/me`, data, authHeaders(token));
+  async updateMe(token: string, data: UserUpdate) {
+    return axios.put<User>(`${apiUrl}/api/v1/users/me`, data, authHeaders(token));
   },
   async getUsers(token: string) {
-    return axios.get<IUserProfile[]>(`${apiUrl}/api/v1/users/`, authHeaders(token));
+    return axios.get<User[]>(`${apiUrl}/api/v1/users/`, authHeaders(token));
   },
-  async updateUser(token: string, userId: number, data: IUserProfileUpdate) {
+  async updateUser(token: string, userId: number, data: UserUpdate) {
     return axios.put(`${apiUrl}/api/v1/users/${userId}`, data, authHeaders(token));
   },
-  async createUser(token: string, data: IUserProfileCreate) {
+  async createUser(token: string, data: UserCreate) {
     return axios.post(`${apiUrl}/api/v1/users/`, data, authHeaders(token));
   },
   async passwordRecovery(email: string) {

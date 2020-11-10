@@ -1,2 +1,1 @@
-export * from '@/interfaces/user';
-export * from '@/interfaces/project';
+export * from '@/api/generator/api';

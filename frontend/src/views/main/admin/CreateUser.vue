@@ -39,9 +39,9 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import {
-  IUserProfile,
-  IUserProfileUpdate,
-  IUserProfileCreate,
+  User,
+  UserUpdate,
+  UserCreate,
 } from '@/interfaces';
 import { dispatchGetUsers, dispatchCreateUser } from '@/store/admin/actions';
 
@@ -77,7 +77,7 @@ export default class CreateUser extends Vue {
 
   public async submit() {
     if (await this.$validator.validateAll()) {
-      const updatedProfile: IUserProfileCreate = {
+      const updatedProfile: UserCreate = {
         email: this.email,
       };
       if (this.fullName) {

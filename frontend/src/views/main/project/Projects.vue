@@ -25,7 +25,7 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import { Store } from 'vuex';
-import { IProject } from '@/interfaces';
+import { Project } from '@/interfaces';
 import { readProjects } from '@/store/project/getters';
 import { dispatchGetProjects } from '@/store/project/actions';
 

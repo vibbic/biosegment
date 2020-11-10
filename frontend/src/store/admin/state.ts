@@ -1,5 +1,5 @@
-import { IUserProfile } from '@/interfaces';
+import { User } from '@/interfaces';
 
 export interface AdminState {
-    users: IUserProfile[];
+    users: User[];
 }

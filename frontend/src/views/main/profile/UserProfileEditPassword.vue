@@ -50,7 +50,7 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import { Store } from 'vuex';
-import { IUserProfileUpdate } from '@/interfaces';
+import { UserUpdate } from '@/interfaces';
 import { readUserProfile } from '@/store/main/getters';
 import { dispatchUpdateUserProfile } from '@/store/main/actions';
 
@@ -76,7 +76,7 @@ export default class UserProfileEdit extends Vue {
 
   public async submit() {
     if (await this.$validator.validateAll()) {
-      const updatedProfile: IUserProfileUpdate = {};
+      const updatedProfile: UserUpdate = {};
       updatedProfile.password = this.password1;
       await dispatchUpdateUserProfile(this.$store, updatedProfile);
       this.$router.push('/main/profile');

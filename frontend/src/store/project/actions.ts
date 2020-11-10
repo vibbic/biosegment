@@ -1,6 +1,6 @@
 import { api } from '@/api';
 import { ActionContext } from 'vuex';
-import { IProjectCreate, IProjectUpdate } from '@/interfaces';
+import { ProjectCreate, ProjectUpdate } from '@/interfaces';
 import { State } from '../state';
 import { ProjectState } from './state';
 import { getStoreAccessors } from 'typesafe-vuex';
@@ -21,7 +21,7 @@ export const actions = {
             await dispatchCheckApiError(context, error);
         }
     },
-    async actionUpdateProject(context: MainContext, payload: { id: number, project: IProjectUpdate }) {
+    async actionUpdateProject(context: MainContext, payload: { id: number, project: ProjectUpdate }) {
         try {
             const loadingNotification = { content: 'saving', showProgress: true };
             commitAddNotification(context, loadingNotification);
@@ -36,7 +36,7 @@ export const actions = {
             await dispatchCheckApiError(context, error);
         }
     },
-    async actionCreateProject(context: MainContext, payload: IProjectCreate) {
+    async actionCreateProject(context: MainContext, payload: ProjectCreate) {
         try {
             const loadingNotification = { content: 'saving', showProgress: true };
             commitAddNotification(context, loadingNotification);
