@@ -1,6 +1,6 @@
 from typing import TYPE_CHECKING
 
-from sqlalchemy import Column, ForeignKey, Integer, String, PickleType
+from sqlalchemy import Column, ForeignKey, Integer, PickleType, String
 from sqlalchemy.orm import relationship
 
 from app.db.base_class import Base

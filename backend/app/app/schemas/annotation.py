@@ -5,12 +5,14 @@ from pydantic import BaseModel
 
 SHAPES = Dict[str, List[Dict]]
 
+
 class AnnotationFileType(Enum):
-    json = 'json'
+    json = "json"
 
 
 class Shapes(BaseModel):
     shapes: Optional[SHAPES] = None
+
 
 # Shared properties
 class AnnotationBase(BaseModel):
@@ -43,6 +45,7 @@ class AnnotationInDBBase(AnnotationBase):
 # Properties to return to client
 class Annotation(AnnotationInDBBase):
     pass
+
 
 # Properties properties stored in DB
 class AnnotationInDB(AnnotationInDBBase):

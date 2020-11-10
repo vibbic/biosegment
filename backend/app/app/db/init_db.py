@@ -1,7 +1,7 @@
-from typing import Tuple
-from pathlib import Path
 import json
 import logging
+from pathlib import Path
+from typing import Tuple
 
 from sqlalchemy.orm import Session
 
@@ -12,12 +12,14 @@ from app.db.base import Base  # noqa: F401
 
 DATA_FOLDER = Path("/data")
 
+
 def create_resolution(x, y, z):
     return {
         "x": x,
         "y": y,
         "z": z,
     }
+
 
 def add_dataset(
     db: Session,
@@ -26,11 +28,15 @@ def add_dataset(
     model: models.Model,
     name: str,
     resolution: schemas.Resolution,
-    file_type: str 
+    file_type: str,
 ) -> Tuple[models.Dataset, models.Segmentation]:
     title = name
     dataset_in = schemas.DatasetCreate(
-        title=title, description=f"{title} description", location=f"EM/{name}/raw/", resolution=resolution, file_type=file_type
+        title=title,
+        description=f"{title} description",
+        location=f"EM/{name}/raw/",
+        resolution=resolution,
+        file_type=file_type,
     )
     dataset = crud.dataset.create_with_owner(
         db, obj_in=dataset_in, owner_id=user.id, project_id=project.id
@@ -71,9 +77,7 @@ def init_using_setup_config(db, user, setup):
         location = m["location"]
         project = projects[m["project"]]
         model_in = schemas.ModelCreate(
-            title=title,
-            description=f"{title} description",
-            location=location,
+            title=title, description=f"{title} description", location=location,
         )
         db_model = crud.model.create_with_owner(
             db, obj_in=model_in, owner_id=user.id, project_id=project.id
@@ -82,7 +86,7 @@ def init_using_setup_config(db, user, setup):
     for d in setup["datasets"]:
         title = d["title"]
         location = "datasets/{title}/raw"
-        file_type = d["file_type"] 
+        file_type = d["file_type"]
         resolution = d["resolution"]
         project = projects[d["project"]]
         # TODO make optional
@@ -98,9 +102,7 @@ def init_using_setup_config(db, user, setup):
         model = models[s["model"]]
 
         segmentation_in = schemas.SegmentationCreate(
-            title=title,
-            description=f"{title} description",
-            location=location,
+            title=title, description=f"{title} description", location=location,
         )
         crud.segmentation.create_with_owner(
             db,
@@ -115,16 +117,12 @@ def init_using_setup_config(db, user, setup):
         dataset = datasets[a["dataset"]]
 
         annotation_in = schemas.AnnotationCreate(
-            title=title,
-            description=f"{title} description",
-            location=location,
+            title=title, description=f"{title} description", location=location,
         )
         crud.annotation.create_with_owner(
-            db,
-            obj_in=annotation_in,
-            owner_id=user.id,
-            dataset_id=dataset.id,
+            db, obj_in=annotation_in, owner_id=user.id, dataset_id=dataset.id,
         )
+
 
 # make sure all SQL Alchemy models are imported (app.db.base) before initializing DB
 # otherwise, SQL Alchemy might fail to initialize relationships properly

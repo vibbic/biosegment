@@ -3,17 +3,19 @@ from typing import Optional
 
 from pydantic import BaseModel
 
+
 class DatasetFileType(Enum):
-    tif2d = 'tif2d'
-    tif3d = 'tif3d'
-    tifseq = 'tifseq'
-    pngseq = 'pngseq'
+    tif2d = "tif2d"
+    tif3d = "tif3d"
+    tifseq = "tifseq"
+    pngseq = "pngseq"
 
 
 class Resolution(BaseModel):
     x: int
     y: int
     z: int
+
 
 # Shared properties
 class DatasetBase(BaseModel):

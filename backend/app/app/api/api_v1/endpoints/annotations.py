@@ -1,13 +1,12 @@
-import logging
 import json
-from pathlib import Path
-from typing import Any, List
+import logging
 from collections.abc import Mapping
+from typing import Any, List
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
-from app import crud, models, schemas, ROOT_DATA_FOLDER
+from app import ROOT_DATA_FOLDER, crud, models, schemas
 from app.api import deps
 
 router = APIRouter()
@@ -18,7 +17,7 @@ def check_annotation_location(annotation):
         try:
             logging.info(f"location: {annotation.location}")
             assert annotation.location
-            # TODO use root 
+            # TODO use root
             annotations_location = ROOT_DATA_FOLDER / annotation.location
             # TODO define behaviour if folder exists
             annotations_location.parent.mkdir(parents=True, exist_ok=True)
@@ -32,6 +31,7 @@ def check_annotation_location(annotation):
                 status_code=500,
                 detail="Something went wrong during saving the annotations",
             )
+
 
 @router.get("/", response_model=List[schemas.Annotation])
 def read_annotations(
@@ -92,7 +92,7 @@ def update_annotation(
         try:
             logging.info(f"location: {annotation.location}")
             assert annotation.location
-            # TODO use root 
+            # TODO use root
             annotations_location = ROOT_DATA_FOLDER / annotation.location
             # TODO define behaviour if folder exists
             annotations_location.parent.mkdir(parents=True, exist_ok=True)
@@ -129,6 +129,7 @@ def read_annotation(
         raise HTTPException(status_code=400, detail="Not enough permissions")
     return annotation
 
+
 @router.get("/{id}/shapes", response_model=schemas.Shapes)
 def read_shapes(
     *,
@@ -147,7 +148,9 @@ def read_shapes(
             shapes = json.load(fh)
         assert isinstance(shapes, Mapping)
     except Exception as e:
-        raise HTTPException(status_code=404, detail=f"Shapes in annotation not found: {e}")
+        raise HTTPException(
+            status_code=404, detail=f"Shapes in annotation not found: {e}"
+        )
     return schemas.Shapes(shapes=shapes)
 
 

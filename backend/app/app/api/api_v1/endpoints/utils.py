@@ -69,7 +69,7 @@ def train_unet2d(
             "owner_id": current_user.id,
             "project_id": dataset.project_id,
             # TODO use dict for dataset resolution
-            "resolution": dataset.resolution
+            "resolution": dataset.resolution,
         }
     )
     task = celery_app.send_task(
@@ -107,7 +107,11 @@ def infer_unet2d(
         args=[data_dir, model, write_dir, file_type],
         # TODO no hardcoding
         kwargs={
-            "obj_in": {"title": args.title, "location": args.location, "file_type": file_type},
+            "obj_in": {
+                "title": args.title,
+                "location": args.location,
+                "file_type": file_type,
+            },
             "owner_id": current_user.id,
             "dataset_id": args.dataset_id,
             "model_id": args.model_id,

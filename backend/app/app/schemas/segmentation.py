@@ -1,15 +1,14 @@
 from enum import Enum
-
 from typing import Optional
 
 from pydantic import BaseModel
 
 
 class SegmentationFileType(Enum):
-    tif2d = 'tif2d'
-    tif3d = 'tif3d'
-    tifseq = 'tifseq'
-    pngseq = 'pngseq'
+    tif2d = "tif2d"
+    tif3d = "tif3d"
+    tifseq = "tifseq"
+    pngseq = "pngseq"
 
 
 # Shared properties

@@ -2,7 +2,6 @@ from typing import List, Optional
 
 from pydantic import BaseModel
 
-from app.schemas.dataset import Resolution
 
 class TrainingTaskBase(BaseModel):
     # optional extra parameters
