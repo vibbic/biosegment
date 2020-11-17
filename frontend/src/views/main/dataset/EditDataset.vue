@@ -21,17 +21,17 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
-import { Dataset, DatasetUpdate, DatasetCreate, DatasetFileType } from "@/api";
-import { defaultDataset } from "@/interfaces";
-import DatasetForm from "@/components/DatasetForm.vue";
+import { Component, Vue } from 'vue-property-decorator';
+import { Dataset, DatasetUpdate, DatasetCreate, DatasetFileType } from '@/api';
+import { defaultDataset } from '@/interfaces';
+import DatasetForm from '@/components/DatasetForm.vue';
 import {
   dispatchGetDatasets,
   dispatchUpdateDataset,
-} from "@/store/dataset/actions";
-import { component } from "vue/types/umd";
-import { readOneDataset } from "@/store/dataset/getters";
-import { filterUndefined, deepCopy } from "@/utils";
+} from '@/store/dataset/actions';
+import { component } from 'vue/types/umd';
+import { readOneDataset } from '@/store/dataset/getters';
+import { filterUndefined, deepCopy } from '@/utils';
 
 @Component({ components: { DatasetForm } })
 export default class EditDataset extends Vue {
@@ -54,12 +54,12 @@ export default class EditDataset extends Vue {
 
   public async submit() {
     if (await this.$validator.validateAll()) {
-      var filteredDataset: DatasetUpdate = filterUndefined(this.datasetForm);
+      const filteredDataset: DatasetUpdate = filterUndefined(this.datasetForm);
       await dispatchUpdateDataset(this.$store, {
         id: this.datasetForm.id,
         dataset: filteredDataset,
       });
-      this.$router.push("/main/datasets");
+      this.$router.push('/main/datasets');
     }
   }
 

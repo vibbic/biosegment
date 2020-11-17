@@ -5,7 +5,7 @@
         <div class="headline primary--text">Create Dataset</div>
       </v-card-title>
       <v-card-text>
-        <DatasetForm :dataset="new_dataset"></DatasetForm>
+        <DatasetForm :dataset="newDataset"></DatasetForm>
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
@@ -18,17 +18,16 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
-import { Dataset, DatasetUpdate, DatasetCreate, DatasetFileType } from "@/api";
-import { defaultDataset } from "@/interfaces";
-import DatasetForm from "@/components/DatasetForm.vue";
-import { dispatchCreateDataset } from "@/store/dataset/actions";
-import { component } from "vue/types/umd";
-import { filterUndefined } from "@/utils";
+import { Component, Vue } from 'vue-property-decorator';
+import { Dataset, DatasetUpdate, DatasetCreate, DatasetFileType } from '@/api';
+import { defaultDataset } from '@/interfaces';
+import DatasetForm from '@/components/DatasetForm.vue';
+import { dispatchCreateDataset } from '@/store/dataset/actions';
+import { filterUndefined } from '@/utils';
 
 @Component({ components: { DatasetForm } })
 export default class CreateDataset extends Vue {
-  public new_dataset: DatasetCreate = defaultDataset();
+  public newDataset: DatasetCreate = defaultDataset();
   public valid = false;
 
   public async mounted() {
@@ -36,7 +35,7 @@ export default class CreateDataset extends Vue {
   }
 
   public reset() {
-    this.new_dataset = defaultDataset();
+    this.newDataset = defaultDataset();
     this.$validator.reset();
   }
 
@@ -46,9 +45,9 @@ export default class CreateDataset extends Vue {
 
   public async submit() {
     if (await this.$validator.validateAll()) {
-      var filteredDataset: DatasetCreate = filterUndefined(this.new_dataset);
+      const filteredDataset: DatasetCreate = filterUndefined(this.newDataset);
       await dispatchCreateDataset(this.$store, filteredDataset);
-      this.$router.push("/main/datasets");
+      this.$router.push('/main/datasets');
     }
   }
 }

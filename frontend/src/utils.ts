@@ -5,10 +5,10 @@ export const saveLocalToken = (token: string) => localStorage.setItem('token', t
 export const removeLocalToken = () => localStorage.removeItem('token');
 
 export function filterUndefined(obj) {
-    Object.keys(obj).forEach((key) => obj[key] === undefined && delete obj[key]); 
+    Object.keys(obj).forEach((key) => obj[key] === undefined && delete obj[key]);
     return obj;
 }
 
 export function deepCopy(obj) {
-    return JSON.parse(JSON.stringify(obj))
+    return JSON.parse(JSON.stringify(obj));
 }
