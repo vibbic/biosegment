@@ -140,10 +140,11 @@ def change_segmentation_options(name, n_clicks, annotation_mode, current_segment
         cbcontext = [p["prop_id"] for p in dash.callback_context.triggered][0]
         options = DatasetStore.get_dataset(name).get_segmentations_available()
         # open first segmentation 1. as default or 2. on dataset change
-        if (
-            current_segmentation is None and options
-        ) or cbcontext == "selected-dataset-name.value":
-            current_segmentation = options[0]["value"]
+        if (current_segmentation is None or cbcontext == "selected-dataset-name.value"):
+            if options:
+                current_segmentation = options[0]["value"]
+            else:
+                current_segmentation = None
         return [options, current_segmentation, annotation_mode == ANNOTATION_MODE.EDITING]
     raise PreventUpdate
 
