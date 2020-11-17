@@ -5,10 +5,16 @@
       <v-app-bar-nav-icon @click.stop="switchShowDrawer"></v-app-bar-nav-icon>
       <v-toolbar-title v-text="appName"></v-toolbar-title>
       <v-spacer></v-spacer>
-      <v-menu bottom left offset-y>
-        <v-btn icon>
-          <v-icon>more_vert</v-icon>
-        </v-btn>
+      <v-menu bottom left>
+        <template v-slot:activator="{ on, attrs }">
+          <v-btn
+            icon
+            v-bind="attrs"
+            v-on="on"
+          >
+            <v-icon>more_vert</v-icon>
+          </v-btn>
+        </template>
         <v-list>
           <v-list-item to="/main/profile">
             <v-list-item-content>
@@ -45,6 +51,7 @@ import NavigationDrawer from '@/components/NavigationDrawer.vue';
 import { appName } from '@/env';
 import { commitSetDashboardShowDrawer } from '../../store/main/mutations';
 import { readDashboardShowDrawer } from '../../store/main/getters';
+import { dispatchUserLogOut } from '../../store/main/actions';
 
 const routeGuardMain = async (to, from, next) => {
   if (to.path === '/main') {
@@ -75,6 +82,10 @@ export default class Main extends Vue {
       this.$store,
       !readDashboardShowDrawer(this.$store),
     );
+  }
+
+  public async logout() {
+    await dispatchUserLogOut(this.$store);
   }
 }
 </script>
