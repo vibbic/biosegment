@@ -56,7 +56,7 @@ export default class EditDataset extends Vue {
     if (await this.$validator.validateAll()) {
       const filteredDataset: DatasetUpdate = filterUndefined(this.datasetForm);
       await dispatchUpdateDataset(this.$store, {
-        id: this.datasetForm.id,
+        id: this.dataset.id,
         dataset: filteredDataset,
       });
       this.$router.push('/main/datasets');
