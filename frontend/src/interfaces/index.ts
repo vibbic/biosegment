@@ -15,7 +15,7 @@ export function defaultDataset(): DatasetCreate {
       description: '',
       file_type: undefined,
       location: undefined,
-      resolution: undefined,
+      resolution: defaultResoution(),
       modality: undefined,
     };
 }
