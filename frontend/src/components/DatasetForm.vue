@@ -8,7 +8,7 @@
     <v-select
       label="File type"
       v-model="dataset.file_type"
-      :items="fileTypes"
+      :items="file_types"
       deletable-chips
       chips
     ></v-select>
@@ -74,7 +74,7 @@ import { defaultDataset } from '@/interfaces';
 @Component
 export default class DatasetForm extends Vue {
   @Model('dataset', { type: DatasetCreate }) public dataset!: DatasetCreate;
-  public fileTypes = Object.values(DatasetFileType);
+  public file_types = Object.values(DatasetFileType);
   public valid = false;
 }
 </script>
