@@ -1,5 +1,5 @@
 import { ActionContext } from 'vuex';
-import { ProjectCreate, ProjectUpdate } from '@/interfaces';
+import { ProjectCreate, ProjectUpdate } from '@/api';
 import { State } from '../state';
 import { ProjectState } from './state';
 import { getStoreAccessors } from 'typesafe-vuex';

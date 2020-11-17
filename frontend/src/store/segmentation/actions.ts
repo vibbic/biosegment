@@ -1,5 +1,5 @@
 import { ActionContext } from 'vuex';
-import { SegmentationCreate, SegmentationUpdate } from '@/interfaces';
+import { SegmentationCreate, SegmentationUpdate } from '@/api';
 import { State } from '../state';
 import { SegmentationState } from './state';
 import { getStoreAccessors } from 'typesafe-vuex';

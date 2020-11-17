@@ -1,4 +1,4 @@
-import { Project } from '@/interfaces';
+import { Project } from '@/api';
 
 export interface ProjectState {
     projects: Project[];

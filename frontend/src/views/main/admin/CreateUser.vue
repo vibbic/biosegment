@@ -42,7 +42,7 @@ import {
   User,
   UserUpdate,
   UserCreate,
-} from '@/interfaces';
+} from '@/api';
 import { dispatchGetUsers, dispatchCreateUser } from '@/store/admin/actions';
 
 @Component

@@ -1,5 +1,5 @@
 import { ActionContext } from 'vuex';
-import { AnnotationCreate, AnnotationUpdate } from '@/interfaces';
+import { AnnotationCreate, AnnotationUpdate } from '@/api';
 import { State } from '../state';
 import { AnnotationState } from './state';
 import { getStoreAccessors } from 'typesafe-vuex';

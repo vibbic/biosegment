@@ -1,5 +1,5 @@
 import { ActionContext } from 'vuex';
-import { DatasetCreate, DatasetUpdate } from '@/interfaces';
+import { DatasetCreate, DatasetUpdate } from '@/api';
 import { State } from '../state';
 import { DatasetState } from './state';
 import { getStoreAccessors } from 'typesafe-vuex';

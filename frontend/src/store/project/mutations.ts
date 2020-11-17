@@ -1,4 +1,4 @@
-import { Project } from '@/interfaces';
+import { Project } from '@/api';
 import { ProjectState } from './state';
 import { getStoreAccessors } from 'typesafe-vuex';
 import { State } from '../state';

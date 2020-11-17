@@ -1,5 +1,5 @@
 import { API } from '@/api';
-import { User } from '@/api/generator';
+import { User } from '@/api';
 
 
 

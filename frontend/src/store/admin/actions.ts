@@ -1,6 +1,6 @@
 import { api } from '@/api';
 import { ActionContext } from 'vuex';
-import { UserCreate, UserUpdate } from '@/interfaces';
+import { UserCreate, UserUpdate } from '@/api';
 import { State } from '../state';
 import { AdminState } from './state';
 import { getStoreAccessors } from 'typesafe-vuex';

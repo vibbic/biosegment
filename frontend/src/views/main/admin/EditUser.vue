@@ -100,7 +100,7 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import { User, UserUpdate } from '@/interfaces';
+import { User, UserUpdate } from '@/api';
 import { dispatchGetUsers, dispatchUpdateUser } from '@/store/admin/actions';
 import { readAdminOneUser } from '@/store/admin/getters';
 

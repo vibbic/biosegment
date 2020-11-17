@@ -1,8 +1,8 @@
-import { User } from '@/interfaces';
+import { User } from '@/api';
 import { MainState, AppNotification } from './state';
 import { getStoreAccessors } from 'typesafe-vuex';
 import { State } from '../state';
-import { Configuration } from '@/api/generator';
+import { Configuration } from '@/api';
 import { createAPI } from '@/api';
 
 

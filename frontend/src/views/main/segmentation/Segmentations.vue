@@ -28,7 +28,7 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import { Store } from 'vuex';
-import { Segmentation } from '@/interfaces';
+import { Segmentation } from '@/api';
 import { readSegmentations } from '@/store/segmentation/getters';
 import { dispatchGetSegmentations, dispatchDeleteSegmentation } from '@/store/segmentation/actions';
 

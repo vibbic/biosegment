@@ -1,4 +1,4 @@
-import { User } from '@/interfaces';
+import { User } from '@/api';
 import { AdminState } from './state';
 import { getStoreAccessors } from 'typesafe-vuex';
 import { State } from '../state';

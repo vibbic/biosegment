@@ -28,7 +28,7 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import { Store } from 'vuex';
-import { Annotation } from '@/interfaces';
+import { Annotation } from '@/api';
 import { readAnnotations } from '@/store/annotation/getters';
 import { dispatchGetAnnotations, dispatchDeleteAnnotation } from '@/store/annotation/actions';
 

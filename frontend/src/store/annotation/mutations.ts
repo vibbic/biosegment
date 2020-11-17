@@ -1,4 +1,4 @@
-import { Annotation } from '@/interfaces';
+import { Annotation } from '@/api';
 import { AnnotationState } from './state';
 import { getStoreAccessors } from 'typesafe-vuex';
 import { State } from '../state';

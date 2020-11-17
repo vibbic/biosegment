@@ -1,7 +1,9 @@
 import axios from 'axios';
 import { apiUrl } from '@/env';
-import { User, UserUpdate, UserCreate, AnnotationsApi, DatasetsApi, ModelsApi, ProjectsApi, SegmentationsApi } from '@/interfaces';
+import { User, UserUpdate, UserCreate, AnnotationsApi, DatasetsApi, ModelsApi, ProjectsApi, SegmentationsApi } from '@/api';
 import { Configuration } from './generator';
+
+export * from './generator';
 
 export interface API {
   project: ProjectsApi;

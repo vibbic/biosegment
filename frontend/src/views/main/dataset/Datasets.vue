@@ -28,7 +28,7 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import { Store } from 'vuex';
-import { Dataset } from '@/interfaces';
+import { Dataset } from '@/api';
 import { readDatasets } from '@/store/dataset/getters';
 import { dispatchGetDatasets, dispatchDeleteDataset } from '@/store/dataset/actions';
 
