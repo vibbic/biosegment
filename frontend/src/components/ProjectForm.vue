@@ -63,7 +63,7 @@ import { defaultProject } from '@/interfaces';
 export default class ProjectForm extends Vue {
   @Model('project', { type: ProjectCreate }) public project!: ProjectCreate;
   public valid = false;
-  public start_dateMenu = false
-  public stop_dateMenu = false
+  public start_dateMenu = false;
+  public stop_dateMenu = false;
 }
 </script>
