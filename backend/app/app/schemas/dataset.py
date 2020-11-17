@@ -4,7 +4,7 @@ from typing import Optional
 from pydantic import BaseModel
 
 
-class DatasetFileType(Enum):
+class DatasetFileType(str, Enum):
     tif2d = "tif2d"
     tif3d = "tif3d"
     tifseq = "tifseq"

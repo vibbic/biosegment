@@ -4,7 +4,7 @@ from typing import Optional
 from pydantic import BaseModel
 
 
-class SegmentationFileType(Enum):
+class SegmentationFileType(str, Enum):
     tif2d = "tif2d"
     tif3d = "tif3d"
     tifseq = "tifseq"

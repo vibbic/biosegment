@@ -6,7 +6,7 @@ from pydantic import BaseModel
 SHAPES = Dict[str, List[Dict]]
 
 
-class AnnotationFileType(Enum):
+class AnnotationFileType(str, Enum):
     json = "json"
 
 
