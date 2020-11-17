@@ -1,6 +1,6 @@
-import { DatasetCreate, ProjectCreate, Resolution, SegmentationCreate } from '@/api';
+import { AnnotationCreate, DatasetCreate, ModelCreate, ProjectCreate, Resolution, SegmentationCreate } from '@/api';
 
-export function defaultResoution(): Resolution {
+export function defaultResolution(): Resolution {
     return {
       x: 1,
       y: 1,
@@ -17,6 +17,13 @@ export function defaultProject(): ProjectCreate {
   };
 }
 
+export function defaultModel(): ModelCreate {
+  return {
+    title: '',
+    description: '',
+    location: undefined,
+  };
+}
 
 export function defaultDataset(): DatasetCreate {
     return {
@@ -24,12 +31,21 @@ export function defaultDataset(): DatasetCreate {
       description: '',
       file_type: undefined,
       location: undefined,
-      resolution: defaultResoution(),
+      resolution: defaultResolution(),
       modality: undefined,
     };
 }
 
 export function defaultSegmentation(): SegmentationCreate {
+  return {
+    title: '',
+    description: '',
+    file_type: undefined,
+    location: undefined,
+  };
+}
+
+export function defaultAnnotation(): AnnotationCreate {
   return {
     title: '',
     description: '',

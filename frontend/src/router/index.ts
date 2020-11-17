@@ -3,6 +3,7 @@ import Router from 'vue-router';
 
 import RouterComponent from '@/components/RouterComponent.vue';
 import { projectRoutes } from './project';
+import { modelRoutes } from './model';
 import { datasetRoutes } from './dataset';
 import { annotationRoutes } from './annotatation';
 import { segmentationRoutes } from './segmentation';
@@ -63,6 +64,7 @@ export default new Router({
               ],
             },
             projectRoutes,
+            modelRoutes,
             datasetRoutes,
             annotationRoutes,
             segmentationRoutes,

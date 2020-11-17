@@ -5,6 +5,7 @@ import { mainModule } from './main';
 import { State } from './state';
 import { adminModule } from './admin';
 import { projectModule } from './project';
+import { modelModule } from './model';
 import { datasetModule } from './dataset';
 import { annotationModule } from './annotation';
 import { segmentationModule } from './segmentation';
@@ -16,6 +17,7 @@ const storeOptions: StoreOptions<State> = {
     main: mainModule,
     admin: adminModule,
     project: projectModule,
+    model: modelModule,
     dataset: datasetModule,
     annotation: annotationModule,
     segmentation: segmentationModule,
