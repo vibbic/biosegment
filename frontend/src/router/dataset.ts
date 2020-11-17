@@ -17,5 +17,11 @@ export const datasetRoutes = {
         component: () => import(
           /* webpackChunkName: "main-datasets-create" */ '@/views/main/dataset/CreateDataset.vue'),
       },
+      {
+        path: ':id/edit',
+        name: 'main-datasets-edit',
+        component: () => import(
+          /* webpackChunkName: "main-datasets-edit" */ '@/views/main/dataset/EditDataset.vue'),
+      },
     ],
 };

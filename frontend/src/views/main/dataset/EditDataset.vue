@@ -2,16 +2,19 @@
   <v-container fluid>
     <v-card class="ma-3 pa-3">
       <v-card-title primary-title>
-        <div class="headline primary--text">Create Dataset</div>
+        <div class="headline primary--text">Edit Dataset</div>
       </v-card-title>
       <v-card-text>
-        <DatasetForm :dataset="new_dataset"></DatasetForm>
+        <DatasetForm
+          :dataset="datasetForm"
+          title="Update Dataset"
+        ></DatasetForm>
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
         <v-btn @click="cancel">Cancel</v-btn>
         <v-btn @click="reset">Reset</v-btn>
-        <v-btn @click="submit"> Save </v-btn>
+        <v-btn @click="submit">Save</v-btn>
       </v-card-actions>
     </v-card>
   </v-container>
@@ -22,21 +25,26 @@ import { Component, Vue } from "vue-property-decorator";
 import { Dataset, DatasetUpdate, DatasetCreate, DatasetFileType } from "@/api";
 import { defaultDataset } from "@/interfaces";
 import DatasetForm from "@/components/DatasetForm.vue";
-import { dispatchCreateDataset } from "@/store/dataset/actions";
+import {
+  dispatchGetDatasets,
+  dispatchUpdateDataset,
+} from "@/store/dataset/actions";
 import { component } from "vue/types/umd";
-import { filterUndefined } from "@/utils";
+import { readOneDataset } from "@/store/dataset/getters";
+import { filterUndefined, deepCopy } from "@/utils";
 
 @Component({ components: { DatasetForm } })
-export default class CreateDataset extends Vue {
-  public new_dataset: DatasetCreate = defaultDataset();
+export default class EditDataset extends Vue {
+  public datasetForm: DatasetUpdate = deepCopy(this.dataset);
   public valid = false;
 
   public async mounted() {
+    await dispatchGetDatasets(this.$store);
     this.reset();
   }
 
   public reset() {
-    this.new_dataset = defaultDataset();
+    this.datasetForm = deepCopy(this.dataset);
     this.$validator.reset();
   }
 
@@ -46,10 +54,17 @@ export default class CreateDataset extends Vue {
 
   public async submit() {
     if (await this.$validator.validateAll()) {
-      var filteredDataset: DatasetCreate = filterUndefined(this.new_dataset);
-      await dispatchCreateDataset(this.$store, filteredDataset);
+      var filteredDataset: DatasetUpdate = filterUndefined(this.datasetForm);
+      await dispatchUpdateDataset(this.$store, {
+        id: this.datasetForm.id,
+        dataset: filteredDataset,
+      });
       this.$router.push("/main/datasets");
     }
+  }
+
+  get dataset() {
+    return readOneDataset(this.$store)(+this.$router.currentRoute.params.id);
   }
 }
 </script>
