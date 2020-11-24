@@ -222,3 +222,9 @@ The `.env` file is version controlled, so it should not hold production secrets.
 ```bash
 docker-compose --env-file .env.prod up
 ```
+
+## References
+
+- [Cookiecutter template: full-stack-fastapi-postgresql](https://github.com/tiangolo/full-stack-fastapi-postgresql/blob/master/README.md)
+- [Dash: interactive image segmentation](https://github.com/plotly/dash-sample-apps/tree/master/apps/dash-image-segmentation)
+- [Dash: 3D image partitioning](https://github.com/plotly/dash-3d-image-partitioning)
