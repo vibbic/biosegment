@@ -23,7 +23,7 @@ import { defaultSegmentation } from '@/interfaces';
 
 @Component
 export default class SegmentationForm extends Vue {
-  @Model('segmentation', { type: SegmentationCreate }) public segmentation!: SegmentationCreate;
+  @Model('segmentation') public segmentation!: SegmentationCreate;
   public file_types = Object.values(SegmentationFileType);
   public valid = false;
 }

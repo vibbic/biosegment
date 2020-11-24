@@ -59,8 +59,8 @@ export default class UserProfileEdit extends Vue {
   public created() {
     const userProfile = readUserProfile(this.$store);
     if (userProfile) {
-      this.fullName = userProfile.full_name;
-      this.email = userProfile.email;
+      this.fullName = userProfile.full_name!;
+      this.email = userProfile.email!;
     }
   }
 
@@ -71,8 +71,8 @@ export default class UserProfileEdit extends Vue {
   public reset() {
     const userProfile = readUserProfile(this.$store);
     if (userProfile) {
-      this.fullName = userProfile.full_name;
-      this.email = userProfile.email;
+      this.fullName = userProfile.full_name!;
+      this.email = userProfile.email!;
     }
   }
 

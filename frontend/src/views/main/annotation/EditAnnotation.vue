@@ -56,7 +56,7 @@ export default class EditAnnotation extends Vue {
     if (await this.$validator.validateAll()) {
       const filteredAnnotation: AnnotationUpdate = filterUndefined(this.annotationForm);
       await dispatchUpdateAnnotation(this.$store, {
-        id: this.annotation.id,
+        id: this.annotation!.id,
         annotation: filteredAnnotation,
       });
       this.$router.push('/main/annotations');

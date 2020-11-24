@@ -23,7 +23,7 @@ import { defaultAnnotation } from '@/interfaces';
 
 @Component
 export default class AnnotationForm extends Vue {
-  @Model('annotation', { type: AnnotationCreate }) public annotation!: AnnotationCreate;
+  @Model('annotation') public annotation!: AnnotationCreate;
   public file_types = Object.values(AnnotationFileType);
   public valid = false;
 }

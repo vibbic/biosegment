@@ -73,7 +73,7 @@ import { defaultDataset } from '@/interfaces';
 
 @Component
 export default class DatasetForm extends Vue {
-  @Model('dataset', { type: DatasetCreate }) public dataset!: DatasetCreate;
+  @Model('dataset') public dataset!: DatasetCreate;
   public file_types = Object.values(DatasetFileType);
   public valid = false;
 }

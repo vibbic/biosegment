@@ -56,7 +56,7 @@ export default class EditSegmentation extends Vue {
     if (await this.$validator.validateAll()) {
       const filteredSegmentation: SegmentationUpdate = filterUndefined(this.segmentationForm);
       await dispatchUpdateSegmentation(this.$store, {
-        id: this.segmentation.id,
+        id: this.segmentation!.id,
         segmentation: filteredSegmentation,
       });
       this.$router.push('/main/segmentations');

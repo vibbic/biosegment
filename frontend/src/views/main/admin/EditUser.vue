@@ -126,10 +126,10 @@ export default class EditUser extends Vue {
     this.password2 = '';
     this.$validator.reset();
     if (this.user) {
-      this.fullName = this.user.full_name;
-      this.email = this.user.email;
-      this.isActive = this.user.is_active;
-      this.isSuperuser = this.user.is_superuser;
+      this.fullName = this.user.full_name!;
+      this.email = this.user.email!;
+      this.isActive = this.user.is_active!;
+      this.isSuperuser = this.user.is_superuser!;
     }
   }
 

@@ -16,7 +16,7 @@ import { defaultModel } from '@/interfaces';
 
 @Component
 export default class ModelForm extends Vue {
-  @Model('model', { type: ModelCreate }) public model!: ModelCreate;
+  @Model('model') public model!: ModelCreate;
   public valid = false;
 }
 </script>

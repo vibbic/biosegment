@@ -56,7 +56,7 @@ export default class EditModel extends Vue {
     if (await this.$validator.validateAll()) {
       const filteredModel: ModelUpdate = filterUndefined(this.modelForm);
       await dispatchUpdateModel(this.$store, {
-        id: this.model.id,
+        id: this.model!.id,
         model: filteredModel,
       });
       this.$router.push('/main/models');

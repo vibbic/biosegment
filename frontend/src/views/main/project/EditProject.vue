@@ -56,7 +56,7 @@ export default class EditProject extends Vue {
     if (await this.$validator.validateAll()) {
       const filteredProject: ProjectUpdate = filterUndefined(this.projectForm);
       await dispatchUpdateProject(this.$store, {
-        id: this.project.id,
+        id: this.project!.id,
         project: filteredProject,
       });
       this.$router.push('/main/projects');

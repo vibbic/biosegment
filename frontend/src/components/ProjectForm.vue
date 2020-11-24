@@ -61,7 +61,7 @@ import { defaultProject } from '@/interfaces';
 
 @Component
 export default class ProjectForm extends Vue {
-  @Model('project', { type: ProjectCreate }) public project!: ProjectCreate;
+  @Model('project') public project!: ProjectCreate;
   public valid = false;
   public start_dateMenu = false;
   public stop_dateMenu = false;
