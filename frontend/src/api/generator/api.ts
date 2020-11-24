@@ -1138,7 +1138,7 @@ export interface User {
      * @type {number}
      * @memberof User
      */
-    id?: number;
+    id: number;
 }
 /**
  * 
@@ -1754,12 +1754,82 @@ export const AnnotationsApiFactory = function (configuration?: Configuration, ba
 };
 
 /**
+ * AnnotationsApi - interface
+ * @export
+ * @interface AnnotationsApi
+ */
+export interface AnnotationsApiInterface {
+    /**
+     * Create new annotation.
+     * @summary Create Annotation
+     * @param {AnnotationCreate} annotationCreate 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AnnotationsApiInterface
+     */
+    createAnnotationApiV1AnnotationsPost(annotationCreate: AnnotationCreate, options?: any): AxiosPromise<Annotation>;
+
+    /**
+     * Delete an annotation.
+     * @summary Delete Annotation
+     * @param {number} id 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AnnotationsApiInterface
+     */
+    deleteAnnotationApiV1AnnotationsIdDelete(id: number, options?: any): AxiosPromise<Annotation>;
+
+    /**
+     * Get annotation by ID.
+     * @summary Read Annotation
+     * @param {number} id 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AnnotationsApiInterface
+     */
+    readAnnotationApiV1AnnotationsIdGet(id: number, options?: any): AxiosPromise<Annotation>;
+
+    /**
+     * Retrieve annotations.
+     * @summary Read Annotations
+     * @param {number} [skip] 
+     * @param {number} [limit] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AnnotationsApiInterface
+     */
+    readAnnotationsApiV1AnnotationsGet(skip?: number, limit?: number, options?: any): AxiosPromise<Array<Annotation>>;
+
+    /**
+     * Get shapes from annotation by ID.
+     * @summary Read Shapes
+     * @param {number} id 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AnnotationsApiInterface
+     */
+    readShapesApiV1AnnotationsIdShapesGet(id: number, options?: any): AxiosPromise<Shapes>;
+
+    /**
+     * Update an annotation.
+     * @summary Update Annotation
+     * @param {number} id 
+     * @param {AnnotationUpdate} annotationUpdate 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AnnotationsApiInterface
+     */
+    updateAnnotationApiV1AnnotationsIdPut(id: number, annotationUpdate: AnnotationUpdate, options?: any): AxiosPromise<Annotation>;
+
+}
+
+/**
  * AnnotationsApi - object-oriented interface
  * @export
  * @class AnnotationsApi
  * @extends {BaseAPI}
  */
-export class AnnotationsApi extends BaseAPI {
+export class AnnotationsApi extends BaseAPI implements AnnotationsApiInterface {
     /**
      * Create new annotation.
      * @summary Create Annotation
@@ -2638,12 +2708,118 @@ export const DatasetsApiFactory = function (configuration?: Configuration, baseP
 };
 
 /**
+ * DatasetsApi - interface
+ * @export
+ * @interface DatasetsApi
+ */
+export interface DatasetsApiInterface {
+    /**
+     * Create new annotation.
+     * @summary Create Annotation
+     * @param {number} id 
+     * @param {AnnotationCreate} annotationCreate 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DatasetsApiInterface
+     */
+    createAnnotationApiV1DatasetsIdAnnotationsPost(id: number, annotationCreate: AnnotationCreate, options?: any): AxiosPromise<Annotation>;
+
+    /**
+     * Create new dataset.
+     * @summary Create Dataset
+     * @param {DatasetCreate} datasetCreate 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DatasetsApiInterface
+     */
+    createDatasetApiV1DatasetsPost(datasetCreate: DatasetCreate, options?: any): AxiosPromise<Dataset>;
+
+    /**
+     * Create new segmentation.
+     * @summary Create Segmentation
+     * @param {number} id 
+     * @param {SegmentationCreate} segmentationCreate 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DatasetsApiInterface
+     */
+    createSegmentationApiV1DatasetsIdSegmentationsPost(id: number, segmentationCreate: SegmentationCreate, options?: any): AxiosPromise<Segmentation>;
+
+    /**
+     * Delete an dataset.
+     * @summary Delete Dataset
+     * @param {number} id 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DatasetsApiInterface
+     */
+    deleteDatasetApiV1DatasetsIdDelete(id: number, options?: any): AxiosPromise<Dataset>;
+
+    /**
+     * Retrieve annotations.
+     * @summary Read Annotations
+     * @param {number} id 
+     * @param {number} [skip] 
+     * @param {number} [limit] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DatasetsApiInterface
+     */
+    readAnnotationsApiV1DatasetsIdAnnotationsGet(id: number, skip?: number, limit?: number, options?: any): AxiosPromise<Array<Annotation>>;
+
+    /**
+     * Get dataset by ID.
+     * @summary Read Dataset
+     * @param {number} id 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DatasetsApiInterface
+     */
+    readDatasetApiV1DatasetsIdGet(id: number, options?: any): AxiosPromise<Dataset>;
+
+    /**
+     * Retrieve datasets.
+     * @summary Read Datasets
+     * @param {number} [skip] 
+     * @param {number} [limit] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DatasetsApiInterface
+     */
+    readDatasetsApiV1DatasetsGet(skip?: number, limit?: number, options?: any): AxiosPromise<Array<Dataset>>;
+
+    /**
+     * Retrieve segmentations.
+     * @summary Read Segmentations
+     * @param {number} id 
+     * @param {number} [skip] 
+     * @param {number} [limit] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DatasetsApiInterface
+     */
+    readSegmentationsApiV1DatasetsIdSegmentationsGet(id: number, skip?: number, limit?: number, options?: any): AxiosPromise<Array<Segmentation>>;
+
+    /**
+     * Update an dataset.
+     * @summary Update Dataset
+     * @param {number} id 
+     * @param {DatasetUpdate} datasetUpdate 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DatasetsApiInterface
+     */
+    updateDatasetApiV1DatasetsIdPut(id: number, datasetUpdate: DatasetUpdate, options?: any): AxiosPromise<Dataset>;
+
+}
+
+/**
  * DatasetsApi - object-oriented interface
  * @export
  * @class DatasetsApi
  * @extends {BaseAPI}
  */
-export class DatasetsApi extends BaseAPI {
+export class DatasetsApi extends BaseAPI implements DatasetsApiInterface {
     /**
      * Create new annotation.
      * @summary Create Annotation
@@ -3200,12 +3376,72 @@ export const ItemsApiFactory = function (configuration?: Configuration, basePath
 };
 
 /**
+ * ItemsApi - interface
+ * @export
+ * @interface ItemsApi
+ */
+export interface ItemsApiInterface {
+    /**
+     * Create new item.
+     * @summary Create Item
+     * @param {ItemCreate} itemCreate 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ItemsApiInterface
+     */
+    createItemApiV1ItemsPost(itemCreate: ItemCreate, options?: any): AxiosPromise<Item>;
+
+    /**
+     * Delete an item.
+     * @summary Delete Item
+     * @param {number} id 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ItemsApiInterface
+     */
+    deleteItemApiV1ItemsIdDelete(id: number, options?: any): AxiosPromise<Item>;
+
+    /**
+     * Get item by ID.
+     * @summary Read Item
+     * @param {number} id 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ItemsApiInterface
+     */
+    readItemApiV1ItemsIdGet(id: number, options?: any): AxiosPromise<Item>;
+
+    /**
+     * Retrieve items.
+     * @summary Read Items
+     * @param {number} [skip] 
+     * @param {number} [limit] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ItemsApiInterface
+     */
+    readItemsApiV1ItemsGet(skip?: number, limit?: number, options?: any): AxiosPromise<Array<Item>>;
+
+    /**
+     * Update an item.
+     * @summary Update Item
+     * @param {number} id 
+     * @param {ItemUpdate} itemUpdate 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ItemsApiInterface
+     */
+    updateItemApiV1ItemsIdPut(id: number, itemUpdate: ItemUpdate, options?: any): AxiosPromise<Item>;
+
+}
+
+/**
  * ItemsApi - object-oriented interface
  * @export
  * @class ItemsApi
  * @extends {BaseAPI}
  */
-export class ItemsApi extends BaseAPI {
+export class ItemsApi extends BaseAPI implements ItemsApiInterface {
     /**
      * Create new item.
      * @summary Create Item
@@ -3621,12 +3857,64 @@ export const LoginApiFactory = function (configuration?: Configuration, basePath
 };
 
 /**
+ * LoginApi - interface
+ * @export
+ * @interface LoginApi
+ */
+export interface LoginApiInterface {
+    /**
+     * OAuth2 compatible token login, get an access token for future requests
+     * @summary Login Access Token
+     * @param {string} username 
+     * @param {string} password 
+     * @param {string} [grantType] 
+     * @param {string} [scope] 
+     * @param {string} [clientId] 
+     * @param {string} [clientSecret] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof LoginApiInterface
+     */
+    loginAccessTokenApiV1LoginAccessTokenPost(username: string, password: string, grantType?: string, scope?: string, clientId?: string, clientSecret?: string, options?: any): AxiosPromise<Token>;
+
+    /**
+     * Password Recovery
+     * @summary Recover Password
+     * @param {string} email 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof LoginApiInterface
+     */
+    recoverPasswordApiV1PasswordRecoveryEmailPost(email: string, options?: any): AxiosPromise<Msg>;
+
+    /**
+     * Reset password
+     * @summary Reset Password
+     * @param {BodyResetPasswordApiV1ResetPasswordPost} bodyResetPasswordApiV1ResetPasswordPost 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof LoginApiInterface
+     */
+    resetPasswordApiV1ResetPasswordPost(bodyResetPasswordApiV1ResetPasswordPost: BodyResetPasswordApiV1ResetPasswordPost, options?: any): AxiosPromise<Msg>;
+
+    /**
+     * Test access token
+     * @summary Test Token
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof LoginApiInterface
+     */
+    testTokenApiV1LoginTestTokenPost(options?: any): AxiosPromise<User>;
+
+}
+
+/**
  * LoginApi - object-oriented interface
  * @export
  * @class LoginApi
  * @extends {BaseAPI}
  */
-export class LoginApi extends BaseAPI {
+export class LoginApi extends BaseAPI implements LoginApiInterface {
     /**
      * OAuth2 compatible token login, get an access token for future requests
      * @summary Login Access Token
@@ -4119,12 +4407,72 @@ export const ModelsApiFactory = function (configuration?: Configuration, basePat
 };
 
 /**
+ * ModelsApi - interface
+ * @export
+ * @interface ModelsApi
+ */
+export interface ModelsApiInterface {
+    /**
+     * Create new model.
+     * @summary Create Model
+     * @param {ModelCreate} modelCreate 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ModelsApiInterface
+     */
+    createModelApiV1ModelsPost(modelCreate: ModelCreate, options?: any): AxiosPromise<Model>;
+
+    /**
+     * Delete an model.
+     * @summary Delete Model
+     * @param {number} id 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ModelsApiInterface
+     */
+    deleteModelApiV1ModelsIdDelete(id: number, options?: any): AxiosPromise<Model>;
+
+    /**
+     * Get model by ID.
+     * @summary Read Model
+     * @param {number} id 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ModelsApiInterface
+     */
+    readModelApiV1ModelsIdGet(id: number, options?: any): AxiosPromise<Model>;
+
+    /**
+     * Retrieve models.
+     * @summary Read Models
+     * @param {number} [skip] 
+     * @param {number} [limit] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ModelsApiInterface
+     */
+    readModelsApiV1ModelsGet(skip?: number, limit?: number, options?: any): AxiosPromise<Array<Model>>;
+
+    /**
+     * Update an model.
+     * @summary Update Model
+     * @param {number} id 
+     * @param {ModelUpdate} modelUpdate 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ModelsApiInterface
+     */
+    updateModelApiV1ModelsIdPut(id: number, modelUpdate: ModelUpdate, options?: any): AxiosPromise<Model>;
+
+}
+
+/**
  * ModelsApi - object-oriented interface
  * @export
  * @class ModelsApi
  * @extends {BaseAPI}
  */
-export class ModelsApi extends BaseAPI {
+export class ModelsApi extends BaseAPI implements ModelsApiInterface {
     /**
      * Create new model.
      * @summary Create Model
@@ -4991,12 +5339,118 @@ export const ProjectsApiFactory = function (configuration?: Configuration, baseP
 };
 
 /**
+ * ProjectsApi - interface
+ * @export
+ * @interface ProjectsApi
+ */
+export interface ProjectsApiInterface {
+    /**
+     * Create new dataset for project.
+     * @summary Create Dataset
+     * @param {number} id 
+     * @param {DatasetCreate} datasetCreate 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ProjectsApiInterface
+     */
+    createDatasetApiV1ProjectsIdDatasetsPost(id: number, datasetCreate: DatasetCreate, options?: any): AxiosPromise<Dataset>;
+
+    /**
+     * Create new model for project.
+     * @summary Create Model
+     * @param {number} id 
+     * @param {ModelCreate} modelCreate 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ProjectsApiInterface
+     */
+    createModelApiV1ProjectsIdModelsPost(id: number, modelCreate: ModelCreate, options?: any): AxiosPromise<Dataset>;
+
+    /**
+     * Create new project.
+     * @summary Create Project
+     * @param {ProjectCreate} projectCreate 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ProjectsApiInterface
+     */
+    createProjectApiV1ProjectsPost(projectCreate: ProjectCreate, options?: any): AxiosPromise<Project>;
+
+    /**
+     * Delete an project.
+     * @summary Delete Project
+     * @param {number} id 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ProjectsApiInterface
+     */
+    deleteProjectApiV1ProjectsIdDelete(id: number, options?: any): AxiosPromise<Project>;
+
+    /**
+     * Retrieve datasets for project.
+     * @summary Read Datasets
+     * @param {number} id 
+     * @param {number} [skip] 
+     * @param {number} [limit] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ProjectsApiInterface
+     */
+    readDatasetsApiV1ProjectsIdDatasetsGet(id: number, skip?: number, limit?: number, options?: any): AxiosPromise<Array<Dataset>>;
+
+    /**
+     * Retrieve models for project.
+     * @summary Read Models
+     * @param {number} id 
+     * @param {number} [skip] 
+     * @param {number} [limit] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ProjectsApiInterface
+     */
+    readModelsApiV1ProjectsIdModelsGet(id: number, skip?: number, limit?: number, options?: any): AxiosPromise<Array<Model>>;
+
+    /**
+     * Get project by ID.
+     * @summary Read Project
+     * @param {number} id 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ProjectsApiInterface
+     */
+    readProjectApiV1ProjectsIdGet(id: number, options?: any): AxiosPromise<Project>;
+
+    /**
+     * Retrieve projects.
+     * @summary Read Projects
+     * @param {number} [skip] 
+     * @param {number} [limit] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ProjectsApiInterface
+     */
+    readProjectsApiV1ProjectsGet(skip?: number, limit?: number, options?: any): AxiosPromise<Array<Project>>;
+
+    /**
+     * Update an project.
+     * @summary Update Project
+     * @param {number} id 
+     * @param {ProjectUpdate} projectUpdate 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ProjectsApiInterface
+     */
+    updateProjectApiV1ProjectsIdPut(id: number, projectUpdate: ProjectUpdate, options?: any): AxiosPromise<Project>;
+
+}
+
+/**
  * ProjectsApi - object-oriented interface
  * @export
  * @class ProjectsApi
  * @extends {BaseAPI}
  */
-export class ProjectsApi extends BaseAPI {
+export class ProjectsApi extends BaseAPI implements ProjectsApiInterface {
     /**
      * Create new dataset for project.
      * @summary Create Dataset
@@ -5553,12 +6007,72 @@ export const SegmentationsApiFactory = function (configuration?: Configuration, 
 };
 
 /**
+ * SegmentationsApi - interface
+ * @export
+ * @interface SegmentationsApi
+ */
+export interface SegmentationsApiInterface {
+    /**
+     * Create new segmentation, possibly from a model.
+     * @summary Create Segmentation
+     * @param {SegmentationCreate} segmentationCreate 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof SegmentationsApiInterface
+     */
+    createSegmentationApiV1SegmentationsPost(segmentationCreate: SegmentationCreate, options?: any): AxiosPromise<Segmentation>;
+
+    /**
+     * Delete an segmentation.
+     * @summary Delete Segmentation
+     * @param {number} id 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof SegmentationsApiInterface
+     */
+    deleteSegmentationApiV1SegmentationsIdDelete(id: number, options?: any): AxiosPromise<Segmentation>;
+
+    /**
+     * Get segmentation by ID.
+     * @summary Read Segmentation
+     * @param {number} id 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof SegmentationsApiInterface
+     */
+    readSegmentationApiV1SegmentationsIdGet(id: number, options?: any): AxiosPromise<Segmentation>;
+
+    /**
+     * Retrieve segmentations.
+     * @summary Read Segmentations
+     * @param {number} [skip] 
+     * @param {number} [limit] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof SegmentationsApiInterface
+     */
+    readSegmentationsApiV1SegmentationsGet(skip?: number, limit?: number, options?: any): AxiosPromise<Array<Segmentation>>;
+
+    /**
+     * Update an segmentation.
+     * @summary Update Segmentation
+     * @param {number} id 
+     * @param {SegmentationUpdate} segmentationUpdate 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof SegmentationsApiInterface
+     */
+    updateSegmentationApiV1SegmentationsIdPut(id: number, segmentationUpdate: SegmentationUpdate, options?: any): AxiosPromise<Segmentation>;
+
+}
+
+/**
  * SegmentationsApi - object-oriented interface
  * @export
  * @class SegmentationsApi
  * @extends {BaseAPI}
  */
-export class SegmentationsApi extends BaseAPI {
+export class SegmentationsApi extends BaseAPI implements SegmentationsApiInterface {
     /**
      * Create new segmentation, possibly from a model.
      * @summary Create Segmentation
@@ -6208,12 +6722,91 @@ export const UsersApiFactory = function (configuration?: Configuration, basePath
 };
 
 /**
+ * UsersApi - interface
+ * @export
+ * @interface UsersApi
+ */
+export interface UsersApiInterface {
+    /**
+     * Create new user.
+     * @summary Create User
+     * @param {UserCreate} userCreate 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof UsersApiInterface
+     */
+    createUserApiV1UsersPost(userCreate: UserCreate, options?: any): AxiosPromise<User>;
+
+    /**
+     * Create new user without the need to be logged in.
+     * @summary Create User Open
+     * @param {BodyCreateUserOpenApiV1UsersOpenPost} bodyCreateUserOpenApiV1UsersOpenPost 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof UsersApiInterface
+     */
+    createUserOpenApiV1UsersOpenPost(bodyCreateUserOpenApiV1UsersOpenPost: BodyCreateUserOpenApiV1UsersOpenPost, options?: any): AxiosPromise<User>;
+
+    /**
+     * Get a specific user by id.
+     * @summary Read User By Id
+     * @param {number} userId 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof UsersApiInterface
+     */
+    readUserByIdApiV1UsersUserIdGet(userId: number, options?: any): AxiosPromise<User>;
+
+    /**
+     * Get current user.
+     * @summary Read User Me
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof UsersApiInterface
+     */
+    readUserMeApiV1UsersMeGet(options?: any): AxiosPromise<User>;
+
+    /**
+     * Retrieve users.
+     * @summary Read Users
+     * @param {number} [skip] 
+     * @param {number} [limit] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof UsersApiInterface
+     */
+    readUsersApiV1UsersGet(skip?: number, limit?: number, options?: any): AxiosPromise<Array<User>>;
+
+    /**
+     * Update a user.
+     * @summary Update User
+     * @param {number} userId 
+     * @param {UserUpdate} userUpdate 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof UsersApiInterface
+     */
+    updateUserApiV1UsersUserIdPut(userId: number, userUpdate: UserUpdate, options?: any): AxiosPromise<User>;
+
+    /**
+     * Update own user.
+     * @summary Update User Me
+     * @param {BodyUpdateUserMeApiV1UsersMePut} [bodyUpdateUserMeApiV1UsersMePut] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof UsersApiInterface
+     */
+    updateUserMeApiV1UsersMePut(bodyUpdateUserMeApiV1UsersMePut?: BodyUpdateUserMeApiV1UsersMePut, options?: any): AxiosPromise<User>;
+
+}
+
+/**
  * UsersApi - object-oriented interface
  * @export
  * @class UsersApi
  * @extends {BaseAPI}
  */
-export class UsersApi extends BaseAPI {
+export class UsersApi extends BaseAPI implements UsersApiInterface {
     /**
      * Create new user.
      * @summary Create User
@@ -6823,12 +7416,80 @@ export const UtilsApiFactory = function (configuration?: Configuration, basePath
 };
 
 /**
+ * UtilsApi - interface
+ * @export
+ * @interface UtilsApi
+ */
+export interface UtilsApiInterface {
+    /**
+     * Segment using UNet2D model.
+     * @summary Infer Unet2D
+     * @param {SegmentationCreateFromModel} segmentationCreateFromModel 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof UtilsApiInterface
+     */
+    inferUnet2dApiV1UtilsInferPost(segmentationCreateFromModel: SegmentationCreateFromModel, options?: any): AxiosPromise<Task>;
+
+    /**
+     * Poll Celery task.
+     * @summary Poll Task
+     * @param {Task} task 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof UtilsApiInterface
+     */
+    pollTaskApiV1UtilsPollTaskPost(task: Task, options?: any): AxiosPromise<TaskState>;
+
+    /**
+     * Test Celery worker.
+     * @summary Test Celery
+     * @param {number} timeout 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof UtilsApiInterface
+     */
+    testCeleryApiV1UtilsTestCeleryPost(timeout: number, options?: any): AxiosPromise<Task>;
+
+    /**
+     * Test emails.
+     * @summary Test Email
+     * @param {string} emailTo 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof UtilsApiInterface
+     */
+    testEmailApiV1UtilsTestEmailPost(emailTo: string, options?: any): AxiosPromise<Msg>;
+
+    /**
+     * Test Celery worker and Pytorch.
+     * @summary Test Pytorch
+     * @param {Msg} msg 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof UtilsApiInterface
+     */
+    testPytorchApiV1UtilsTestPytorchPost(msg: Msg, options?: any): AxiosPromise<Task>;
+
+    /**
+     * Train UNet2D model.
+     * @summary Train Unet2D
+     * @param {ModelCreateFromAnnotation} modelCreateFromAnnotation 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof UtilsApiInterface
+     */
+    trainUnet2dApiV1UtilsTrainPost(modelCreateFromAnnotation: ModelCreateFromAnnotation, options?: any): AxiosPromise<Task>;
+
+}
+
+/**
  * UtilsApi - object-oriented interface
  * @export
  * @class UtilsApi
  * @extends {BaseAPI}
  */
-export class UtilsApi extends BaseAPI {
+export class UtilsApi extends BaseAPI implements UtilsApiInterface {
     /**
      * Segment using UNet2D model.
      * @summary Infer Unet2D

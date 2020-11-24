@@ -2143,6 +2143,7 @@
       "AnnotationFileType": {
         "title": "AnnotationFileType",
         "enum": ["json"],
+        "type": "string",
         "description": "An enumeration."
       },
       "AnnotationUpdate": {
@@ -2239,6 +2240,7 @@
       "DatasetFileType": {
         "title": "DatasetFileType",
         "enum": ["tif2d", "tif3d", "tifseq", "pngseq"],
+        "type": "string",
         "description": "An enumeration."
       },
       "DatasetUpdate": {
@@ -2515,6 +2517,7 @@
       "SegmentationFileType": {
         "title": "SegmentationFileType",
         "enum": ["tif2d", "tif3d", "tifseq", "pngseq"],
+        "type": "string",
         "description": "An enumeration."
       },
       "SegmentationUpdate": {
@@ -2568,6 +2571,7 @@
       },
       "User": {
         "title": "User",
+        "required": ["id"],
         "type": "object",
         "properties": {
           "email": { "title": "Email", "type": "string", "format": "email" },
