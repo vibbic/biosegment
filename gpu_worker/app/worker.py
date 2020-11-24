@@ -80,7 +80,7 @@ def train_unet2d(
     from neuralnets.data.datasets import StronglyLabeledVolumeDataset
     from neuralnets.networks.unet import UNet2D
     from neuralnets.util.augmentation import ToFloatTensor, Rotate90, FlipX, FlipY, ContrastAdjust, RandomDeformation_2D, AddNoise
-    from neuralnets.util.io import print_frm, write_volume, read_volume
+    from neuralnets.util.io import write_volume, read_volume
     from neuralnets.util.losses import get_loss_function
     from neuralnets.util.tools import set_seed, train_test_split
     from neuralnets.util.validation import validate
@@ -103,7 +103,7 @@ def train_unet2d(
     data_dir = ROOT_DATA_FOLDER / data_dir
     annotations_dir_json = ROOT_DATA_FOLDER / annotation_dir
 
-    print_frm('Setting up log directories')
+    logger.info('Setting up log directories')
     log_dir.mkdir(parents=True, exist_ok=True)
 
     """
@@ -141,8 +141,8 @@ def train_unet2d(
         Load the data
     """
     input_shape = (1, resolution["x"], resolution["y"])
-    print_frm('Loading data')
-    print_frm(f"""
+    logger.info('Loading data')
+    logger.info(f"""
     Args: input_shape {input_shape}
     len_epoch {len_epoch}
     batch_size {train_batch_size}
@@ -156,7 +156,7 @@ def train_unet2d(
             in_channels=in_channels, batch_size=train_batch_size,
             orientations=orientations)
 
-    print_frm('Creating testing and training subsets')
+    logger.info('Creating testing and training subsets')
     x_train, y_train, x_test, y_test = train_test_split(labeled_volume.data, labeled_volume.labels, test_size=test_size)
 
     # Write out numpy arrays in log_dir
@@ -188,7 +188,7 @@ def train_unet2d(
     """
         Build the network
     """
-    print_frm('Building the network')
+    logger.info('Building the network')
     if retrain_model:
         net = torch.load(ROOT_DATA_FOLDER / retrain_model)
     else:
@@ -198,7 +198,7 @@ def train_unet2d(
     """
         Setup optimization for training
     """
-    print_frm('Setting up optimization for training')
+    logger.info('Setting up optimization for training')
     optimizer = optim.Adam(net.parameters(), lr=lr)
     scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=step_size, gamma=gamma)
 
@@ -211,7 +211,7 @@ def train_unet2d(
         Train the network
     """
     self.update_state(state="PROGRESS", meta=create_meta(2, 10))
-    print_frm('Starting training')
+    logger.info('Starting training')
     net.train_net(train_loader, test_loader, loss_fn, optimizer, epochs, scheduler=scheduler,
                 augmenter=augmenter, print_stats=print_stats, log_dir=log_dir, device=device)
     self.update_state(state="PROGRESS", meta=create_meta(9, 10))
@@ -256,7 +256,7 @@ def infer_unet2d(  # TODO: rename to just "infer", also 2.5d and 3d nets are sup
     from app.file_types import FileType
 
     from neuralnets.util.tools import load_net
-    from neuralnets.util.io import print_frm, read_png, write_volume
+    from neuralnets.util.io import read_png, write_volume
     from neuralnets.util.validation import segment
     from neuralnets.data.datasets import StronglyLabeledVolumeDataset, UnlabeledVolumeDataset
 
@@ -308,23 +308,24 @@ def infer_unet2d(  # TODO: rename to just "infer", also 2.5d and 3d nets are sup
     file_type = FileType(file_type)
     if not file_type.is_dir():
         try:
+            # use first file in raw/ as data 
             data_dir = list(data_dir.iterdir())[0]
             # give segmentation same name
-            write_dir = write_dir / "segmentation_" + data_dir.name
+            write_dir = write_dir / f"segmentation_{data_dir.name}"
         except Exception as e:
             logger.error(f"Could not find data for data_dir={data_dir} and file_type={file_type}")
             return
 
-    print_frm('Reading dataset')
+    logger.info('Reading dataset')
 
     test = UnlabeledVolumeDataset(data_dir,
                                     input_shape=input_shape, len_epoch=len_epoch, type=file_type.value,
                                     in_channels=in_channels, batch_size=test_batch_size,
                                     orientations=orientations)
 
-    print_frm('Loading model')
+    logger.info('Loading model')
     net = load_net(model)
-    print_frm('Segmenting')
+    logger.info('Segmenting')
     self.update_state(state="PROGRESS", meta=create_meta(1, 10))
     segmentation = infer(net, test.data, orientations=orientations, input_size=input_size, in_channels=in_channels)
 
