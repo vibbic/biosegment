@@ -13,10 +13,11 @@ def dropdown_with_button(
     button_text="Refresh",
     button_size="sm",
     button_width=3,
+    multi=False,
 ):
     return dbc.Row(
         [
-            dbc.Col(dcc.Dropdown(id=dropdown_id), width=dropdown_width,),
+            dbc.Col(dcc.Dropdown(id=dropdown_id, multi=multi), width=dropdown_width),
             dbc.Col(
                 dbc.Button(button_text, id=button_id, size=button_size),
                 width=button_width,

@@ -16,11 +16,14 @@ from dash.exceptions import PreventUpdate
 DEFAULT_LABEL_CLASS = 0
 
 
-def add_layout_images_to_fig(fig, segmentation, dataset, slice_id, update_ranges=True):
+def add_layout_images_to_fig(fig, segmentations, dataset, slice_id, update_ranges=True):
     """ images is a sequence of PIL Image objects """
     images = [("slice", dataset.get_slice(slice_id))]
-    if segmentation:
-        images.append(("label", dataset.get_label(segmentation, slice_id)))
+    if segmentations:
+        if not isinstance(segmentations, list):
+            segmentations = [segmentations]
+        for s in segmentations:
+            images.append(("label", dataset.get_label(s, slice_id)))
     for t_im in images:
         # if image is a path to an image, load the image to get its size
         is_slice = t_im[0] == "slice"
@@ -99,6 +102,7 @@ viewer_layout = dbc.Card(
         dropdown_with_button(
             dropdown_id="selected-segmentation-name",
             button_id="update-button-segmentations-options",
+            multi=True
         ),
         html.Div(id=f"viewer-slice-info"),
         dcc.Slider(id=f"viewer-slice-id"),
@@ -232,7 +236,7 @@ def create_annotations(shape, slice_id):
 )
 def update_fig(
     # inputs
-    current_segmentation,
+    current_segmentations,
     current_dataset,
     slice_id_update,
     any_label_class_button_value,
@@ -305,7 +309,7 @@ def update_fig(
     # logging.debug(f"Fig: {fig}")
     add_layout_images_to_fig(
         fig=fig,
-        segmentation=current_segmentation,
+        segmentations=current_segmentations,
         dataset=DatasetStore.get_dataset(current_dataset),
         slice_id=int(slice_id),
     )
