@@ -1,8 +1,29 @@
 import itertools
+from pathlib import Path
 
+from PIL import Image
 import numpy as np
+from skimage.io import ImageCollection, imread_collection, MultiImage
 
 import plotly.express as px
+from app.FileType import FileType
+import logging
+
+def create_collection(folder: Path, type: FileType) -> ImageCollection:
+    assert folder.is_dir()
+    contents = [str(p) for p in folder.iterdir()]
+    if type == FileType.tif3d:
+        # presume single TIFF
+        path = contents[0]
+        return MultiImage(path)
+    elif type == FileType.pngseq:
+        return imread_collection(contents)
+    else:
+        logging.error(f"Unkown filetype for folder: {folder}")
+        return None
+
+def convert_array_to_png(array):
+    return Image.fromarray(array)
 
 
 def fromhex(n):
