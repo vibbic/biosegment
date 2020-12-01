@@ -1,0 +1,32 @@
+site_name: BioSegment
+nav:
+  - Home: 'index.md'
+  - 'Basics':
+      - 'basics/feature-overview.md'
+      - 'basics/getting-started.md'
+      - 'basics/basic-usage.md'
+      - 'basics/tutorial.md'
+      - 'basics/known-issues.md'
+  - 'Reference':
+      - 'reference/viewer.md'
+      - 'reference/backend-API.md'
+  - 'Contributing':
+      - 'contributing/contributing-guide.md'
+      - 'contributing/packaging-guide.md'
+      - 'contributing/build-systems.md'
+      - 'contributing/developer-guide.md'
+theme: 
+  name: material
+  palette:
+    primary: blue
+  features:
+    - navigation.tabs
+markdown_extensions:
+  - toc:
+        permalink: true
+        baselevel: 2
+  - attr_list
+extra:
+  version:
+    method: mike
+repo_url: https://github.com/vibbic/biosegment

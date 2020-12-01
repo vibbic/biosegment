@@ -6,3 +6,4 @@ __pycache__/
 .mypy_cache
 docker-stack.yml
 .pytest_cache
+site/
