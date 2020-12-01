@@ -7,10 +7,10 @@ The following diagram gives on overview of the BioSegment workflow. Users intera
 - Dataset
     - Electron-microscopy data
     - example formats: pngseq, tif3d
-- Topic of interest
-    - example topics of interest: mitochondria, endoplasmatic reticulum...
+- Classes of interest
+    - example classes of interest: mitochondria, endoplasmatic reticulum...
 - Segmentations
-    - Attribution for each part of a dataset to a topic interest
+    - Attribution for each part of a dataset to an interest
     - mostly ground-truth or machine made
 - Annotations
     - Stroke or area of a part of the dataset that is attributed

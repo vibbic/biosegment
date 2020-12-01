@@ -11,13 +11,13 @@ from app.layout_utils import dropdown_with_button
 from dash.dependencies import Input, Output, State
 from dash.exceptions import PreventUpdate
 
-PREFIX = "retrainer"
+PREFIX = "finetuner"
 
 create_callbacks(PREFIX)
 
-model_retrainer_layout = dbc.Card(
+finetuner_layout = dbc.Card(
     [
-        html.H4("Model retrainer", className="card-title"),
+        html.H4("Fine-tune model", className="card-title"),
         dbc.FormGroup(
             [
                 dbc.Label("Selected model"),
