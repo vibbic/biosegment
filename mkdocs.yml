@@ -4,11 +4,11 @@ nav:
   - 'Overview':
       - 'overview/workflow.md'
       - 'overview/getting-started.md'
-      - 'overview/basic-usage.md'
   - 'User Guide':
+      - 'user-guide/dashboard.md'
       - 'user-guide/viewer.md'
-      - 'user-guide/workers.md'
-      - 'user-guide/backend-API.md'
+      - 'user-guide/tutorial.md'
+      - 'user-guide/backend-documentation.md'
   - 'Contributing':
       - 'contributing/contributing-guide.md'
       - 'contributing/documentation-guide.md'
@@ -17,7 +17,8 @@ nav:
       - 'developer-guide/frontend-development.md'
       - 'developer-guide/dash-frontend-development.md'
       - 'developer-guide/backend-development.md'
-      - 'developer-guide/API-code-generation.md'
+      - 'developer-guide/workers.md'
+      - 'developer-guide/code-generation.md'
       - 'developer-guide/build-systems.md'
 theme: 
   name: material

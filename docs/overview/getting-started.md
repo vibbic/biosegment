@@ -11,3 +11,5 @@ Open the URL in your webbrowser. This will direct you to a login interface. Use 
 Logging in will direct you to the BioSegment dashboard. Here you can manage projects, datasets, annotations and segmentations.
 
 ![Dashboard](/assets/dashboard.png)
+
+For more information, follow the [User Guide](/docs/user-guide/dashboard.md).
