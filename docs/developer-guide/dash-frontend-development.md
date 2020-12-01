@@ -1,0 +1,1 @@
+- Dash frontend hot-reloads on file changes

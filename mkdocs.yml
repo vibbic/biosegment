@@ -1,31 +1,40 @@
 site_name: BioSegment
 nav:
   - Home: 'index.md'
-  - 'Basics':
-      - 'basics/feature-overview.md'
-      - 'basics/getting-started.md'
-      - 'basics/basic-usage.md'
-      - 'basics/tutorial.md'
-      - 'basics/known-issues.md'
-  - 'Reference':
-      - 'reference/viewer.md'
-      - 'reference/backend-API.md'
+  - 'Overview':
+      - 'overview/workflow.md'
+      - 'overview/getting-started.md'
+      - 'overview/basic-usage.md'
+  - 'User Guide':
+      - 'user-guide/viewer.md'
+      - 'user-guide/workers.md'
+      - 'user-guide/backend-API.md'
   - 'Contributing':
       - 'contributing/contributing-guide.md'
-      - 'contributing/packaging-guide.md'
-      - 'contributing/build-systems.md'
-      - 'contributing/developer-guide.md'
+      - 'contributing/documentation-guide.md'
+  - 'Developer Guide':
+      - 'developer-guide/setup.md'
+      - 'developer-guide/frontend-development.md'
+      - 'developer-guide/dash-frontend-development.md'
+      - 'developer-guide/backend-development.md'
+      - 'developer-guide/API-code-generation.md'
+      - 'developer-guide/build-systems.md'
 theme: 
   name: material
   palette:
     primary: blue
   features:
-    - navigation.tabs
+    # TODO still only Insiders features as of 1/12/2020
+    - navigation.expand
+    - toc.integrate
 markdown_extensions:
   - toc:
         permalink: true
-        baselevel: 2
+        toc_depth: 2
   - attr_list
+  - pymdownx.emoji:
+      emoji_index: !!python/name:materialx.emoji.twemoji
+      emoji_generator: !!python/name:materialx.emoji.to_svg
 extra:
   version:
     method: mike
