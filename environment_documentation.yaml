@@ -1,0 +1,7 @@
+name: biosegment_documentation
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - mkdocs-material=6.1.7
+  - mkdocs-material-extensions=1.0.1
