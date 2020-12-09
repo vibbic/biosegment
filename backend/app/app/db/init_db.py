@@ -1,7 +1,7 @@
 import json
 import logging
 from pathlib import Path
-from typing import Tuple
+from typing import Dict, Tuple
 
 from sqlalchemy.orm import Session
 
@@ -9,16 +9,10 @@ from app import models  # noqa: F401
 from app import crud, schemas
 from app.core.config import settings
 from app.db.base import Base  # noqa: F401
+from app.models.dataset import Dataset
+from app.schemas.dataset import Resolution
 
 DATA_FOLDER = Path("/data")
-
-
-def create_resolution(x, y, z):
-    return {
-        "x": x,
-        "y": y,
-        "z": z,
-    }
 
 
 def add_dataset(
@@ -58,10 +52,10 @@ def add_dataset(
     return dataset, ground_truth
 
 
-def init_using_setup_config(db, user, setup):
+def init_using_setup_config(db: Session, user: models.User, setup: Dict) -> None:
     projects = {}
     models = {}
-    datasets = {}
+    datasets: Dict[str, Dataset] = {}
 
     for p in setup["projects"]:
         title = p["title"]
@@ -91,8 +85,14 @@ def init_using_setup_config(db, user, setup):
         project = projects[d["project"]]
         # TODO make optional
         model = list(models.values())[0]
-        db_dataset = add_dataset(
-            db, user, project, model, title, create_resolution(*resolution), file_type
+        db_dataset, _ = add_dataset(
+            db,
+            user,
+            project,
+            model,
+            title,
+            Resolution(x=resolution[0], y=resolution[1], z=resolution[2],),
+            file_type,
         )
         datasets[title] = db_dataset
     for s in setup["segmentations"]:

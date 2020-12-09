@@ -12,7 +12,7 @@ from app.api import deps
 router = APIRouter()
 
 
-def check_annotation_location(annotation):
+def check_annotation_location(annotation: schemas.AnnotationCreate) -> None:
     if annotation.location:
         try:
             logging.info(f"location: {annotation.location}")

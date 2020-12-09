@@ -29,7 +29,7 @@ class AnnotationCreate(AnnotationBase):
 
 # Properties to receive on annotation update
 class AnnotationUpdate(AnnotationBase):
-    shapes: SHAPES = None
+    shapes: Optional[SHAPES] = None
 
 
 # Properties shared by models stored in DB

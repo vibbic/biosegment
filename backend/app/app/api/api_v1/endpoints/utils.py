@@ -38,7 +38,7 @@ def train_unet2d(
     try:
         dataset = crud.dataset.get(db=db, id=annotation.dataset_id)
         assert dataset
-    except:
+    except Exception:
         raise HTTPException(status_code=404, detail="Dataset not found")
     if not dataset.location:
         raise HTTPException(status_code=404, detail="Dataset has no location")
