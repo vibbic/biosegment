@@ -12,4 +12,4 @@ Logging in will direct you to the BioSegment dashboard. Here you can manage proj
 
 ![Dashboard](/assets/dashboard.png)
 
-For more information, follow the [User Guide](/docs/user-guide/dashboard.md).
+For more information, follow the [User Guide](/user-guide/dashboard/).

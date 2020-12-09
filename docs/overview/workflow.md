@@ -1,4 +1,4 @@
-The following diagram gives on overview of the BioSegment workflow. Users interact with a frontend using their browser. They can visualize a dataset, edit annotations and create segmentations using AI models. The BioSegment backend handles the tasks given be the frontend and fetches the datasets from disk storage. For long-running tasks like conversion and fine-tuning, seperate workers are used.
+The following diagram gives on overview of the BioSegment workflow. Users interact with a frontend using their browser. They can visualize a dataset, edit annotations and create segmentations using AI models. The BioSegment backend handles the tasks given by the frontend and fetches the datasets from disk storage. For long-running tasks like conversion and fine-tuning, separate workers are used.
 
 ![Placeholder](/assets/overview_v2.png)
 
@@ -17,14 +17,14 @@ The following diagram gives on overview of the BioSegment workflow. Users intera
     - made by a human
 - AI models
     -  able to take EM data and an annotation and create a segmentation
-    -  can be pretrained and further fine-tuned with additional annonotations
+    -  can be pretrained and further fine-tuned with additional annotations
     -  e.g. UNet
 
 
 ## Actors
 
 - Scientist
-    - A domain expert that wants to visualize and annotatate EM data with a specialized tool
+    - A domain expert that wants to visualize and annotate EM data with a specialized tool
 - AI engineer
     - Implements and pretrains AI models
 
