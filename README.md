@@ -50,32 +50,8 @@ docker-compose up -d --build
 See [Developer Guide]().
 
 ## Data folder
-In `.env` a ROOT_DATA_FOLDER is defined with the default value of `./data`, relative to this project folder. The structure of the folder is the following:
-- ROOT_DATA_FOLDER
-  - setup.json
-    - JSON file containing configurations the backend reads during initialization of the database. Used in development.
-  - EM/
-    - {dataset_name} e.g. EMBL
-      - raw/
-        - {pngs}
-  - models/
-    - {model_name} e.g. unet_2d
-      - = output folder of neuralnets training
-      - saved model e.g. best_checkpoint.pytorch
-  - segmentations/
-    - {dataset_name}
-      - labels/
-        - = ground truth labels of the dataset
-        - {pngs}
-      - {segmentation_name}
-        - = output folder of neuralnets inference
-        - {pngs}
-  - annotations
-    - {dataset_name}
-      - {annotation_name}
-        - saved annotations e.g. annotations.json
+In `.env` a ROOT_DATA_FOLDER is defined with the default value of `./data`, relative to this project folder. The structure of the folder is documented in the [User Guide]().
 
-In the future the backend will handle this folder structure.
 Overwriting ROOT_DATA_FOLDER can be done using an environment variable:
 ```bash
 # On Linux:

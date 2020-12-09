@@ -1,3 +1,5 @@
+# Contributing Guide
+
 You can contribute to BioSegment by
 
 - making a [GitHub Issue](https://github.com/vibbic/biosegment/issues) for a bug or feature proposal

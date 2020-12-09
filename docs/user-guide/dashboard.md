@@ -1,3 +1,5 @@
+# Dashboard
+
 ## Adding a new dataset
 
 ## Opening a dataset
