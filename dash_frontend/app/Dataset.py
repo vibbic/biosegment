@@ -93,4 +93,7 @@ class Dataset:
         return self.title
 
     def get_dimensions(self):
-        return {"min": 0, "max": self.dataset["resolution"]["z"]}
+        """
+        z-resolution is 1-indexed, so -1 to gain 0-index.
+        """
+        return {"min": 0, "max": self.dataset["resolution"]["z"] - 1}
