@@ -4,6 +4,7 @@ nav:
   - 'Overview':
       - 'overview/workflow.md'
       - 'overview/getting-started.md'
+      - 'overview/data-folder.md'
   - 'User Guide':
       - 'user-guide/dashboard.md'
       - 'user-guide/viewer.md'
