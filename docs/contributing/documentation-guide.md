@@ -25,4 +25,4 @@ Run a hot-reload server for the documentation and edit the files.
 mkdocs serve
 ```
 
-When the changes are merged into `main`, the [CI](/contributing/build-systems.md) configuration will update the GitHub Pages site.
+When the changes are merged into `main`, the [CI](/developer-guide/build-systems/) configuration will update the GitHub Pages site.
