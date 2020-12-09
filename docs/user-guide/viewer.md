@@ -10,7 +10,7 @@ The viewer has 4 components.
 ## Viewer
 
 - Given a dataset, segmentations and slider location, a view of a slice of the dataset will be shown. Differently annotated regions will be colored.
-- the slider is the `z` coordinate.
+- the slider is the `z` coordinate. For the type `pngseq`, the slider value corresponds to the png filename e.g. slider value 25 shows the file `0025.png`.
 - Multiple segmentations can be selected at the same time.
 
 ## Annotations tools
