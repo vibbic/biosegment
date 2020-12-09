@@ -13,6 +13,7 @@
 5. Fill in the form and save
       1. choose file type `pngseq` for multiple png files and `tif3d` for a single tiff file.
       2. The resulution of the files can be obtained with e.g. [Fiji](https://fiji.sc/)`Image > Show Info...`. Width == x, Height == y and Depth == z. For `pngseq`, `z` is also equal to the number of png files.
+      3. location = e.g. `EM/DATASET_TITLE/raw/`.
 6. The dataset should show up in the list and be accessible by the viewer.
 
 ### Open the dataset in the viewer
