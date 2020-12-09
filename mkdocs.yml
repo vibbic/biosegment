@@ -9,6 +9,9 @@ nav:
       - 'user-guide/viewer.md'
       - 'user-guide/tutorial.md'
       - 'user-guide/backend-documentation.md'
+  - 'Administrator Guide':
+      - 'admin-guide/setup.md'
+      - 'admin-guide/user-managment.md'
   - 'Contributing':
       - 'contributing/contributing-guide.md'
       - 'contributing/documentation-guide.md'
