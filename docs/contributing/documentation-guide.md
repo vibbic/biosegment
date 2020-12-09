@@ -15,7 +15,7 @@ Documentation of BioSegment is done through:
 
 ### Via GitHub
 
-You can directly edit the documentation by clicking the pencil icon :material-pencil:. This takes you to GitHub and let's you edit the documention's Markdown file located in [/docs](https://github.com/vibbic/biosegment/tree/master/docs). Apply your changes and make a Pull request describing your change.
+You can directly edit the documentation by clicking the pencil icon :material-pencil:. This takes you to GitHub and lets you edit the documention's Markdown file located in [/docs](https://github.com/vibbic/biosegment/tree/master/docs). Apply your changes and make a Pull request describing your change.
 
 ### Locally
 
@@ -24,6 +24,8 @@ Setup your environment using the [Material for MkDocs installation guide](https:
 Run a hot-reload server for the documentation and edit the files.
 
 ```bash
+conda env create -f environment_documentation.yaml --prune
+conda activate biosegment_documentation
 mkdocs serve
 ```
 
