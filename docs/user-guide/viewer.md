@@ -1,3 +1,5 @@
+# Viewer
+
 The viewer is an interface implemented using [Dash](https://plotly.com/dash/). It can be used for basic visualizations of BioSegment data. The viewer also allows for annotating, running a segmentation job and fine-tuning a model.
 
 - Open a dataset via the Dashboard or go to the URL directly. 

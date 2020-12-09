@@ -1,3 +1,5 @@
+# User Managment
+
 With an administrator account, extra interfaces are available in the frontend UI e.g. `http://localhost/main/admin/users/all`.
 
 ## Manage Users

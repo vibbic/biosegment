@@ -1,3 +1,5 @@
+# Tutorial
+
 ## Run a segmentation on a new dataset
 
 ### Add a new dataset

@@ -1,3 +1,5 @@
+# Documentation Guide
+
 Documentation of BioSegment is done through:
 
 - This [GitHub Pages site](https://vibbic.github.io/biosegment)

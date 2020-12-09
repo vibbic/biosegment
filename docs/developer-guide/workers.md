@@ -1,3 +1,5 @@
+# Workers
+
 Long-running tasks need to be delegated to workers. [Celery](https://docs.celeryproject.org/en/stable/index.html) is used to manage these.
 
 ## backend-worker
