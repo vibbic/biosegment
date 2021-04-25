@@ -43,4 +43,5 @@ markdown_extensions:
 extra:
   version:
     method: mike
-repo_url: https://github.com/vibbic/biosegment
+repo_url: https://github.com/vibbic/biosegment/
+site_url: https://vibbic.github.io/biosegment/
