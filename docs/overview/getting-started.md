@@ -4,12 +4,12 @@ A BioSegment instance should be run using the [instructions](/contributing/devel
 
 Open the URL in your webbrowser. This will direct you to a login interface. Use your account credentials to log in.
 
-![Login screen](/assets/login_screen.png)
+![Login screen](../assets/login_screen.png)
 
 ## Frontend interface
 
 Logging in will direct you to the BioSegment dashboard. Here you can manage projects, datasets, annotations and segmentations.
 
-![Dashboard](/assets/dashboard.png)
+![Dashboard](../assets/dashboard.png)
 
 For more information, follow the [User Guide](/user-guide/dashboard/).

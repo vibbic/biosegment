@@ -1,6 +1,6 @@
 The following diagram gives on overview of the BioSegment workflow. Users interact with a frontend using their browser. They can visualize a dataset, edit annotations and create segmentations using AI models. The BioSegment backend handles the tasks given by the frontend and fetches the datasets from disk storage. For long-running tasks like conversion and fine-tuning, separate workers are used.
 
-![Placeholder](/assets/overview_v2.png)
+![Placeholder](../assets/overview_v2.png)
 
 ## Data
 
@@ -32,4 +32,4 @@ The following diagram gives on overview of the BioSegment workflow. Users intera
 
 Example of the user flow for a scientist when interacting with a BioSegment frontend.
 
-![Placeholder](/assets/user_flow.png)
+![Placeholder](../assets/user_flow.png)
