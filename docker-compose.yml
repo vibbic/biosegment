@@ -113,7 +113,7 @@ services:
       - "queue-data:/data"
   
   flower:
-    image: mher/flower
+    image: mher/flower:0.9.7
     networks:
       - ${TRAEFIK_PUBLIC_NETWORK?Variable not set}
       - default
