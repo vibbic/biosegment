@@ -49,7 +49,7 @@ def train_unet2d(
     seed=0,
     device=0,
     print_stats=50,
-    fm=1,
+    fm=16,
     levels=4,
     dropout=0.0,
     norm="instance",
@@ -63,7 +63,7 @@ def train_unet2d(
     epochs=50,
     len_epoch=100,
     test_freq=1,
-    train_batch_size=1,
+    train_batch_size=2,
     test_batch_size=1,
     test_size=0.33,
     **kwargs,
@@ -140,7 +140,7 @@ def train_unet2d(
     """
         Load the data
     """
-    input_shape = (1, resolution["x"], resolution["y"])
+    input_shape = (1, 256, 256)
     logger.info('Loading data')
     logger.info(f"""
     Args: input_shape {input_shape}
@@ -189,11 +189,10 @@ def train_unet2d(
         Build the network
     """
     logger.info('Building the network')
-    if retrain_model:
-        net = torch.load(ROOT_DATA_FOLDER / retrain_model)
-    else:
-        net = UNet2D(in_channels=in_channels, feature_maps=fm, levels=levels, dropout_enc=dropout,
+    net = UNet2D(in_channels=in_channels, feature_maps=fm, levels=levels, dropout_enc=dropout,
                 dropout_dec=dropout, norm=norm, activation=activation, coi=classes_of_interest)
+    if retrain_model:
+        net.load_state_dict(torch.load(ROOT_DATA_FOLDER / retrain_model))
 
     """
         Setup optimization for training
