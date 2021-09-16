@@ -64,7 +64,7 @@ services:
       - ./backend/app:/app
       - ${ROOT_DATA_FOLDER?Variable not set}:/data:ro
     environment:
-      - RUN=celery worker -A app.worker -l info -Q main-queue -c 1
+      - RUN=celery -A app.worker worker -l info -Q main-queue -c 1 -n backend_worker@%h
       - JUPYTER=jupyter lab --ip=0.0.0.0 --allow-root --NotebookApp.custom_display_url=http://127.0.0.1:8888
       - SERVER_HOST=http://${DOMAIN?Variable not set}
     build:
