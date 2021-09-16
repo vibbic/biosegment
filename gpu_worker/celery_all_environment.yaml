@@ -1,6 +1,7 @@
 name: celery_neuralnets
 channels:
   - pytorch
+  - nvidia
   - conda-forge
   - defaults
 dependencies:
@@ -8,9 +9,9 @@ dependencies:
     # pytorch
   - pytorch
   - torchvision
-  - cudatoolkit=10.2
+  - cudatoolkit=11.1
     # celery
-  - celery==4.4.6
+  - celery==5.1.2
   - watchdog
     # neuralnets
   - future
@@ -32,7 +33,7 @@ dependencies:
   - pip: 
     - git+https://github.com/JorisRoels/neuralnets.git@biosegment
     # celery
-    - celery[redis]==4.4.6
+    - celery[redis]==5.1.2
 
 
 

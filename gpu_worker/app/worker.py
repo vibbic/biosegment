@@ -154,6 +154,7 @@ def train_unet2d(
             str(annotations_dir_png),
             input_shape=input_shape, len_epoch=len_epoch, type='pngseq',
             in_channels=in_channels, batch_size=train_batch_size,
+            coi=classes_of_interest,
             orientations=orientations)
 
     logger.info('Creating testing and training subsets')
@@ -176,11 +177,13 @@ def train_unet2d(
                                         str(train_labels_path),
                                         input_shape=input_shape, len_epoch=len_epoch, type='pngseq',
                                         in_channels=in_channels, batch_size=train_batch_size,
+                                        coi=classes_of_interest,
                                         orientations=orientations)
     test = StronglyLabeledVolumeDataset(str(test_path),
                                         str(test_labels_path),
                                         input_shape=input_shape, len_epoch=len_epoch, type='pngseq',
                                         in_channels=in_channels, batch_size=test_batch_size,
+                                        coi=classes_of_interest,
                                         orientations=orientations)
     train_loader = DataLoader(train, batch_size=train_batch_size)
     test_loader = DataLoader(test, batch_size=test_batch_size)
