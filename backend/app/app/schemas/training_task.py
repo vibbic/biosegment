@@ -12,7 +12,7 @@ class TrainingTaskBase(BaseModel):
     seed: Optional[int] = 0
     device: Optional[int] = 0
     print_stats: Optional[int] = 50
-    fm: Optional[int] = 1
+    fm: Optional[int] = 16
     levels: Optional[int] = 4
     dropout: Optional[float] = 0.0
     norm: Optional[str] = "instance"
@@ -25,7 +25,7 @@ class TrainingTaskBase(BaseModel):
     epochs: Optional[int] = 50
     len_epoch: Optional[int] = 100
     test_freq: Optional[int] = 1
-    train_batch_size: Optional[int] = 1
+    train_batch_size: Optional[int] = 2
     test_batch_size: Optional[int] = 1
 
 
