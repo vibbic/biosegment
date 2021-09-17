@@ -3,8 +3,8 @@ from pathlib import Path
 
 from PIL import Image
 import numpy as np
-from skimage.io import ImageCollection, imread_collection, MultiImage
-
+from skimage.io import ImageCollection, imread_collection
+from aicsimageio.readers.default_reader import DefaultReader
 import plotly.express as px
 from app.FileType import FileType
 import logging
@@ -15,7 +15,7 @@ def create_collection(folder: Path, type: FileType) -> ImageCollection:
     if type == FileType.tif3d:
         # presume single TIFF
         path = contents[0]
-        return MultiImage(path)
+        return DefaultReader(path).dask_data
     elif type == FileType.pngseq:
         return imread_collection(contents)
     else:

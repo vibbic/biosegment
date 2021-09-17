@@ -23,8 +23,11 @@ class Dataset:
         self.labels = {}
 
     def get_slice(self, slice_id):
-        assert self.slices
-        return convert_array_to_png(self.slices[slice_id])
+        if self.type == FileType.tif3d:
+            slice = self.slices[slice_id].compute()
+        else:
+            slice = self.slices[slice_id]
+        return convert_array_to_png(slice)
 
     def recolor_image(self, image_array):
         if self.type == FileType.tif3d:
@@ -60,15 +63,17 @@ class Dataset:
             labels_folder = None
         logging.debug(f"labels_folder: {labels_folder}")
         assert labels_folder.is_dir()
-        contents = [str(p) for p in labels_folder.iterdir()]
-        # TODO support for different segmentation file type
+        # TODO support for different segmentation file type from image file type
         collection = create_collection(labels_folder, self.type)
         self.labels[segment_id] = collection
 
     def get_label(self, segment_id, slice_id):
         if segment_id not in self.labels:
             self.get_labels(segment_id)
-        image_array = self.labels[segment_id][slice_id]
+        if self.type == FileType.tif3d:
+            image_array = self.labels[segment_id][slice_id].compute()
+        else:
+            image_array = self.labels[segment_id][slice_id]
         return self.recolor_image(image_array)
 
     def get_models_available(self):
