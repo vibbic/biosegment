@@ -55,7 +55,7 @@ def train_unet2d(
     norm="instance",
     activation="relu",
     in_channels=1,
-    orientations=[0],
+    orientations='z',
     loss="ce",
     lr=1e-3,
     step_size=10,
@@ -63,33 +63,27 @@ def train_unet2d(
     epochs=50,
     len_epoch=100,
     test_freq=1,
-    train_batch_size=2,
-    test_batch_size=1,
+    train_batch_size=4,
+    test_batch_size=4,
     test_size=0.33,
     **kwargs,
 ) -> str:
-    import os
-    from pathlib import Path
     import json
 
     import torch
-    import torch.optim as optim
+    import pytorch_lightning as pl
     from torch.utils.data import DataLoader
-    from torchvision.transforms import Compose
+    from pytorch_lightning.loggers import TensorBoardLogger
 
-    from neuralnets.data.datasets import StronglyLabeledVolumeDataset
+    from neuralnets.data.datasets import LabeledVolumeDataset, LabeledSlidingWindowDataset
     from neuralnets.networks.unet import UNet2D
-    from neuralnets.util.augmentation import ToFloatTensor, Rotate90, FlipX, FlipY, ContrastAdjust, RandomDeformation_2D, AddNoise
-    from neuralnets.util.io import write_volume, read_volume
-    from neuralnets.util.losses import get_loss_function
-    from neuralnets.util.tools import set_seed, train_test_split
-    from neuralnets.util.validation import validate
+    from neuralnets.util.augmentation import Compose, Rotate90, Flip, ContrastAdjust, CleanDeformedLabels, RandomDeformation, AddNoise
+    from neuralnets.util.tools import set_seed
+    from neuralnets.util.io import read_volume
 
     from app.shape_utils import annotations_to_png
 
     self.update_state(state="PROGRESS", meta=create_meta(1, 10))
-
-    loss_fn = get_loss_function(loss)
 
     """
     Fix seed (for reproducibility)
@@ -135,90 +129,99 @@ def train_unet2d(
     except Exception as e:
         logger.error(f"Error converting annotations: {e}")
         return None
+    logger.info(f"data dir: {data_dir}")
     logger.info(f"pngs folder: {annotations_dir_png}")
+    annotations = read_volume(str(annotations_dir_png), type='pngseq')
 
     """
         Load the data
     """
+    # TODO don't hard code these
     input_shape = (1, 256, 256)
+    num_workers = 12
+    type = 'pngseq'
+    split = [.50, .75]
+    num_layers = 4
+    gpus = [0]
+    accelerator = 'dp'
+    log_freq = 50
+    log_refresh_rate = -1
+    k = 16
+    bn_size = 2
+    orientations = 'z'
+
     logger.info('Loading data')
-    logger.info(f"""
-    Args: input_shape {input_shape}
-    len_epoch {len_epoch}
-    batch_size {train_batch_size}
-    in_channels {in_channels}
-    orientations {orientations}
-    """)
-    # read in datasets
-    labeled_volume = StronglyLabeledVolumeDataset(str(data_dir),
-            str(annotations_dir_png),
-            input_shape=input_shape, len_epoch=len_epoch, type='pngseq',
-            in_channels=in_channels, batch_size=train_batch_size,
-            coi=classes_of_interest,
-            orientations=orientations)
-
-    logger.info('Creating testing and training subsets')
-    x_train, y_train, x_test, y_test = train_test_split(labeled_volume.data, labeled_volume.labels, test_size=test_size)
-
-    # Write out numpy arrays in log_dir
-    # TODO remove unnecessary serialization steps
-    # TODO also use pathlib for neuralnets functions
-    train_path = log_dir / 'train'
-    train_labels_path = log_dir / 'train_labels'
-    test_path = log_dir / 'test'
-    test_labels_path = log_dir / 'test_labels'
-    write_volume(data=x_train, file=str(train_path), type="pngseq")
-    write_volume(data=y_train, file=str(train_labels_path), type="pngseq")
-    write_volume(data=x_test, file=str(test_path), type="pngseq")
-    write_volume(data=y_test, file=str(test_labels_path), type="pngseq")
-
-    # read in pngseqs to volume dataset
-    train = StronglyLabeledVolumeDataset(str(train_path),
-                                        str(train_labels_path),
-                                        input_shape=input_shape, len_epoch=len_epoch, type='pngseq',
-                                        in_channels=in_channels, batch_size=train_batch_size,
-                                        coi=classes_of_interest,
-                                        orientations=orientations)
-    test = StronglyLabeledVolumeDataset(str(test_path),
-                                        str(test_labels_path),
-                                        input_shape=input_shape, len_epoch=len_epoch, type='pngseq',
-                                        in_channels=in_channels, batch_size=test_batch_size,
-                                        coi=classes_of_interest,
-                                        orientations=orientations)
-    train_loader = DataLoader(train, batch_size=train_batch_size)
-    test_loader = DataLoader(test, batch_size=test_batch_size)
+    transform = Compose([Rotate90(), Flip(prob=0.5, dim=0), Flip(prob=0.5, dim=1), ContrastAdjust(adj=0.1),
+                        RandomDeformation(), AddNoise(sigma_max=0.05), CleanDeformedLabels(classes_of_interest)])
+    train = LabeledVolumeDataset(str(data_dir), annotations, input_shape=input_shape, type=type,
+                                batch_size=train_batch_size, transform=transform, range_split=(0, split[0]),
+                                range_dir=orientations)
+    val = LabeledSlidingWindowDataset(str(data_dir), annotations, input_shape=input_shape, type=type,
+                                    batch_size=test_batch_size, range_split=(split[0], split[1]),
+                                    range_dir=orientations)
+    test = LabeledSlidingWindowDataset(str(data_dir), annotations, input_shape=input_shape, type=type,
+                                    batch_size=test_batch_size, range_split=(split[1], 1),
+                                    range_dir=orientations)
+    train_loader = DataLoader(train, batch_size=train_batch_size, num_workers=num_workers,
+                            pin_memory=True)
+    val_loader = DataLoader(val, batch_size=test_batch_size, num_workers=num_workers,
+                            pin_memory=True)
+    test_loader = DataLoader(test, batch_size=test_batch_size, num_workers=num_workers,
+                            pin_memory=True)
+    logger.info('Label distribution: ')
+    for i in range(len(classes_of_interest)):
+        logger.info('    - Class %d: %.3f (train) - %.3f (val) - %.3f (test)' %
+                (train.label_stats[0][i][0], train.label_stats[0][i][1],
+                val.label_stats[0][i][1], test.label_stats[0][i][1]))
+    logger.info('    - Unlabeled pixels: %.3f (train) - %.3f (val) - %.3f (test)' %
+            (train.label_stats[0][-1][1], val.label_stats[0][-1][1], test.label_stats[0][-1][1]))
 
     """
         Build the network
     """
     logger.info('Building the network')
-    net = UNet2D(in_channels=in_channels, feature_maps=fm, levels=levels, dropout_enc=dropout,
-                dropout_dec=dropout, norm=norm, activation=activation, coi=classes_of_interest)
-    if retrain_model:
-        net.load_state_dict(torch.load(ROOT_DATA_FOLDER / retrain_model))
+    net = UNet2D(feature_maps=fm, levels=levels, dropout_enc=dropout,
+                  dropout_dec=dropout, norm=norm, activation=activation,
+                  coi=classes_of_interest, 
+                #   num_layers=num_layers, k=k, bn_size=bn_size,
+                  loss_fn=loss)
+
+    # if retrain_model:
+    #     net.load_state_dict(torch.load(ROOT_DATA_FOLDER / retrain_model))
 
     """
-        Setup optimization for training
+    Train the network
     """
-    logger.info('Setting up optimization for training')
-    optimizer = optim.Adam(net.parameters(), lr=lr)
-    scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=step_size, gamma=gamma)
-
-    augmenter = Compose([ToFloatTensor(device=device), Rotate90(), FlipX(prob=0.5), FlipY(prob=0.5),
-                        ContrastAdjust(adj=0.1, include_segmentation=True),
-                        RandomDeformation_2D(input_shape[1:], grid_size=(64, 64), sigma=0.01, device=device,
-                                            include_segmentation=True),
-                        AddNoise(sigma_max=0.05, include_segmentation=True)])
-    """
-        Train the network
-    """
-    self.update_state(state="PROGRESS", meta=create_meta(2, 10))
     logger.info('Starting training')
-    net.train_net(train_loader, test_loader, loss_fn, optimizer, epochs, scheduler=scheduler,
-                augmenter=augmenter, print_stats=print_stats, log_dir=log_dir, device=device)
+    logger.info('Training with loss: %s' % loss)
+    lr_monitor = pl.callbacks.LearningRateMonitor(logging_interval='step')
+    # logger = TensorBoardLogger(log_dir, name="my_model_corrected")
+    trainer = pl.Trainer(max_epochs=epochs, gpus=gpus, accelerator=accelerator,
+                        default_root_dir=log_dir, flush_logs_every_n_steps=log_freq,
+                        log_every_n_steps=log_freq, callbacks=[lr_monitor])
+    # TODO overwrite progress bar to do update_state
+    self.update_state(state="PROGRESS", meta=create_meta(2, 10))
+    trainer.fit(net, train_loader, val_loader)
     self.update_state(state="PROGRESS", meta=create_meta(9, 10))
+
+    """
+    Testing the network
+    """
+    logger.info('Testing network')
+    trainer.test(net, test_loader)
+
+    """
+    Saving the new model
+    """
+    logger.info('Saving model')
+    location = ROOT_DATA_FOLDER / kwargs["obj_in"]['location']
+    torch.save(net.state_dict(), str(location))
+    
+    # TODO support ONNX model export 
+    # net.to_onnx(location.parent / location.name + ".onxx", input_sample=train[0][0], export_params=True)
+
     # TODO use on_success syntax
-    # if metadata for segmentation creation is present
+    # if metadata for segmentation creation is present    
     if len(kwargs) > 0:
         logger.info(f"Running subtask with kwargs {kwargs}")
         task = celery_app.send_task(
@@ -246,7 +249,7 @@ def infer_unet2d(  # TODO: rename to just "infer", also 2.5d and 3d nets are sup
     input_size=(256,256), 
     in_channels=1,
     test_batch_size=1,
-    orientations=[0],
+    orientations='z',
     len_epoch=100,
     classes_of_interest=(0, 1, 2),
     **kwargs,

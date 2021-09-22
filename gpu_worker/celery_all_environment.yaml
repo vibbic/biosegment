@@ -6,6 +6,7 @@ channels:
   - defaults
 dependencies:
   - python>=3.8
+  - ipykernel
     # pytorch
   - pytorch
   - torchvision
@@ -13,17 +14,17 @@ dependencies:
     # celery
   - celery==5.1.2
   - watchdog
-    # neuralnets
-  - future
-  - tensorboard
-  - numpy
-  - tifffile
-  - h5py
-  - scikit-image
-  - progress
-  - six
-  - scikit-learn
-  - opencv==4.2.0
+  #   # neuralnets
+  # - future
+  # - tensorboard
+  # - numpy
+  # - tifffile
+  # - h5py
+  # - scikit-image
+  # - progress
+  # - six
+  # - scikit-learn
+  # - opencv==4.2.0
   # for shape_utils
   - plotly
   - pandas
@@ -31,7 +32,9 @@ dependencies:
   # 
   - pip
   - pip: 
-    - git+https://github.com/JorisRoels/neuralnets.git@biosegment
+    # - neuralnets
+    - git+https://github.com/JorisRoels/neuralnets.git
+    # - git+https://github.com/JorisRoels/neuralnets.git@biosegment
     # celery
     - celery[redis]==5.1.2
 

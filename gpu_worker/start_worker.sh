@@ -14,4 +14,6 @@ RESULT_BACKEND=${BROKER}
 # conda activate celery_neuralnets
 # TODO add alternative production mode
 # celery 5.0.0
-watchmedo auto-restart --directory=./ --pattern=*.py --recursive -- celery --app app.worker -b ${BROKER} --result-backend ${RESULT_BACKEND} worker -l INFO -Q gpu-queue -n gpu_worker@%h -E -c 1
+# -P threads is needed for 
+# Error celery: daemonic processes are not allowed to have children
+watchmedo auto-restart --directory=./ --pattern=*.py --recursive -- celery --app app.worker -b ${BROKER} --result-backend ${RESULT_BACKEND} worker -P threads -l INFO -Q gpu-queue -n gpu_worker@%h -E -c 1
