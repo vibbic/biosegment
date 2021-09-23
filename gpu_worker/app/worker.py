@@ -248,37 +248,19 @@ def infer_unet2d(  # TODO: rename to just "infer", also 2.5d and 3d nets are sup
     file_type,
     input_size=(256,256), 
     in_channels=1,
-    test_batch_size=1,
-    orientations='z',
-    len_epoch=100,
+    orientations=(0,),
     classes_of_interest=(0, 1, 2),
     **kwargs,
 ):
-    import os
-    from pathlib import Path
-    import torch
     import numpy as np
     from app.file_types import FileType
 
     from neuralnets.util.tools import load_net
-    from neuralnets.util.io import read_png, write_volume
+    from neuralnets.util.io import write_volume
     from neuralnets.util.validation import segment
-    from neuralnets.data.datasets import StronglyLabeledVolumeDataset, UnlabeledVolumeDataset
+    from neuralnets.data.datasets import SlidingWindowDataset
 
-    def infer(net, data, input_size, in_channels=1, batch_size=1, write_dir=None,
-             val_file=None, writer=None, epoch=0, track_progress=False, device=0, orientations=(0,), normalization='unit'):
-        # compute segmentation for each orientation and average results
-        segmentation = np.zeros((net.out_channels, *data.shape))
-        progress=3
-        for orientation in orientations:
-            segmentation += segment(data, net, input_size, train=False, in_channels=in_channels, batch_size=batch_size,
-                                    track_progress=track_progress, device=device, orientation=orientation, normalization=normalization)
-            progress += 1
-            self.update_state(state="PROGRESS", meta=create_meta(progress, 10))
-        segmentation = segmentation / len(orientations)
-        return segmentation
-
-    def write_out(write_dir, segmentation, classes_of_interest, file_type, threshold=0.2):
+    def write_out(write_dir, segmentation, classes_of_interest, file_type):
         # (3, 64, 512, 512)
         # print(segmentation.shape)
         image_array = np.zeros(segmentation.shape[1:])
@@ -322,20 +304,17 @@ def infer_unet2d(  # TODO: rename to just "infer", also 2.5d and 3d nets are sup
             return
 
     logger.info('Reading dataset')
-
-    test = UnlabeledVolumeDataset(data_dir,
-                                    input_shape=input_shape, len_epoch=len_epoch, type=file_type.value,
-                                    in_channels=in_channels, batch_size=test_batch_size,
-                                    orientations=orientations)
+    self.update_state(state="PROGRESS", meta=create_meta(1, 10))
+    data = SlidingWindowDataset(str(data_dir), input_shape=input_shape, type=file_type.value, in_channels=in_channels)
 
     logger.info('Loading model')
     net = load_net(model)
     logger.info('Segmenting')
-    self.update_state(state="PROGRESS", meta=create_meta(1, 10))
-    segmentation = infer(net, test.data, orientations=orientations, input_size=input_size, in_channels=in_channels)
+    self.update_state(state="PROGRESS", meta=create_meta(2, 10))
+    segmentation = segment(data.data[0], net, input_size, train=False, in_channels=in_channels, device=0, orientations=orientations)
 
+    self.update_state(state="PROGRESS", meta=create_meta(9, 10))
     if write_dir:
-        self.update_state(state="PROGRESS", meta=create_meta(9, 10))
         # TODO also use Paths in neuralnets
         write_out(str(write_dir), segmentation, file_type=file_type.value, classes_of_interest=classes_of_interest)
     
