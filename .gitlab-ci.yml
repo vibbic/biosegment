@@ -41,14 +41,14 @@ deploy-stag:
   stage: deploy
   script: 
     - >
-      DOMAIN=stag.biosegment.irc.ugent.be
-      TRAEFIK_TAG=stag.biosegment.irc.ugent.be
-      STACK_NAME=stag-biosegment-irc-ugent-be
+      DOMAIN=stag.biosegment.ugent.be
+      TRAEFIK_TAG=stag.biosegment.ugent.be
+      STACK_NAME=stag-biosegment-ugent-be
       TAG=stag
       sh ./scripts/deploy.sh
   environment:
     name: staging
-    url: https://stag.biosegment.irc.ugent.be
+    url: https://stag.biosegment.ugent.be
   only:
     - master
   tags:
@@ -59,14 +59,14 @@ deploy-prod:
   stage: deploy
   script:
     - >
-      DOMAIN=biosegment.irc.ugent.be
-      TRAEFIK_TAG=biosegment.irc.ugent.be
-      STACK_NAME=biosegment-irc-ugent-be
+      DOMAIN=biosegment.ugent.be
+      TRAEFIK_TAG=biosegment.ugent.be
+      STACK_NAME=biosegment-ugent-be
       TAG=prod
       sh ./scripts/deploy.sh
   environment:
     name: production
-    url: https://biosegment.irc.ugent.be
+    url: https://biosegment.ugent.be
   only:
     - production
   tags:
