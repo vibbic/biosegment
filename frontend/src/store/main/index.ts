@@ -4,11 +4,12 @@ import { actions } from './actions';
 import { MainState } from './state';
 import { Configuration } from '@/api';
 import { createAPI } from '@/api';
+import { apiUrl } from '@/env';
 
 const defaultState: MainState = {
   isLoggedIn: null,
   token: '',
-  api: createAPI(new Configuration()),
+  api: createAPI(new Configuration({basePath: apiUrl,})),
   logInError: false,
   userProfile: null,
   dashboardMiniDrawer: false,

@@ -4,12 +4,16 @@ import { getStoreAccessors } from 'typesafe-vuex';
 import { State } from '../state';
 import { Configuration } from '@/api';
 import { createAPI } from '@/api';
+import { apiUrl } from '@/env';
 
 
 export const mutations = {
     setToken(state: MainState, payload: string) {
         state.token = payload;
-        const config = new Configuration({accessToken: payload});
+        const config = new Configuration({
+            basePath: apiUrl,
+            accessToken: payload,
+        });
         state.api = createAPI(config);
     },
     setLoggedIn(state: MainState, payload: boolean) {
