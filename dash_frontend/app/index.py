@@ -4,6 +4,7 @@ import dash_bootstrap_components as dbc
 import dash_core_components as dcc
 import dash_html_components as html
 from app.app import app
+from app.env import DEV_MODE
 from app.pages import Dataset, Datasets, Project, Projects, Viewer2DPage
 from dash.dependencies import Input, Output
 
@@ -62,8 +63,7 @@ def display_page(pathname):
     return current_page.layout
 
 
-# TODO turn off in production
-app.enable_dev_tools(debug=True)
+app.enable_dev_tools(debug=DEV_MODE)
 
 server = app.server
 

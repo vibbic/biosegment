@@ -11,21 +11,25 @@ from app.env import API_DOMAIN
 from requests_toolbelt import sessions
 
 # TODO remove credentials and use client secret
-ROOT_USERNAME = "admin@biosegment.irc.ugent.be"
+ROOT_USERNAME = "admin@biosegment.ugent.be"
 ROOT_PASSWORD = "m1cr0scopy"
 # CLIENT_ID = "<your client key>"
 # CLIENT_SECRET = "<your client secret>"
 
-API_ROOT = f"http://{API_DOMAIN}/api/v1/"
-TOKEN_URL = "login/access-token"
+if API_DOMAIN in ['localhost', 'backend']:
+    protocol = 'http'
+else:
+    protocol = 'https'
 
+API_ROOT = f"{protocol}://{API_DOMAIN}/api/v1/"
 http_session = sessions.BaseUrlSession(base_url=API_ROOT)
-
 retries = Retry(total=3, backoff_factor=1, status_forcelist=[429, 500, 502, 503, 504])
 # Mount it for both http and https usage
 adapter = TimeoutHTTPAdapter(max_retries=retries)
-http_session.mount("https://", adapter)
-http_session.mount("http://", adapter)
+http_session.mount(f"http://", adapter)
+http_session.mount(f"https://", adapter)
+TOKEN_URL = "login/access-token/"
+token = None
 
 # setup logging
 http.client.HTTPConnection.debuglevel = 1
@@ -37,7 +41,18 @@ requests_log.setLevel(logging.DEBUG)
 requests_log.propagate = True
 
 
+def unwrap_request(r):
+    if not (r.status_code == 200 or r.status_code == 201):
+        logging.error(f'Request status code {r.status_code}')
+        logging.debug(str(r))
+        raise Exception
+    return r.json()
+
+
 def get_tokens():
+    global token
+    if token is not None:
+        return
     global http_session
     # TODO refresh tokens
     data = {
@@ -60,7 +75,7 @@ def get_tokens():
     # r = oath.get(f"{API_ROOT}projects")
     logging.debug(data)
     logging.debug(TOKEN_URL)
-    try:
+    while not token:
         access_token_response = http_session.post(
             TOKEN_URL,
             data=data,
@@ -75,43 +90,36 @@ def get_tokens():
         tokens = new_tokens
         # print(Base.tokens)
         token = tokens["access_token"]
-        logging.debug(f"Token type: {type(token)}")
-    except Exception as e:
-        logging.warning(f"Exception {e}")
-        return None
-    return str(token)
-
-
-token = get_tokens()
-while token is None:
-    token = get_tokens()
-
+        logging.debug(f"Token: {token}")
+    headers = {
+        "Authorization": "Bearer " + token,
+        "Content-type": "application/json",
+        "Accept": "application/json",
+    }
+    http_session.headers.update(headers)
 
 def get(path, headers={}, **kwargs):
     global token
+    logging.debug(token)
     global http_session
-    if not token:
-        token = get_tokens()
+    get_tokens()
     # logging.debug(f"GET using token {token}")
     # logging.debug(f"Path {path}")
     r = http_session.get(
         path,
-        headers={
-            "Authorization": "Bearer " + token,
-            "Accept": "application/json",
-            # **headers
-        },
+        # headers={
+        #     # "Authorization": "Bearer " + token,
+        #     # "Accept": "application/json",
+        #     # **headers
+        # },
         timeout=1,
     )
-    assert r.status_code == 200
-    # logging.debug(f"f {r}")
-    return r.json()
+    return unwrap_request(r)
 
 def post(path, headers={}, **kwargs):
     global token
     global http_session
-    if not token:
-        token = get_tokens()
+    logging.debug(token)
     # logging.debug(f"POST using token {token}")
     # logging.debug(f"Path {path}")
     try:
@@ -121,24 +129,22 @@ def post(path, headers={}, **kwargs):
     # logging.debug(f"JSON {payload}")
     r = http_session.post(
         path,
-        headers={
-            "Authorization": "Bearer " + token,
-            # **headers
-            "Content-type": "application/json",
-            "Accept": "application/json",
-        },
+        # headers={
+        #     # "Authorization": "Bearer " + token,
+        #     # # **headers
+        #     # "Content-type": "application/json",
+        #     # "Accept": "application/json",
+        # },
         timeout=1,
         json=payload,
     )
-    assert r.status_code == 200 or r.status_code == 201
-    # logging.debug(f"f {r}")
-    return r.json()
+    return unwrap_request(r)
 
 def put(path, headers={}, **kwargs):
     global token
     global http_session
-    if not token:
-        token = get_tokens()
+    logging.debug(token)
+    get_tokens()
     # logging.debug(f"POST using token {token}")
     # logging.debug(f"Path {path}")
     try:
@@ -148,15 +154,13 @@ def put(path, headers={}, **kwargs):
     # logging.debug(f"JSON {payload}")
     r = http_session.put(
         path,
-        headers={
-            "Authorization": "Bearer " + token,
-            # **headers
-            "Content-type": "application/json",
-            "Accept": "application/json",
-        },
+        # headers={
+        #     "Authorization": "Bearer " + token,
+        #     # **headers
+        #     "Content-type": "application/json",
+        #     "Accept": "application/json",
+        # },
         timeout=1,
         json=payload,
     )
-    assert r.status_code == 200 or r.status_code == 201
-    # logging.debug(f"f {r}")
-    return r.json()
+    return unwrap_request(r)

@@ -1,4 +1,4 @@
-A BioSegment instance should be run using the [instructions](/contributing/developer-guide/#running-locally). The administrator of this instance can give you account credentials and a access URL e.g. `https://biosegment.irc.ugent.be`. The default URL used in the documentation is `localhost`.
+A BioSegment instance should be run using the [instructions](/contributing/developer-guide/#running-locally). The administrator of this instance can give you account credentials and a access URL e.g. `https://biosegment.ugent.be`. The default URL used in the documentation is `localhost`.
 
 ## Log in
 

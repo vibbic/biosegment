@@ -1,10 +1,10 @@
 from app.api import base
 
-ENTRYPOINT_BASE = "models"
+ENTRYPOINT_BASE = "models/"
 
 
 def get(id, **kwargs):
-    return base.get(f"{ENTRYPOINT_BASE}/{id}", **kwargs)
+    return base.get(f"{ENTRYPOINT_BASE}{id}", **kwargs)
 
 
 def get_multi(**kwargs):

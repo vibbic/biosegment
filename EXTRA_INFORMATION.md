@@ -310,36 +310,36 @@ Check all the corresponding available URLs in the section at the end.
 
 If you are running Docker in an IP address different than `127.0.0.1` (`localhost`) and `192.168.99.100` (the default of Docker Toolbox), you will need to perform some additional steps. That will be the case if you are running a custom Virtual Machine, a secondary Docker Toolbox or your Docker is located in a different machine in your network.
 
-In that case, you will need to use a fake local domain (`dev.biosegment.irc.ugent.be`) and make your computer think that the domain is is served by the custom IP (e.g. `192.168.99.150`).
+In that case, you will need to use a fake local domain (`dev.biosegment.ugent.be`) and make your computer think that the domain is is served by the custom IP (e.g. `192.168.99.150`).
 
-If you used the default CORS enabled domains, `dev.biosegment.irc.ugent.be` was configured to be allowed. If you want a custom one, you need to add it to the list in the variable `BACKEND_CORS_ORIGINS` in the `.env` file.
+If you used the default CORS enabled domains, `dev.biosegment.ugent.be` was configured to be allowed. If you want a custom one, you need to add it to the list in the variable `BACKEND_CORS_ORIGINS` in the `.env` file.
 
 * Open your `hosts` file with administrative privileges using a text editor:
   * **Note for Windows**: If you are in Windows, open the main Windows menu, search for "notepad", right click on it, and select the option "open as Administrator" or similar. Then click the "File" menu, "Open file", go to the directory `c:\Windows\System32\Drivers\etc\`, select the option to show "All files" instead of only "Text (.txt) files", and open the `hosts` file.
   * **Note for Mac and Linux**: Your `hosts` file is probably located at `/etc/hosts`, you can edit it in a terminal running `sudo nano /etc/hosts`.
 
-* Additional to the contents it might have, add a new line with the custom IP (e.g. `192.168.99.150`) a space character, and your fake local domain: `dev.biosegment.irc.ugent.be`.
+* Additional to the contents it might have, add a new line with the custom IP (e.g. `192.168.99.150`) a space character, and your fake local domain: `dev.biosegment.ugent.be`.
 
 The new line might look like:
 
 ```
-192.168.99.100    dev.biosegment.irc.ugent.be
+192.168.99.100    dev.biosegment.ugent.be
 ```
 
 * Save the file.
   * **Note for Windows**: Make sure you save the file as "All files", without an extension of `.txt`. By default, Windows tries to add the extension. Make sure the file is saved as is, without extension.
 
-...that will make your computer think that the fake local domain is served by that custom IP, and when you open that URL in your browser, it will talk directly to your locally running server when it is asked to go to `dev.biosegment.irc.ugent.be` and think that it is a remote server while it is actually running in your computer.
+...that will make your computer think that the fake local domain is served by that custom IP, and when you open that URL in your browser, it will talk directly to your locally running server when it is asked to go to `dev.biosegment.ugent.be` and think that it is a remote server while it is actually running in your computer.
 
-To configure it in your stack, follow the section **Change the development "domain"** below, using the domain `dev.biosegment.irc.ugent.be`.
+To configure it in your stack, follow the section **Change the development "domain"** below, using the domain `dev.biosegment.ugent.be`.
 
-After performing those steps you should be able to open: http://dev.biosegment.irc.ugent.be and it will be server by your stack in `localhost`.
+After performing those steps you should be able to open: http://dev.biosegment.ugent.be and it will be server by your stack in `localhost`.
 
 Check all the corresponding available URLs in the section at the end.
 
 ### Change the development "domain"
 
-If you need to use your local stack with a different domain than `localhost`, you need to make sure the domain you use points to the IP where your stack is set up. See the different ways to achieve that in the sections above (i.e. using Docker Toolbox with `local.dockertoolbox.tiangolo.com`, using `localhost.tiangolo.com` or using `dev.biosegment.irc.ugent.be`).
+If you need to use your local stack with a different domain than `localhost`, you need to make sure the domain you use points to the IP where your stack is set up. See the different ways to achieve that in the sections above (i.e. using Docker Toolbox with `local.dockertoolbox.tiangolo.com`, using `localhost.tiangolo.com` or using `dev.biosegment.ugent.be`).
 
 To simplify your Docker Compose setup, for example, so that the API docs (Swagger UI) knows where is your API, you should let it know you are using that domain for development. You will need to edit 1 line in 2 files.
 
@@ -478,7 +478,7 @@ Then you need to have those constraints in your `docker-compose.yml` file for th
 To be able to use different environments, like `prod` and `stag`, you should pass the name of the stack as an environment variable. Like:
 
 ```bash
-STACK_NAME=stag-biosegment-irc-ugent-be sh ./scripts/deploy.sh
+STACK_NAME=stag-biosegment-ugent-be sh ./scripts/deploy.sh
 ```
 
 To use and expand that environment variable inside the `docker-compose.yml` files you can add the constraints to the services like:
@@ -506,7 +506,7 @@ services:
     deploy:
       placement:
         constraints:
-          - node.labels.biosegment-irc-ugent-be.app-db-data == true
+          - node.labels.biosegment-ugent-be.app-db-data == true
 ```
 
 **Note**: The `${STACK_NAME?Variable not set}` means "use the environment variable `STACK_NAME`, but if it is not set, show an error `Variable not set`".
@@ -558,13 +558,13 @@ then chose a node from the list. For example, `dog.example.com`.
 * Add the label to that node. Use as label the name of the stack you are deploying followed by a dot (`.`) followed by the named volume, and as value, just `true`, e.g.:
 
 ```bash
-docker node update --label-add biosegment-irc-ugent-be.app-db-data=true dog.example.com
+docker node update --label-add biosegment-ugent-be.app-db-data=true dog.example.com
 ```
 
 * Then you need to do the same for each stack version you have. For example, for staging you could do:
 
 ```bash
-docker node update --label-add stag-biosegment-irc-ugent-be.app-db-data=true cat.example.com
+docker node update --label-add stag-biosegment-ugent-be.app-db-data=true cat.example.com
 ```
 
 ### Deploy to a Docker Swarm mode cluster
@@ -608,16 +608,16 @@ TAG=prod FRONTEND_ENV=production bash ./scripts/build-push.sh
 3. **Deploy your stack**
 
 * Set these environment variables:
-  * `DOMAIN=biosegment.irc.ugent.be`
-  * `TRAEFIK_TAG=biosegment.irc.ugent.be`
-  * `STACK_NAME=biosegment-irc-ugent-be`
+  * `DOMAIN=biosegment.ugent.be`
+  * `TRAEFIK_TAG=biosegment.ugent.be`
+  * `STACK_NAME=biosegment-ugent-be`
   * `TAG=prod`
 * Use the provided `scripts/deploy.sh` file with those environment variables:
 
 ```bash
-DOMAIN=biosegment.irc.ugent.be \
-TRAEFIK_TAG=biosegment.irc.ugent.be \
-STACK_NAME=biosegment-irc-ugent-be \
+DOMAIN=biosegment.ugent.be \
+TRAEFIK_TAG=biosegment.ugent.be \
+STACK_NAME=biosegment-ugent-be \
 TAG=prod \
 bash ./scripts/deploy.sh
 ```
@@ -706,33 +706,33 @@ These are the URLs that will be used and generated by the project.
 
 Production URLs, from the branch `production`.
 
-Frontend: https://biosegment.irc.ugent.be
+Frontend: https://biosegment.ugent.be
 
-Backend: https://biosegment.irc.ugent.be/api/
+Backend: https://biosegment.ugent.be/api/
 
-Automatic Interactive Docs (Swagger UI): https://biosegment.irc.ugent.be/docs
+Automatic Interactive Docs (Swagger UI): https://biosegment.ugent.be/docs
 
-Automatic Alternative Docs (ReDoc): https://biosegment.irc.ugent.be/redoc
+Automatic Alternative Docs (ReDoc): https://biosegment.ugent.be/redoc
 
-PGAdmin: https://pgadmin.biosegment.irc.ugent.be
+PGAdmin: https://pgadmin.biosegment.ugent.be
 
-Flower: https://flower.biosegment.irc.ugent.be
+Flower: https://flower.biosegment.ugent.be
 
 ### Staging URLs
 
 Staging URLs, from the branch `master`.
 
-Frontend: https://stag.biosegment.irc.ugent.be
+Frontend: https://stag.biosegment.ugent.be
 
-Backend: https://stag.biosegment.irc.ugent.be/api/
+Backend: https://stag.biosegment.ugent.be/api/
 
-Automatic Interactive Docs (Swagger UI): https://stag.biosegment.irc.ugent.be/docs
+Automatic Interactive Docs (Swagger UI): https://stag.biosegment.ugent.be/docs
 
-Automatic Alternative Docs (ReDoc): https://stag.biosegment.irc.ugent.be/redoc
+Automatic Alternative Docs (ReDoc): https://stag.biosegment.ugent.be/redoc
 
-PGAdmin: https://pgadmin.stag.biosegment.irc.ugent.be
+PGAdmin: https://pgadmin.stag.biosegment.ugent.be
 
-Flower: https://flower.stag.biosegment.irc.ugent.be
+Flower: https://flower.stag.biosegment.ugent.be
 
 ### Development URLs
 
@@ -774,19 +774,19 @@ Traefik UI: http://local.dockertoolbox.tiangolo.com:8090
 
 Development URLs, for local development.
 
-Frontend: http://dev.biosegment.irc.ugent.be
+Frontend: http://dev.biosegment.ugent.be
 
-Backend: http://dev.biosegment.irc.ugent.be/api/
+Backend: http://dev.biosegment.ugent.be/api/
 
-Automatic Interactive Docs (Swagger UI): https://dev.biosegment.irc.ugent.be/docs
+Automatic Interactive Docs (Swagger UI): https://dev.biosegment.ugent.be/docs
 
-Automatic Alternative Docs (ReDoc): https://dev.biosegment.irc.ugent.be/redoc
+Automatic Alternative Docs (ReDoc): https://dev.biosegment.ugent.be/redoc
 
-PGAdmin: http://dev.biosegment.irc.ugent.be:5050
+PGAdmin: http://dev.biosegment.ugent.be:5050
 
-Flower: http://dev.biosegment.irc.ugent.be:5555
+Flower: http://dev.biosegment.ugent.be:5555
 
-Traefik UI: http://dev.biosegment.irc.ugent.be:8090
+Traefik UI: http://dev.biosegment.ugent.be:8090
 
 ### Development in localhost with a custom domain URLs
 

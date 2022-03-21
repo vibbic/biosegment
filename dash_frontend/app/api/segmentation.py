@@ -1,6 +1,6 @@
 from app.api import base
 
-ENTRYPOINT_BASE = "segmentations"
+ENTRYPOINT_BASE = "segmentations/"
 
 
 def get(id, **kwargs):

@@ -1,6 +1,6 @@
 from app.api import base
 
-ENTRYPOINT_BASE = "projects"
+ENTRYPOINT_BASE = "projects/"
 
 
 def get(id, **kwargs):

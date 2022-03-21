@@ -1,4 +1,5 @@
 data/
+remote_data/
 __pycache__/
 *.db
 *.log
