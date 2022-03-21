@@ -1,27 +1,10 @@
-import os
-from pathlib import Path
-
 from app.celery_app import celery_app
 from celery.utils.log import get_task_logger
+from app.utils import ROOT_DATA_FOLDER, create_meta
 
 logger = get_task_logger(__name__)
 
-try:
-   # expect to be in gpu_worker/ and data/ is located at ..
-   os.chdir(Path(".."))
-   # but allow for absolute ROOT_DATA_FOLDER
-   ROOT_DATA_FOLDER = Path(os.environ["ROOT_DATA_FOLDER"]).resolve()
-   print(f"Root data folder {ROOT_DATA_FOLDER}")
-except KeyError: 
-   import sys
-   print("Please set the environment variable ROOT_DATA_FOLDER in .env")
-   sys.exit(1)
-
-def create_meta(current, total):
-    return {
-        "current": current,
-        "total": total
-    }
+# ADDING new task: register in main celery_app.py config at backend
 
 @celery_app.task(bind=True, acks_late=True)
 def test_pytorch(
@@ -236,7 +219,6 @@ def train_unet2d(
         logger.info(f"Subtask {task}")
     else:
         logger.info(f"Not subtask with kwargs {kwargs}")
-
 
 
 @celery_app.task(bind=True, acks_late=True)
