@@ -23,12 +23,13 @@ def add_dataset(
     name: str,
     resolution: schemas.Resolution,
     file_type: str,
+    EM_location: str,
 ) -> Tuple[models.Dataset, models.Segmentation]:
     title = name
     dataset_in = schemas.DatasetCreate(
         title=title,
         description=f"{title} description",
-        location=f"EM/{name}/raw/",
+        location=f"{EM_location}/{name}/raw/",
         resolution=resolution,
         file_type=file_type,
     )
@@ -39,7 +40,7 @@ def add_dataset(
     segmentation_in = schemas.SegmentationCreate(
         title="Ground Truth",
         description=f"{name} Ground Truth",
-        location=f"segmentations/{name}/labels/",
+        location=f"{EM_location}/{name}/labels/",
     )
     ground_truth = crud.segmentation.create_with_owner(
         db,
@@ -69,7 +70,10 @@ def init_using_setup_config(db: Session, user: models.User, setup: Dict) -> None
     for m in setup["models"]:
         title = m["title"]
         location = m["location"]
-        project = projects[m["project"]]
+        if 'project' in m:
+            project = projects[m["project"]]
+        else:
+            project = list(projects.values())[0]
         model_in = schemas.ModelCreate(
             title=title, description=f"{title} description", location=location,
         )
@@ -79,10 +83,12 @@ def init_using_setup_config(db: Session, user: models.User, setup: Dict) -> None
         models[title] = db_model
     for d in setup["datasets"]:
         title = d["title"]
-        location = "datasets/{title}/raw"
         file_type = d["file_type"]
         resolution = d["resolution"]
-        project = projects[d["project"]]
+        if 'project' in d:
+            project = projects[d["project"]]
+        else:
+            project = list(projects.values())[0]
         # TODO make optional
         model = list(models.values())[0]
         db_dataset, _ = add_dataset(
@@ -93,13 +99,18 @@ def init_using_setup_config(db: Session, user: models.User, setup: Dict) -> None
             title,
             Resolution(x=resolution[0], y=resolution[1], z=resolution[2],),
             file_type,
+            EM_location=setup.get("EM_location", "EM")
         )
         datasets[title] = db_dataset
     for s in setup["segmentations"]:
         title = s["title"]
         location = s["location"]
         dataset = datasets[s["dataset"]]
-        model = models[s["model"]]
+        if s["model"]:
+            model = models[s["model"]]
+        else:
+            # TODO make optional
+            model = list(models.values())[0]
 
         segmentation_in = schemas.SegmentationCreate(
             title=title, description=f"{title} description", location=location,

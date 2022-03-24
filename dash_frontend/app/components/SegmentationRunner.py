@@ -92,7 +92,7 @@ def start_segmentation(n, new_segmentation_name, selected_model, selected_datase
         )
         body = {
             "title": new_segmentation_name,
-            "location": f"segmentations/{dataset_title}/{new_segmentation_name}",
+            "location": f"biosegment/segmentations/{dataset_title}/{new_segmentation_name}",
             "model_id": selected_model,
             "dataset_id": selected_dataset,
         }
