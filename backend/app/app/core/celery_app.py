@@ -1,9 +1,12 @@
 from celery import Celery
+from app.core.config import settings
 
-celery_app = Celery("worker", broker="redis://queue:6379/0")
+BROKER = f"redis://:{settings.REDIS_PASSWORD}@queue:6379/0"
+
+celery_app = Celery("worker", broker=BROKER)
 
 celery_app.conf.update(
-    result_backend = "redis://queue:6379/0",
+    result_backend = BROKER,
     worker_pool_restarts = True,
     task_routes = {
     # main queue, processed by backend
