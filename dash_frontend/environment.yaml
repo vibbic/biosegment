@@ -11,7 +11,7 @@ dependencies:
   # image viewer
   - pillow>=7.2.0
   - scikit-image>=0.16.2
-  # run server
+  - numcodecs
   - gunicorn>=20.0.4
   # backend api
   - requests>=2.24.0
