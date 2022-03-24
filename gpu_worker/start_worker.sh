@@ -10,8 +10,10 @@ set -xe
 # get ROOT_DATA_FOLDER from .env
 # TODO allow use of .env.prod
 export "$(grep "ROOT_DATA_FOLDER" ../.env | xargs)"
+export "$(grep "REDIS_PASSWORD" ../.env | xargs)"
+export "$(grep "ROOT_DATA_FOLDER" ../.env | xargs)"
 
-BROKER="redis://${1:-biosegment.ugent.be}:6379/0"
+BROKER="redis://${REDIS_PASSWORD}@${1:-biosegment.ugent.be}:6379/0"
 RESULT_BACKEND=${BROKER}
 
 # celery 5.0.0
